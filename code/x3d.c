@@ -367,9 +367,32 @@ x3d_xml_target_stream (FILE *xml_out, xml_context *stack, int top)
 static void
 x3d_xml_add_attr_fragment (dynstring *attrs, const char *field, const char *value)
 {
+  dynstring *rebuilt;
+  char *copy, *token, *saveptr;
+  size_t field_len;
+
   assert (attrs);
   assert (field);
   assert (value);
+
+  rebuilt = ds_create ("");
+  copy = x3d_strdup (attrs->string);
+  field_len = strlen (field);
+
+  for (token = strtok_r (copy, " ", &saveptr);
+       token != NULL;
+       token = strtok_r (NULL, " ", &saveptr)) {
+    if (strncmp (token, field, field_len) == 0 && token[field_len] == '=') {
+      continue;
+    }
+    ds_cat (rebuilt, " ");
+    ds_cat (rebuilt, token);
+  }
+
+  ds_reset (attrs);
+  if (rebuilt->length > 0) ds_cat (attrs, rebuilt->string);
+  ds_delete (rebuilt);
+  free (copy);
 
   ds_cat (attrs, " ");
   ds_cat (attrs, field);
@@ -559,6 +582,7 @@ static int
 x3d_proto_field_arity (const char *field_name)
 {
   if (str_eq (field_name, "p")) return 3;
+  if (str_eq (field_name, "c")) return 1;
   if (str_eq (field_name, "rad")) return 1;
   if (str_eq (field_name, "dc") || str_eq (field_name, "ec") ||
       str_eq (field_name, "sc")) return 3;
@@ -929,7 +953,11 @@ x3d_convert_classic_to_xml_stream (FILE *xml_out, FILE *classic_infile,
     }
 
     space = strchr (line, ' ');
-    if (space == NULL) yyerror ("unsupported X3D Classic statement");
+    if (space == NULL) {
+      dynstring *message = ds_create ("unsupported X3D Classic statement: ");
+      ds_cat (message, line);
+      yyerror (message->string);
+    }
     *space = '\0';
     field = line;
     value = space + 1;
@@ -947,43 +975,13 @@ x3d_convert_classic_to_xml_stream (FILE *xml_out, FILE *classic_infile,
 static void
 x3d_convert_classic_to_xml (void)
 {
-  char classic_path[256];
-  char xml_path[256];
-  FILE *classic_out;
-  FILE *xml_in;
-  char command[1024];
-  int ch;
-
   assert (x3d_output_format_mode == X3D_OUTPUT_XML);
   assert (x3d_proper_outfile);
   assert (x3d_classic_tmpfile);
 
   fflush (outfile);
   outfile = x3d_proper_outfile;
-  snprintf (classic_path, sizeof (classic_path),
-            "/tmp/molscript_x3d_%ld_%d.x3dv",
-            (long) getpid(), rand());
-  snprintf (xml_path, sizeof (xml_path),
-            "/tmp/molscript_x3d_%ld_%d.x3d",
-            (long) getpid(), rand());
-
-  classic_out = fopen (classic_path, "w");
-  if (classic_out == NULL) yyerror ("could not create temporary X3D file");
-  rewind (x3d_classic_tmpfile);
-  while ((ch = fgetc (x3d_classic_tmpfile)) != EOF) fputc (ch, classic_out);
-  fclose (classic_out);
-
-  snprintf (command, sizeof (command),
-            "HOME=/tmp view3dscene --write --write-encoding=xml \"%s\" > \"%s\" 2>/dev/null",
-            classic_path, xml_path);
-  if (system (command) != 0) yyerror ("view3dscene failed converting X3D output");
-
-  xml_in = fopen (xml_path, "r");
-  if (xml_in == NULL) yyerror ("could not read converted X3D XML file");
-  while ((ch = fgetc (xml_in)) != EOF) fputc (ch, outfile);
-  fclose (xml_in);
-  unlink (classic_path);
-  unlink (xml_path);
+  x3d_convert_classic_to_xml_stream (outfile, x3d_classic_tmpfile, TRUE);
   fclose (x3d_classic_tmpfile);
   x3d_classic_tmpfile = NULL;
   x3d_proper_outfile = NULL;
@@ -1019,11 +1017,7 @@ x3d_convert_classic_to_webgl_html (void)
 {
   FILE *classic_infile;
   FILE *xml_infile;
-  FILE *classic_out;
   const char *page_title;
-  char classic_path[256];
-  char xml_path[256];
-  char command[1024];
   int ch;
 
   assert (x3d_output_format_mode == X3D_OUTPUT_WEBGL);
@@ -1034,25 +1028,9 @@ x3d_convert_classic_to_webgl_html (void)
   outfile = x3d_proper_outfile;
   classic_infile = x3d_classic_tmpfile;
   page_title = title ? title : program_str;
-  snprintf (classic_path, sizeof (classic_path),
-            "/tmp/molscript_webgl_%ld_%d.x3dv",
-            (long) getpid(), rand());
-  snprintf (xml_path, sizeof (xml_path),
-            "/tmp/molscript_webgl_%ld_%d.x3d",
-            (long) getpid(), rand());
-  classic_out = fopen (classic_path, "w");
-  if (classic_out == NULL) yyerror ("could not create temporary WebGL X3D file");
-  rewind (classic_infile);
-  while ((ch = fgetc (classic_infile)) != EOF) fputc (ch, classic_out);
-  fclose (classic_out);
-
-  snprintf (command, sizeof (command),
-            "HOME=/tmp view3dscene --write --write-encoding=xml \"%s\" > \"%s\" 2>/dev/null",
-            classic_path, xml_path);
-  if (system (command) != 0) yyerror ("view3dscene failed converting WebGL scene");
-
-  xml_infile = fopen (xml_path, "r");
-  if (xml_infile == NULL) yyerror ("could not read converted WebGL XML scene");
+  xml_infile = tmpfile ();
+  if (xml_infile == NULL) yyerror ("could not create temporary WebGL XML scene");
+  x3d_convert_classic_to_xml_stream (xml_infile, classic_infile, TRUE);
 
   fputs ("<!DOCTYPE html>\n"
          "<html lang=\"en\">\n"
@@ -1063,6 +1041,24 @@ x3d_convert_classic_to_webgl_html (void)
   x3d_xml_escape (outfile, page_title, FALSE);
   fputs ("</title>\n"
          "  <script defer src=\"https://cdn.jsdelivr.net/npm/x_ite@12.1.9/dist/x_ite.min.js\"></script>\n"
+         "  <script>\n"
+         "    window.addEventListener('DOMContentLoaded', function () {\n"
+         "      try {\n"
+         "        const scene = document.getElementById('molscript-scene-data');\n"
+         "        const canvas = document.getElementById('molscript-scene');\n"
+         "        const xml = scene.value.trimStart();\n"
+         "        console.log('MolScriptSVG WebGL: parsing XML scene', xml.length);\n"
+         "        const doc = new DOMParser().parseFromString(xml, 'application/xml');\n"
+         "        if (doc.documentElement.nodeName === 'parsererror') {\n"
+         "          throw new Error(doc.documentElement.textContent || 'X3D XML parse error');\n"
+         "        }\n"
+         "        canvas.appendChild(document.importNode(doc.documentElement, true));\n"
+         "        console.log('MolScriptSVG WebGL: scene attached');\n"
+         "      } catch (error) {\n"
+         "        console.error('MolScriptSVG WebGL load failed:', error);\n"
+         "      }\n"
+         "    });\n"
+         "  </script>\n"
          "  <style>\n"
          "    html, body {\n"
          "      margin: 0;\n"
@@ -1075,20 +1071,31 @@ x3d_convert_classic_to_webgl_html (void)
          "      width: 100vw;\n"
          "      height: 100vh;\n"
          "    }\n"
+         "    #molscript-scene-data {\n"
+         "      display: none;\n"
+         "    }\n"
          "  </style>\n"
          "</head>\n"
          "<body>\n"
-         "  <x3d-canvas id=\"molscript-scene\" contentScale=\"auto\" update=\"auto\" src=\"data:model/x3d+xml;charset=utf-8,",
+         "  <textarea id=\"molscript-scene-data\">",
          outfile);
-  x3d_write_data_url_encoded_stream (outfile, xml_infile);
-  fputs ("\"></x3d-canvas>\n"
+  rewind (xml_infile);
+  while ((ch = fgetc (xml_infile)) != EOF) {
+    if (ch == '&') {
+      fputs ("&amp;", outfile);
+    } else if (ch == '<') {
+      fputs ("&lt;", outfile);
+    } else {
+      fputc (ch, outfile);
+    }
+  }
+  fputs ("</textarea>\n"
+         "  <x3d-canvas id=\"molscript-scene\" contentScale=\"auto\" update=\"auto\"></x3d-canvas>\n"
          "</body>\n"
          "</html>\n",
          outfile);
 
   fclose (xml_infile);
-  unlink (classic_path);
-  unlink (xml_path);
   fclose (classic_infile);
   x3d_classic_tmpfile = NULL;
   x3d_proper_outfile = NULL;

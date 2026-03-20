@@ -5,6 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>GDP bonds</title>
   <script defer src="https://cdn.jsdelivr.net/npm/x_ite@12.1.9/dist/x_ite.min.js"></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', function () {
+      try {
+        const scene = document.getElementById('molscript-scene-data');
+        const canvas = document.getElementById('molscript-scene');
+        const xml = scene.value.trimStart();
+        console.log('MolScriptSVG WebGL: parsing XML scene', xml.length);
+        const doc = new DOMParser().parseFromString(xml, 'application/xml');
+        if (doc.documentElement.nodeName === 'parsererror') {
+          throw new Error(doc.documentElement.textContent || 'X3D XML parse error');
+        }
+        canvas.appendChild(document.importNode(doc.documentElement, true));
+        console.log('MolScriptSVG WebGL: scene attached');
+      } catch (error) {
+        console.error('MolScriptSVG WebGL load failed:', error);
+      }
+    });
+  </script>
   <style>
     html, body {
       margin: 0;
@@ -17,9 +35,189 @@
       width: 100vw;
       height: 100vh;
     }
+    #molscript-scene-data {
+      display: none;
+    }
   </style>
 </head>
 <body>
-  <x3d-canvas id="molscript-scene" contentScale="auto" update="auto" src="data:model/x3d+xml;charset=utf-8,%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%3F%3E%0A%3C%21DOCTYPE%20X3D%20PUBLIC%20%22ISO%2F%2FWeb3D%2F%2FDTD%20X3D%203.3%2F%2FEN%22%20%22http%3A%2F%2Fwww.web3d.org%2Fspecifications%2Fx3d-3.3.dtd%22%3E%0A%3CX3D%20profile%3D%22Interchange%22%20version%3D%223.3%22%0A%20%20%20%20%20xmlns%3Axsd%3D%22http%3A%2F%2Fwww.w3.org%2F2001%2FXMLSchema-instance%22%0A%20%20%20%20%20xsd%3AnoNamespaceSchemaLocation%3D%22http%3A%2F%2Fwww.web3d.org%2Fspecifications%2Fx3d-3.3.xsd%22%3E%0A%3Chead%3E%0A%09%3Cmeta%20name%3D%22generator%22%20content%3D%22view3dscene%2C%20https%3A%2F%2Fcastle-engine.io%2Fview3dscene.php%22%20%2F%3E%0A%09%3Cmeta%20name%3D%22source%22%20content%3D%22molscript_webgl_30_1804289383.x3dv%22%20%2F%3E%0A%3C%2Fhead%3E%0A%3CScene%3E%0A%09%3CWorldInfo%0A%09%09title%3D%22GDP%20bonds%22%0A%09%09info%3D%27%22Program%3A%20MolScriptSVG%202.1.2%2C%20Copyright%20%28C%29%201997-1998%20Per%20J.%20Kraulis%22%20%22Author%3A%20jwm%22%27%20%2F%3E%0A%09%3CProtoDeclare%20name%3D%22Ball%22%3E%0A%09%09%3CProtoInterface%3E%0A%09%09%09%09%3Cfield%20accessType%3D%22inputOutput%22%20type%3D%22SFVec3f%22%20name%3D%22p%22%20value%3D%220%200%200%22%20%2F%3E%0A%09%09%09%09%3Cfield%20accessType%3D%22initializeOnly%22%20type%3D%22SFFloat%22%20name%3D%22rad%22%20value%3D%221.5%22%20%2F%3E%0A%09%09%09%09%3Cfield%20accessType%3D%22initializeOnly%22%20type%3D%22SFColor%22%20name%3D%22dc%22%20value%3D%221%201%201%22%20%2F%3E%0A%09%09%09%09%3Cfield%20accessType%3D%22initializeOnly%22%20type%3D%22SFColor%22%20name%3D%22ec%22%20value%3D%220%200%200%22%20%2F%3E%0A%09%09%09%09%3Cfield%20accessType%3D%22initializeOnly%22%20type%3D%22SFColor%22%20name%3D%22sc%22%20value%3D%220.20000000298023224%200.20000000298023224%200.20000000298023224%22%20%2F%3E%0A%09%09%09%09%3Cfield%20accessType%3D%22initializeOnly%22%20type%3D%22SFFloat%22%20name%3D%22sh%22%20value%3D%220%22%20%2F%3E%0A%09%09%09%09%3Cfield%20accessType%3D%22initializeOnly%22%20type%3D%22SFFloat%22%20name%3D%22tr%22%20value%3D%220%22%20%2F%3E%0A%09%09%3C%2FProtoInterface%3E%0A%09%09%3CProtoBody%3E%0A%09%09%09%3CTransform%3E%0A%09%09%09%09%3CShape%3E%0A%09%09%09%09%09%3CAppearance%3E%0A%09%09%09%09%09%09%3CMaterial%3E%0A%09%09%09%09%09%09%09%3CIS%3E%0A%09%09%09%09%09%09%09%09%3Cconnect%20nodeField%3D%22emissiveColor%22%20protoField%3D%22ec%22%20%2F%3E%0A%09%09%09%09%09%09%09%09%3Cconnect%20nodeField%3D%22diffuseColor%22%20protoField%3D%22dc%22%20%2F%3E%0A%09%09%09%09%09%09%09%09%3Cconnect%20nodeField%3D%22shininess%22%20protoField%3D%22sh%22%20%2F%3E%0A%09%09%09%09%09%09%09%09%3Cconnect%20nodeField%3D%22specularColor%22%20protoField%3D%22sc%22%20%2F%3E%0A%09%09%09%09%09%09%09%09%3Cconnect%20nodeField%3D%22transparency%22%20protoField%3D%22tr%22%20%2F%3E%0A%09%09%09%09%09%09%09%3C%2FIS%3E%0A%09%09%09%09%09%09%3C%2FMaterial%3E%0A%09%09%09%09%09%3C%2FAppearance%3E%0A%09%09%09%09%09%3CSphere%3E%0A%09%09%09%09%09%09%3CIS%3E%0A%09%09%09%09%09%09%09%3Cconnect%20nodeField%3D%22radius%22%20protoField%3D%22rad%22%20%2F%3E%0A%09%09%09%09%09%09%3C%2FIS%3E%0A%09%09%09%09%09%3C%2FSphere%3E%0A%09%09%09%09%3C%2FShape%3E%0A%09%09%09%09%3CIS%3E%0A%09%09%09%09%09%3Cconnect%20nodeField%3D%22translation%22%20protoField%3D%22p%22%20%2F%3E%0A%09%09%09%09%3C%2FIS%3E%0A%09%09%09%3C%2FTransform%3E%0A%09%09%3C%2FProtoBody%3E%0A%09%3C%2FProtoDeclare%3E%0A%09%3CProtoDeclare%20name%3D%22Cyl%22%3E%0A%09%09%3CProtoInterface%3E%0A%09%09%09%09%3Cfield%20accessType%3D%22inputOutput%22%20type%3D%22SFVec3f%22%20name%3D%22p%22%20value%3D%220%200%200%22%20%2F%3E%0A%09%09%09%09%3Cfield%20accessType%3D%22inputOutput%22%20type%3D%22SFRotation%22%20name%3D%22r%22%20value%3D%220%200%201%200%22%20%2F%3E%0A%09%09%09%09%3Cfield%20accessType%3D%22inputOutput%22%20type%3D%22SFVec3f%22%20name%3D%22s%22%20value%3D%221%201%201%22%20%2F%3E%0A%09%09%09%09%3Cfield%20accessType%3D%22initializeOnly%22%20type%3D%22SFColor%22%20name%3D%22dc%22%20value%3D%221%201%201%22%20%2F%3E%0A%09%09%09%09%3Cfield%20accessType%3D%22initializeOnly%22%20type%3D%22SFColor%22%20name%3D%22ec%22%20value%3D%220%200%200%22%20%2F%3E%0A%09%09%09%09%3Cfield%20accessType%3D%22initializeOnly%22%20type%3D%22SFColor%22%20name%3D%22sc%22%20value%3D%220.20000000298023224%200.20000000298023224%200.20000000298023224%22%20%2F%3E%0A%09%09%09%09%3Cfield%20accessType%3D%22initializeOnly%22%20type%3D%22SFFloat%22%20name%3D%22sh%22%20value%3D%220%22%20%2F%3E%0A%09%09%09%09%3Cfield%20accessType%3D%22initializeOnly%22%20type%3D%22SFFloat%22%20name%3D%22tr%22%20value%3D%220%22%20%2F%3E%0A%09%09%3C%2FProtoInterface%3E%0A%09%09%3CProtoBody%3E%0A%09%09%09%3CTransform%3E%0A%09%09%09%09%3CShape%3E%0A%09%09%09%09%09%3CAppearance%3E%0A%09%09%09%09%09%09%3CMaterial%3E%0A%09%09%09%09%09%09%09%3CIS%3E%0A%09%09%09%09%09%09%09%09%3Cconnect%20nodeField%3D%22emissiveColor%22%20protoField%3D%22ec%22%20%2F%3E%0A%09%09%09%09%09%09%09%09%3Cconnect%20nodeField%3D%22diffuseColor%22%20protoField%3D%22dc%22%20%2F%3E%0A%09%09%09%09%09%09%09%09%3Cconnect%20nodeField%3D%22shininess%22%20protoField%3D%22sh%22%20%2F%3E%0A%09%09%09%09%09%09%09%09%3Cconnect%20nodeField%3D%22specularColor%22%20protoField%3D%22sc%22%20%2F%3E%0A%09%09%09%09%09%09%09%09%3Cconnect%20nodeField%3D%22transparency%22%20protoField%3D%22tr%22%20%2F%3E%0A%09%09%09%09%09%09%09%3C%2FIS%3E%0A%09%09%09%09%09%09%3C%2FMaterial%3E%0A%09%09%09%09%09%3C%2FAppearance%3E%0A%09%09%09%09%09%3CCylinder%20%2F%3E%0A%09%09%09%09%3C%2FShape%3E%0A%09%09%09%09%3CIS%3E%0A%09%09%09%09%09%3Cconnect%20nodeField%3D%22rotation%22%20protoField%3D%22r%22%20%2F%3E%0A%09%09%09%09%09%3Cconnect%20nodeField%3D%22scale%22%20protoField%3D%22s%22%20%2F%3E%0A%09%09%09%09%09%3Cconnect%20nodeField%3D%22translation%22%20protoField%3D%22p%22%20%2F%3E%0A%09%09%09%09%3C%2FIS%3E%0A%09%09%09%3C%2FTransform%3E%0A%09%09%3C%2FProtoBody%3E%0A%09%3C%2FProtoDeclare%3E%0A%09%3CProtoDeclare%20name%3D%22Stick%22%3E%0A%09%09%3CProtoInterface%3E%0A%09%09%09%09%3Cfield%20accessType%3D%22inputOutput%22%20type%3D%22SFVec3f%22%20name%3D%22p%22%20value%3D%220%200%200%22%20%2F%3E%0A%09%09%09%09%3Cfield%20accessType%3D%22inputOutput%22%20type%3D%22SFRotation%22%20name%3D%22r%22%20value%3D%220%200%201%200%22%20%2F%3E%0A%09%09%09%09%3Cfield%20accessType%3D%22inputOutput%22%20type%3D%22SFVec3f%22%20name%3D%22s%22%20value%3D%221%201%201%22%20%2F%3E%0A%09%09%09%09%3Cfield%20accessType%3D%22initializeOnly%22%20type%3D%22SFColor%22%20name%3D%22dc%22%20value%3D%221%201%201%22%20%2F%3E%0A%09%09%09%09%3Cfield%20accessType%3D%22initializeOnly%22%20type%3D%22SFColor%22%20name%3D%22ec%22%20value%3D%220%200%200%22%20%2F%3E%0A%09%09%09%09%3Cfield%20accessType%3D%22initializeOnly%22%20type%3D%22SFColor%22%20name%3D%22sc%22%20value%3D%220.20000000298023224%200.20000000298023224%200.20000000298023224%22%20%2F%3E%0A%09%09%09%09%3Cfield%20accessType%3D%22initializeOnly%22%20type%3D%22SFFloat%22%20name%3D%22sh%22%20value%3D%220%22%20%2F%3E%0A%09%09%09%09%3Cfield%20accessType%3D%22initializeOnly%22%20type%3D%22SFFloat%22%20name%3D%22tr%22%20value%3D%220%22%20%2F%3E%0A%09%09%3C%2FProtoInterface%3E%0A%09%09%3CProtoBody%3E%0A%09%09%09%3CTransform%3E%0A%09%09%09%09%3CShape%3E%0A%09%09%09%09%09%3CAppearance%3E%0A%09%09%09%09%09%09%3CMaterial%3E%0A%09%09%09%09%09%09%09%3CIS%3E%0A%09%09%09%09%09%09%09%09%3Cconnect%20nodeField%3D%22emissiveColor%22%20protoField%3D%22ec%22%20%2F%3E%0A%09%09%09%09%09%09%09%09%3Cconnect%20nodeField%3D%22diffuseColor%22%20protoField%3D%22dc%22%20%2F%3E%0A%09%09%09%09%09%09%09%09%3Cconnect%20nodeField%3D%22shininess%22%20protoField%3D%22sh%22%20%2F%3E%0A%09%09%09%09%09%09%09%09%3Cconnect%20nodeField%3D%22specularColor%22%20protoField%3D%22sc%22%20%2F%3E%0A%09%09%09%09%09%09%09%09%3Cconnect%20nodeField%3D%22transparency%22%20protoField%3D%22tr%22%20%2F%3E%0A%09%09%09%09%09%09%09%3C%2FIS%3E%0A%09%09%09%09%09%09%3C%2FMaterial%3E%0A%09%09%09%09%09%3C%2FAppearance%3E%0A%09%09%09%09%09%3CExtrusion%0A%09%09%09%09%09%09spine%3D%220%20-1%200%200%201%200%22%0A%09%09%09%09%09%09crossSection%3D%221%200%200.70710700750350952%20-0.70710700750350952%20-1.8369700141799558E-16%20-1%20-0.70710700750350952%20-0.70710700750350952%20-1%201.2246500289587201E-16%20-0.70710700750350952%200.70710700750350952%206.123230292458899E-17%201%200.70710700750350952%200.70710700750350952%201%200%22%0A%09%09%09%09%09%09beginCap%3D%22false%22%0A%09%09%09%09%09%09endCap%3D%22false%22%0A%09%09%09%09%09%09creaseAngle%3D%221.7000000476837158%22%20%2F%3E%0A%09%09%09%09%3C%2FShape%3E%0A%09%09%09%09%3CIS%3E%0A%09%09%09%09%09%3Cconnect%20nodeField%3D%22rotation%22%20protoField%3D%22r%22%20%2F%3E%0A%09%09%09%09%09%3Cconnect%20nodeField%3D%22scale%22%20protoField%3D%22s%22%20%2F%3E%0A%09%09%09%09%09%3Cconnect%20nodeField%3D%22translation%22%20protoField%3D%22p%22%20%2F%3E%0A%09%09%09%09%3C%2FIS%3E%0A%09%09%09%3C%2FTransform%3E%0A%09%09%3C%2FProtoBody%3E%0A%09%3C%2FProtoDeclare%3E%0A%09%3CProtoDeclare%20name%3D%22Label%22%3E%0A%09%09%3CProtoInterface%3E%0A%09%09%09%09%3Cfield%20accessType%3D%22initializeOnly%22%20type%3D%22SFVec3f%22%20name%3D%22p%22%20value%3D%220%200%200%22%20%2F%3E%0A%09%09%09%09%3Cfield%20accessType%3D%22initializeOnly%22%20type%3D%22SFFloat%22%20name%3D%22sz%22%20value%3D%221%22%20%2F%3E%0A%09%09%09%09%3Cfield%20accessType%3D%22initializeOnly%22%20type%3D%22MFString%22%20name%3D%22c%22%20value%3D%27%27%20%2F%3E%0A%09%09%09%09%3Cfield%20accessType%3D%22initializeOnly%22%20type%3D%22SFVec3f%22%20name%3D%22o%22%20value%3D%220%200%200%22%20%2F%3E%0A%09%09%09%09%3Cfield%20accessType%3D%22initializeOnly%22%20type%3D%22SFColor%22%20name%3D%22dc%22%20value%3D%221%201%201%22%20%2F%3E%0A%09%09%09%09%3Cfield%20accessType%3D%22initializeOnly%22%20type%3D%22SFColor%22%20name%3D%22ec%22%20value%3D%220%200%200%22%20%2F%3E%0A%09%09%09%09%3Cfield%20accessType%3D%22initializeOnly%22%20type%3D%22SFColor%22%20name%3D%22sc%22%20value%3D%220.20000000298023224%200.20000000298023224%200.20000000298023224%22%20%2F%3E%0A%09%09%09%09%3Cfield%20accessType%3D%22initializeOnly%22%20type%3D%22SFFloat%22%20name%3D%22sh%22%20value%3D%220%22%20%2F%3E%0A%09%09%09%09%3Cfield%20accessType%3D%22initializeOnly%22%20type%3D%22SFFloat%22%20name%3D%22tr%22%20value%3D%220%22%20%2F%3E%0A%09%09%3C%2FProtoInterface%3E%0A%09%09%3CProtoBody%3E%0A%09%09%09%3CTransform%3E%0A%09%09%09%09%3CBillboard%0A%09%09%09%09%09axisOfRotation%3D%220%200%200%22%3E%0A%09%09%09%09%09%3CTransform%3E%0A%09%09%09%09%09%09%3CShape%3E%0A%09%09%09%09%09%09%09%3CAppearance%3E%0A%09%09%09%09%09%09%09%09%3CMaterial%3E%0A%09%09%09%09%09%09%09%09%09%3CIS%3E%0A%09%09%09%09%09%09%09%09%09%09%3Cconnect%20nodeField%3D%22emissiveColor%22%20protoField%3D%22ec%22%20%2F%3E%0A%09%09%09%09%09%09%09%09%09%09%3Cconnect%20nodeField%3D%22diffuseColor%22%20protoField%3D%22dc%22%20%2F%3E%0A%09%09%09%09%09%09%09%09%09%09%3Cconnect%20nodeField%3D%22shininess%22%20protoField%3D%22sh%22%20%2F%3E%0A%09%09%09%09%09%09%09%09%09%09%3Cconnect%20nodeField%3D%22specularColor%22%20protoField%3D%22sc%22%20%2F%3E%0A%09%09%09%09%09%09%09%09%09%09%3Cconnect%20nodeField%3D%22transparency%22%20protoField%3D%22tr%22%20%2F%3E%0A%09%09%09%09%09%09%09%09%09%3C%2FIS%3E%0A%09%09%09%09%09%09%09%09%3C%2FMaterial%3E%0A%09%09%09%09%09%09%09%3C%2FAppearance%3E%0A%09%09%09%09%09%09%09%3CText%3E%0A%09%09%09%09%09%09%09%09%3CFontStyle%3E%0A%09%09%09%09%09%09%09%09%09%3CIS%3E%0A%09%09%09%09%09%09%09%09%09%09%3Cconnect%20nodeField%3D%22size%22%20protoField%3D%22sz%22%20%2F%3E%0A%09%09%09%09%09%09%09%09%09%3C%2FIS%3E%0A%09%09%09%09%09%09%09%09%3C%2FFontStyle%3E%0A%09%09%09%09%09%09%09%09%3CIS%3E%0A%09%09%09%09%09%09%09%09%09%3Cconnect%20nodeField%3D%22string%22%20protoField%3D%22c%22%20%2F%3E%0A%09%09%09%09%09%09%09%09%3C%2FIS%3E%0A%09%09%09%09%09%09%09%3C%2FText%3E%0A%09%09%09%09%09%09%3C%2FShape%3E%0A%09%09%09%09%09%09%3CIS%3E%0A%09%09%09%09%09%09%09%3Cconnect%20nodeField%3D%22translation%22%20protoField%3D%22o%22%20%2F%3E%0A%09%09%09%09%09%09%3C%2FIS%3E%0A%09%09%09%09%09%3C%2FTransform%3E%0A%09%09%09%09%3C%2FBillboard%3E%0A%09%09%09%09%3CIS%3E%0A%09%09%09%09%09%3Cconnect%20nodeField%3D%22translation%22%20protoField%3D%22p%22%20%2F%3E%0A%09%09%09%09%3C%2FIS%3E%0A%09%09%09%3C%2FTransform%3E%0A%09%09%3C%2FProtoBody%3E%0A%09%3C%2FProtoDeclare%3E%0A%09%3CCollision%0A%09%09enabled%3D%22false%22%0A%09%09bboxCenter%3D%220.19178299605846405%200.51822799444198608%20-0.20266300439834595%22%0A%09%09bboxSize%3D%2214.085399627685547%209.2922601699829102%206.0749001502990723%22%3E%0A%09%09%3CShape%3E%0A%09%09%09%3CAppearance%3E%0A%09%09%09%09%3CMaterial%20%2F%3E%0A%09%09%09%3C%2FAppearance%3E%0A%09%09%09%3CIndexedLineSet%0A%09%09%09%09coordIndex%3D%220%201%20-1%202%203%20-1%204%205%20-1%206%207%20-1%208%209%20-1%2010%2011%20-1%2012%2013%20-1%2014%2015%20-1%2016%2017%20-1%2018%2019%20-1%2020%2021%20-1%2022%2023%20-1%2024%2025%20-1%2026%2027%20-1%2028%2029%20-1%2030%2031%20-1%2032%2033%20-1%2034%2035%20-1%2036%2037%20-1%2038%2039%20-1%2040%2041%20-1%2042%2043%20-1%2044%2045%20-1%2046%2047%20-1%2048%2049%20-1%2050%2051%20-1%2052%2053%20-1%2054%2055%20-1%2056%2057%20-1%2058%2059%20-1%2060%2061%20-1%2062%2063%20-1%2064%2065%20-1%2066%2067%20-1%2068%2069%20-1%2070%2071%20-1%2072%2073%20-1%2074%2075%20-1%2076%2077%20-1%2078%2079%20-1%2080%2081%20-1%2082%2083%20-1%2084%2085%20-1%2086%2087%20-1%2088%2089%20-1%2090%2091%20-1%2092%2093%20-1%2094%2095%20-1%2096%2097%20-1%2098%2099%20-1%20100%20101%20-1%20102%20103%20-1%20104%20105%20-1%20106%20107%20-1%22%0A%09%09%09%09colorPerVertex%3D%22false%22%0A%09%09%09%09colorIndex%3D%220%201%200%201%200%201%200%201%200%201%200%201%200%201%200%201%201%202%202%202%201%202%201%202%202%201%202%202%201%202%202%203%203%202%203%202%202%203%203%202%202%202%202%201%202%203%203%202%202%203%202%203%203%202%22%3E%0A%09%09%09%09%3CCoordinate%0A%09%09%09%09%09point%3D%22-4.940000057220459%20-2.2699999809265137%200.55000001192092896%20-5.4000000953674316%20-2.4500000476837158%20-0.0099999997764825821%20-5.4000000953674316%20-2.4500000476837158%20-0.0099999997764825821%20-5.8499999046325684%20-2.630000114440918%20-0.56000000238418579%20-4.940000057220459%20-2.2699999809265137%200.55000001192092896%20-4.3400001525878906%20-2.7000000476837158%200.61000001430511475%20-4.3400001525878906%20-2.7000000476837158%200.61000001430511475%20-3.7400000095367432%20-3.130000114440918%200.6600000262260437%20-4.940000057220459%20-2.2699999809265137%200.55000001192092896%20-5.2800002098083496%20-2.130000114440918%201.190000057220459%20-5.2800002098083496%20-2.130000114440918%201.190000057220459%20-5.619999885559082%20-2%201.8300000429153442%20-4.940000057220459%20-2.2699999809265137%200.55000001192092896%20-4.6399998664855957%20-1.5499999523162842%200.33000001311302185%20-4.6399998664855957%20-1.5499999523162842%200.33000001311302185%20-4.3499999046325684%20-0.82999998331069946%200.10999999940395355%20-3.2999999523162842%20-0.73000001907348633%20-1.1100000143051147%20-3.6400001049041748%20-0.40000000596046448%20-1.6699999570846558%20-3.6400001049041748%20-0.40000000596046448%20-1.6699999570846558%20-3.9700000286102295%20-0.059999998658895493%20-2.2400000095367432%20-3.2999999523162842%20-0.73000001907348633%20-1.1100000143051147%20-2.9900000095367432%20-1.3999999761581421%20-1.2000000476837158%20-2.9900000095367432%20-1.3999999761581421%20-1.2000000476837158%20-2.690000057220459%20-2.0699999332427979%20-1.2999999523162842%20-3.2999999523162842%20-0.73000001907348633%20-1.1100000143051147%20-3.8199999332427979%20-0.77999997138977051%20-0.5%20-3.8199999332427979%20-0.77999997138977051%20-0.5%20-4.3499999046325684%20-0.82999998331069946%200.10999999940395355%20-3.2999999523162842%20-0.73000001907348633%20-1.1100000143051147%20-2.7400000095367432%20-0.23999999463558197%20-0.81000000238418579%20-2.7400000095367432%20-0.23999999463558197%20-0.81000000238418579%20-2.1800000667572021%200.25999999046325684%20-0.51999998092651367%20-2.1800000667572021%200.25999999046325684%20-0.51999998092651367%20-2.3399999141693115%200.74000000953674316%20-0.019999999552965164%20-2.3399999141693115%200.74000000953674316%20-0.019999999552965164%20-2.5099999904632568%201.2300000190734863%200.4699999988079071%20-2.5099999904632568%201.2300000190734863%200.4699999988079071%20-1.3700000047683716%202.2100000381469727%200.70999997854232788%20-1.3700000047683716%202.2100000381469727%200.70999997854232788%20-0.82999998331069946%201.8899999856948853%201.059999942779541%20-0.82999998331069946%201.8899999856948853%201.059999942779541%20-0.28999999165534973%201.5800000429153442%201.4099999666213989%20-1.3700000047683716%202.2100000381469727%200.70999997854232788%20-0.8399999737739563%202.75%20-0.60000002384185791%20-0.28999999165534973%201.5800000429153442%201.4099999666213989%200.33000001311302185%201.6499999761581421%201.0499999523162842%200.33000001311302185%201.6499999761581421%201.0499999523162842%200.94999998807907104%201.7300000190734863%200.68000000715255737%20-0.8399999737739563%202.75%20-0.60000002384185791%20-0.94999998807907104%203.4600000381469727%20-0.6600000262260437%20-0.94999998807907104%203.4600000381469727%20-0.6600000262260437%20-1.059999942779541%204.1599998474121094%20-0.70999997854232788%20-0.8399999737739563%202.75%20-0.60000002384185791%200.63999998569488525%202.4500000476837158%20-0.62000000476837158%200.63999998569488525%202.4500000476837158%20-0.62000000476837158%201.0299999713897705%203.0499999523162842%20-0.68000000715255737%201.0299999713897705%203.0499999523162842%20-0.68000000715255737%201.4099999666213989%203.6500000953674316%20-0.74000000953674316%200.63999998569488525%202.4500000476837158%20-0.62000000476837158%200.94999998807907104%201.7300000190734863%200.68000000715255737%200.94999998807907104%201.7300000190734863%200.68000000715255737%201.2599999904632568%201.0800000429153442%200.55000001192092896%201.2599999904632568%201.0800000429153442%200.55000001192092896%201.5700000524520874%200.41999998688697815%200.41999998688697815%201.5700000524520874%200.41999998688697815%200.41999998688697815%201.2899999618530273%20-0.18000000715255737%200.31999999284744263%201.2899999618530273%20-0.18000000715255737%200.31999999284744263%201%20-0.79000002145767212%200.2199999988079071%201.5700000524520874%200.41999998688697815%200.41999998688697815%202.2400000095367432%200.2800000011920929%200.37999999523162842%202.2400000095367432%200.2800000011920929%200.37999999523162842%202.9200000762939453%200.14000000059604645%200.33000001311302185%201%20-0.79000002145767212%200.2199999988079071%201.3700000047683716%20-1.2999999523162842%200.10999999940395355%201.3700000047683716%20-1.2999999523162842%200.10999999940395355%201.7400000095367432%20-1.809999942779541%200.0099999997764825821%201.7400000095367432%20-1.809999942779541%200.0099999997764825821%202.380000114440918%20-1.5199999809265137%200.039999999105930328%202.380000114440918%20-1.5199999809265137%200.039999999105930328%203.0099999904632568%20-1.2300000190734863%200.070000000298023224%203.0099999904632568%20-1.2300000190734863%200.070000000298023224%204.3000001907348633%20-1.8200000524520874%20-0.070000000298023224%203.0099999904632568%20-1.2300000190734863%200.070000000298023224%202.9200000762939453%200.14000000059604645%200.33000001311302185%204.3000001907348633%20-1.8200000524520874%20-0.070000000298023224%204.429999828338623%20-2.4100000858306885%20-0.18999999761581421%204.429999828338623%20-2.4100000858306885%20-0.18999999761581421%204.570000171661377%20-3%20-0.30000001192092896%204.3000001907348633%20-1.8200000524520874%20-0.070000000298023224%204.8000001907348633%20-1.3600000143051147%200%204.8000001907348633%20-1.3600000143051147%200%205.309999942779541%20-0.88999998569488525%200.070000000298023224%205.309999942779541%20-0.88999998569488525%200.070000000298023224%205.2199997901916504%20-0.2199999988079071%200.18999999761581421%205.2199997901916504%20-0.2199999988079071%200.18999999761581421%205.130000114440918%200.46000000834465027%200.31999999284744263%205.130000114440918%200.46000000834465027%200.31999999284744263%205.679999828338623%200.82999998331069946%200.37000000476837158%205.679999828338623%200.82999998331069946%200.37000000476837158%206.2300000190734863%201.190000057220459%200.41999998688697815%205.130000114440918%200.46000000834465027%200.31999999284744263%204.5300002098083496%200.74000000953674316%200.38999998569488525%204.5300002098083496%200.74000000953674316%200.38999998569488525%203.9300000667572021%201.0299999713897705%200.46000000834465027%203.9300000667572021%201.0299999713897705%200.46000000834465027%203.4200000762939453%200.57999998331069946%200.40000000596046448%203.4200000762939453%200.57999998331069946%200.40000000596046448%202.9200000762939453%200.14000000059604645%200.33000001311302185%22%20%2F%3E%0A%09%09%09%09%3CColor%0A%09%09%09%09%09color%3D%221%200%201%201%200%200%200.20000000298023224%200.20000000298023224%200.20000000298023224%200%200%201%22%20%2F%3E%0A%09%09%09%3C%2FIndexedLineSet%3E%0A%09%09%3C%2FShape%3E%0A%09%3C%2FCollision%3E%0A%09%3CNavigationInfo%0A%09%09avatarSize%3D%220.25%201.6000000238418579%200.75%22%0A%09%09speed%3D%224%22%0A%09%09type%3D%27%22EXAMINE%22%20%22FLY%22%27%20%2F%3E%0A%09%3CBackground%0A%09%09skyColor%3D%221%201%201%22%20%2F%3E%0A%09%3CViewpoint%0A%09%09position%3D%220.18999999761581421%200.51999998092651367%2016.700000762939453%22%0A%09%09description%3D%22overall%20default%22%20%2F%3E%0A%3C%2FScene%3E%0A%3C%2FX3D%3E%0A"></x3d-canvas>
+  <textarea id="molscript-scene-data">&lt;?xml version="1.0" encoding="UTF-8"?>
+&lt;X3D profile="Interchange" version="3.3" xmlns:xsd="http://www.w3.org/2001/XMLSchema-instance" xsd:noNamespaceSchemaLocation="http://www.web3d.org/specifications/x3d-3.3.xsd">
+  &lt;Scene>
+  &lt;WorldInfo title="GDP bonds" info="&amp;quot;Program: MolScriptSVG 2.1.2, Copyright (C) 1997-1998 Per J. Kraulis&amp;quot; &amp;quot;Author: jwm&amp;quot;"/>
+  &lt;ProtoDeclare name="Ball">
+    &lt;ProtoInterface>
+      &lt;field accessType="inputOutput" type="SFVec3f" name="p" value="0 0 0"/>
+      &lt;field accessType="initializeOnly" type="SFFloat" name="rad" value="1.5"/>
+      &lt;field accessType="initializeOnly" type="SFColor" name="dc" value="1 1 1"/>
+      &lt;field accessType="initializeOnly" type="SFColor" name="ec" value="0 0 0"/>
+      &lt;field accessType="initializeOnly" type="SFColor" name="sc" value="0.2 0.2 0.2"/>
+      &lt;field accessType="initializeOnly" type="SFFloat" name="sh" value="0"/>
+      &lt;field accessType="initializeOnly" type="SFFloat" name="tr" value="0"/>
+    &lt;/ProtoInterface>
+    &lt;ProtoBody>
+      &lt;Transform>
+        &lt;Shape>
+          &lt;Appearance>
+            &lt;Material>
+              &lt;IS>
+                &lt;connect nodeField="diffuseColor" protoField="dc"/>
+                &lt;connect nodeField="emissiveColor" protoField="ec"/>
+                &lt;connect nodeField="specularColor" protoField="sc"/>
+                &lt;connect nodeField="shininess" protoField="sh"/>
+                &lt;connect nodeField="transparency" protoField="tr"/>
+              &lt;/IS>
+            &lt;/Material>
+          &lt;/Appearance>
+          &lt;Sphere>
+            &lt;IS>
+              &lt;connect nodeField="radius" protoField="rad"/>
+            &lt;/IS>
+          &lt;/Sphere>
+        &lt;/Shape>
+        &lt;IS>
+          &lt;connect nodeField="translation" protoField="p"/>
+        &lt;/IS>
+      &lt;/Transform>
+    &lt;/ProtoBody>
+  &lt;/ProtoDeclare>
+  &lt;ProtoDeclare name="Cyl">
+    &lt;ProtoInterface>
+      &lt;field accessType="inputOutput" type="SFVec3f" name="p" value="0 0 0"/>
+      &lt;field accessType="inputOutput" type="SFRotation" name="r" value="0 0 1 0"/>
+      &lt;field accessType="inputOutput" type="SFVec3f" name="s" value="1 1 1"/>
+      &lt;field accessType="initializeOnly" type="SFColor" name="dc" value="1 1 1"/>
+      &lt;field accessType="initializeOnly" type="SFColor" name="ec" value="0 0 0"/>
+      &lt;field accessType="initializeOnly" type="SFColor" name="sc" value="0.2 0.2 0.2"/>
+      &lt;field accessType="initializeOnly" type="SFFloat" name="sh" value="0"/>
+      &lt;field accessType="initializeOnly" type="SFFloat" name="tr" value="0"/>
+    &lt;/ProtoInterface>
+    &lt;ProtoBody>
+      &lt;Transform>
+        &lt;Shape>
+          &lt;Appearance>
+            &lt;Material>
+              &lt;IS>
+                &lt;connect nodeField="diffuseColor" protoField="dc"/>
+                &lt;connect nodeField="emissiveColor" protoField="ec"/>
+                &lt;connect nodeField="specularColor" protoField="sc"/>
+                &lt;connect nodeField="shininess" protoField="sh"/>
+                &lt;connect nodeField="transparency" protoField="tr"/>
+              &lt;/IS>
+            &lt;/Material>
+          &lt;/Appearance>
+          &lt;Cylinder/>
+        &lt;/Shape>
+        &lt;IS>
+          &lt;connect nodeField="translation" protoField="p"/>
+          &lt;connect nodeField="rotation" protoField="r"/>
+          &lt;connect nodeField="scale" protoField="s"/>
+        &lt;/IS>
+      &lt;/Transform>
+    &lt;/ProtoBody>
+  &lt;/ProtoDeclare>
+  &lt;ProtoDeclare name="Stick">
+    &lt;ProtoInterface>
+      &lt;field accessType="inputOutput" type="SFVec3f" name="p" value="0 0 0"/>
+      &lt;field accessType="inputOutput" type="SFRotation" name="r" value="0 0 1 0"/>
+      &lt;field accessType="inputOutput" type="SFVec3f" name="s" value="1 1 1"/>
+      &lt;field accessType="initializeOnly" type="SFColor" name="dc" value="1 1 1"/>
+      &lt;field accessType="initializeOnly" type="SFColor" name="ec" value="0 0 0"/>
+      &lt;field accessType="initializeOnly" type="SFColor" name="sc" value="0.2 0.2 0.2"/>
+      &lt;field accessType="initializeOnly" type="SFFloat" name="sh" value="0"/>
+      &lt;field accessType="initializeOnly" type="SFFloat" name="tr" value="0"/>
+    &lt;/ProtoInterface>
+    &lt;ProtoBody>
+      &lt;Transform>
+        &lt;Shape>
+          &lt;Appearance>
+            &lt;Material>
+              &lt;IS>
+                &lt;connect nodeField="diffuseColor" protoField="dc"/>
+                &lt;connect nodeField="emissiveColor" protoField="ec"/>
+                &lt;connect nodeField="specularColor" protoField="sc"/>
+                &lt;connect nodeField="shininess" protoField="sh"/>
+                &lt;connect nodeField="transparency" protoField="tr"/>
+              &lt;/IS>
+            &lt;/Material>
+          &lt;/Appearance>
+          &lt;Extrusion spine="0 -1 0 0 1 0" crossSection="1 0 0.707107 -0.707107 -1.83697e-16 -1 -0.707107 -0.707107 -1 1.22465e-16 -0.707107 0.707107 6.12323e-17 1 0.707107 0.707107 1 0" beginCap="FALSE" endCap="FALSE" creaseAngle="1.7"/>
+        &lt;/Shape>
+        &lt;IS>
+          &lt;connect nodeField="translation" protoField="p"/>
+          &lt;connect nodeField="rotation" protoField="r"/>
+          &lt;connect nodeField="scale" protoField="s"/>
+        &lt;/IS>
+      &lt;/Transform>
+    &lt;/ProtoBody>
+  &lt;/ProtoDeclare>
+  &lt;ProtoDeclare name="Label">
+    &lt;ProtoInterface>
+      &lt;field accessType="initializeOnly" type="SFVec3f" name="p" value="0 0 0"/>
+      &lt;field accessType="initializeOnly" type="SFFloat" name="sz" value="1"/>
+      &lt;field accessType="initializeOnly" type="MFString" name="c" value=""/>
+      &lt;field accessType="initializeOnly" type="SFVec3f" name="o" value="0 0 0"/>
+      &lt;field accessType="initializeOnly" type="SFColor" name="dc" value="1 1 1"/>
+      &lt;field accessType="initializeOnly" type="SFColor" name="ec" value="0 0 0"/>
+      &lt;field accessType="initializeOnly" type="SFColor" name="sc" value="0.2 0.2 0.2"/>
+      &lt;field accessType="initializeOnly" type="SFFloat" name="sh" value="0"/>
+      &lt;field accessType="initializeOnly" type="SFFloat" name="tr" value="0"/>
+    &lt;/ProtoInterface>
+    &lt;ProtoBody>
+      &lt;Transform>
+        &lt;Billboard axisOfRotation="0 0 0">
+          &lt;Transform>
+            &lt;Shape>
+              &lt;Appearance>
+                &lt;Material>
+                  &lt;IS>
+                    &lt;connect nodeField="diffuseColor" protoField="dc"/>
+                    &lt;connect nodeField="emissiveColor" protoField="ec"/>
+                    &lt;connect nodeField="specularColor" protoField="sc"/>
+                    &lt;connect nodeField="shininess" protoField="sh"/>
+                    &lt;connect nodeField="transparency" protoField="tr"/>
+                  &lt;/IS>
+                &lt;/Material>
+              &lt;/Appearance>
+              &lt;Text>
+                &lt;FontStyle>
+                  &lt;IS>
+                    &lt;connect nodeField="size" protoField="sz"/>
+                  &lt;/IS>
+                &lt;/FontStyle>
+                &lt;IS>
+                  &lt;connect nodeField="string" protoField="c"/>
+                &lt;/IS>
+              &lt;/Text>
+            &lt;/Shape>
+            &lt;IS>
+              &lt;connect nodeField="translation" protoField="o"/>
+            &lt;/IS>
+          &lt;/Transform>
+        &lt;/Billboard>
+        &lt;IS>
+          &lt;connect nodeField="translation" protoField="p"/>
+        &lt;/IS>
+      &lt;/Transform>
+    &lt;/ProtoBody>
+  &lt;/ProtoDeclare>
+  &lt;Collision collide="FALSE" bboxCenter="0.191783 0.518228 -0.202663" bboxSize="14.0854 9.29226 6.0749">
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedLineSet coordIndex="0 1 -1 2 3 -1 4 5 -1 6 7 -1 8 9 -1 10 11 -1 12 13 -1 14 15 -1 16 17 -1 18 19 -1 20 21 -1 22 23 -1 24 25 -1 26 27 -1 28 29 -1 30 31 -1 32 33 -1 34 35 -1 36 37 -1 38 39 -1 40 41 -1 42 43 -1 44 45 -1 46 47 -1 48 49 -1 50 51 -1 52 53 -1 54 55 -1 56 57 -1 58 59 -1 60 61 -1 62 63 -1 64 65 -1 66 67 -1 68 69 -1 70 71 -1 72 73 -1 74 75 -1 76 77 -1 78 79 -1 80 81 -1 82 83 -1 84 85 -1 86 87 -1 88 89 -1 90 91 -1 92 93 -1 94 95 -1 96 97 -1 98 99 -1 100 101 -1 102 103 -1 104 105 -1 106 107 -1" colorPerVertex="FALSE" colorIndex="0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 1 2 2 2 1 2 1 2 2 1 2 2 1 2 2 3 3 2 3 2 2 3 3 2 2 2 2 1 2 3 3 2 2 3 2 3 3 2">
+        &lt;Coordinate point="-4.94 -2.27 0.55 -5.40 -2.45 -0.01 -5.40 -2.45 -0.01 -5.85 -2.63 -0.56 -4.94 -2.27 0.55 -4.34 -2.70 0.61 -4.34 -2.70 0.61 -3.74 -3.13 0.66 -4.94 -2.27 0.55 -5.28 -2.13 1.19 -5.28 -2.13 1.19 -5.62 -2.00 1.83 -4.94 -2.27 0.55 -4.64 -1.55 0.33 -4.64 -1.55 0.33 -4.35 -0.83 0.11 -3.30 -0.73 -1.11 -3.64 -0.40 -1.67 -3.64 -0.40 -1.67 -3.97 -0.06 -2.24 -3.30 -0.73 -1.11 -2.99 -1.40 -1.20 -2.99 -1.40 -1.20 -2.69 -2.07 -1.30 -3.30 -0.73 -1.11 -3.82 -0.78 -0.50 -3.82 -0.78 -0.50 -4.35 -0.83 0.11 -3.30 -0.73 -1.11 -2.74 -0.24 -0.81 -2.74 -0.24 -0.81 -2.18 0.26 -0.52 -2.18 0.26 -0.52 -2.34 0.74 -0.02 -2.34 0.74 -0.02 -2.51 1.23 0.47 -2.51 1.23 0.47 -1.37 2.21 0.71 -1.37 2.21 0.71 -0.83 1.89 1.06 -0.83 1.89 1.06 -0.29 1.58 1.41 -1.37 2.21 0.71 -0.84 2.75 -0.60 -0.29 1.58 1.41 0.33 1.65 1.05 0.33 1.65 1.05 0.95 1.73 0.68 -0.84 2.75 -0.60 -0.95 3.46 -0.66 -0.95 3.46 -0.66 -1.06 4.16 -0.71 -0.84 2.75 -0.60 0.64 2.45 -0.62 0.64 2.45 -0.62 1.03 3.05 -0.68 1.03 3.05 -0.68 1.41 3.65 -0.74 0.64 2.45 -0.62 0.95 1.73 0.68 0.95 1.73 0.68 1.26 1.08 0.55 1.26 1.08 0.55 1.57 0.42 0.42 1.57 0.42 0.42 1.29 -0.18 0.32 1.29 -0.18 0.32 1.00 -0.79 0.22 1.57 0.42 0.42 2.24 0.28 0.38 2.24 0.28 0.38 2.92 0.14 0.33 1.00 -0.79 0.22 1.37 -1.30 0.11 1.37 -1.30 0.11 1.74 -1.81 0.01 1.74 -1.81 0.01 2.38 -1.52 0.04 2.38 -1.52 0.04 3.01 -1.23 0.07 3.01 -1.23 0.07 4.30 -1.82 -0.07 3.01 -1.23 0.07 2.92 0.14 0.33 4.30 -1.82 -0.07 4.43 -2.41 -0.19 4.43 -2.41 -0.19 4.57 -3.00 -0.30 4.30 -1.82 -0.07 4.80 -1.36 -0.00 4.80 -1.36 -0.00 5.31 -0.89 0.07 5.31 -0.89 0.07 5.22 -0.22 0.19 5.22 -0.22 0.19 5.13 0.46 0.32 5.13 0.46 0.32 5.68 0.83 0.37 5.68 0.83 0.37 6.23 1.19 0.42 5.13 0.46 0.32 4.53 0.74 0.39 4.53 0.74 0.39 3.93 1.03 0.46 3.93 1.03 0.46 3.42 0.58 0.40 3.42 0.58 0.40 2.92 0.14 0.33"/>
+        &lt;Color color="1 0 1 1 0 0 0.2 0.2 0.2 0 0 1"/>
+      &lt;/IndexedLineSet>
+    &lt;/Shape>
+  &lt;/Collision>
+  &lt;NavigationInfo speed="4" type="&amp;quot;EXAMINE&amp;quot; &amp;quot;FLY&amp;quot;"/>
+  &lt;Background skyColor="1 1 1"/>
+  &lt;Viewpoint position="0.19 0.52 16.70" description="overall default"/>
+  &lt;/Scene>
+&lt;/X3D>
+</textarea>
+  <x3d-canvas id="molscript-scene" contentScale="auto" update="auto"></x3d-canvas>
 </body>
 </html>

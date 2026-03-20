@@ -1,525 +1,362 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE X3D PUBLIC "ISO//Web3D//DTD X3D 3.3//EN" "http://www.web3d.org/specifications/x3d-3.3.dtd">
-<X3D profile="Interchange" version="3.3"
-     xmlns:xsd="http://www.w3.org/2001/XMLSchema-instance"
-     xsd:noNamespaceSchemaLocation="http://www.web3d.org/specifications/x3d-3.3.xsd">
-<head>
-	<meta name="generator" content="view3dscene, https://castle-engine.io/view3dscene.php" />
-	<meta name="source" content="molscript_x3d_33_1804289383.x3dv" />
-</head>
-<Scene>
-	<WorldInfo
-		title="GDP cpk"
-		info='"Program: MolScriptSVG 2.1.2, Copyright (C) 1997-1998 Per J. Kraulis" "Author: jwm"' />
-	<ProtoDeclare name="Ball">
-		<ProtoInterface>
-				<field accessType="inputOutput" type="SFVec3f" name="p" value="0 0 0" />
-				<field accessType="initializeOnly" type="SFFloat" name="rad" value="1.5" />
-				<field accessType="initializeOnly" type="SFColor" name="dc" value="1 1 1" />
-				<field accessType="initializeOnly" type="SFColor" name="ec" value="0 0 0" />
-				<field accessType="initializeOnly" type="SFColor" name="sc" value="0.20000000298023224 0.20000000298023224 0.20000000298023224" />
-				<field accessType="initializeOnly" type="SFFloat" name="sh" value="0" />
-				<field accessType="initializeOnly" type="SFFloat" name="tr" value="0" />
-		</ProtoInterface>
-		<ProtoBody>
-			<Transform>
-				<Shape>
-					<Appearance>
-						<Material>
-							<IS>
-								<connect nodeField="emissiveColor" protoField="ec" />
-								<connect nodeField="diffuseColor" protoField="dc" />
-								<connect nodeField="shininess" protoField="sh" />
-								<connect nodeField="specularColor" protoField="sc" />
-								<connect nodeField="transparency" protoField="tr" />
-							</IS>
-						</Material>
-					</Appearance>
-					<Sphere>
-						<IS>
-							<connect nodeField="radius" protoField="rad" />
-						</IS>
-					</Sphere>
-				</Shape>
-				<IS>
-					<connect nodeField="translation" protoField="p" />
-				</IS>
-			</Transform>
-		</ProtoBody>
-	</ProtoDeclare>
-	<ProtoDeclare name="Cyl">
-		<ProtoInterface>
-				<field accessType="inputOutput" type="SFVec3f" name="p" value="0 0 0" />
-				<field accessType="inputOutput" type="SFRotation" name="r" value="0 0 1 0" />
-				<field accessType="inputOutput" type="SFVec3f" name="s" value="1 1 1" />
-				<field accessType="initializeOnly" type="SFColor" name="dc" value="1 1 1" />
-				<field accessType="initializeOnly" type="SFColor" name="ec" value="0 0 0" />
-				<field accessType="initializeOnly" type="SFColor" name="sc" value="0.20000000298023224 0.20000000298023224 0.20000000298023224" />
-				<field accessType="initializeOnly" type="SFFloat" name="sh" value="0" />
-				<field accessType="initializeOnly" type="SFFloat" name="tr" value="0" />
-		</ProtoInterface>
-		<ProtoBody>
-			<Transform>
-				<Shape>
-					<Appearance>
-						<Material>
-							<IS>
-								<connect nodeField="emissiveColor" protoField="ec" />
-								<connect nodeField="diffuseColor" protoField="dc" />
-								<connect nodeField="shininess" protoField="sh" />
-								<connect nodeField="specularColor" protoField="sc" />
-								<connect nodeField="transparency" protoField="tr" />
-							</IS>
-						</Material>
-					</Appearance>
-					<Cylinder />
-				</Shape>
-				<IS>
-					<connect nodeField="rotation" protoField="r" />
-					<connect nodeField="scale" protoField="s" />
-					<connect nodeField="translation" protoField="p" />
-				</IS>
-			</Transform>
-		</ProtoBody>
-	</ProtoDeclare>
-	<ProtoDeclare name="Stick">
-		<ProtoInterface>
-				<field accessType="inputOutput" type="SFVec3f" name="p" value="0 0 0" />
-				<field accessType="inputOutput" type="SFRotation" name="r" value="0 0 1 0" />
-				<field accessType="inputOutput" type="SFVec3f" name="s" value="1 1 1" />
-				<field accessType="initializeOnly" type="SFColor" name="dc" value="1 1 1" />
-				<field accessType="initializeOnly" type="SFColor" name="ec" value="0 0 0" />
-				<field accessType="initializeOnly" type="SFColor" name="sc" value="0.20000000298023224 0.20000000298023224 0.20000000298023224" />
-				<field accessType="initializeOnly" type="SFFloat" name="sh" value="0" />
-				<field accessType="initializeOnly" type="SFFloat" name="tr" value="0" />
-		</ProtoInterface>
-		<ProtoBody>
-			<Transform>
-				<Shape>
-					<Appearance>
-						<Material>
-							<IS>
-								<connect nodeField="emissiveColor" protoField="ec" />
-								<connect nodeField="diffuseColor" protoField="dc" />
-								<connect nodeField="shininess" protoField="sh" />
-								<connect nodeField="specularColor" protoField="sc" />
-								<connect nodeField="transparency" protoField="tr" />
-							</IS>
-						</Material>
-					</Appearance>
-					<Extrusion
-						spine="0 -1 0 0 1 0"
-						crossSection="1 0 0.70710700750350952 -0.70710700750350952 -1.8369700141799558E-16 -1 -0.70710700750350952 -0.70710700750350952 -1 1.2246500289587201E-16 -0.70710700750350952 0.70710700750350952 6.123230292458899E-17 1 0.70710700750350952 0.70710700750350952 1 0"
-						beginCap="false"
-						endCap="false"
-						creaseAngle="1.7000000476837158" />
-				</Shape>
-				<IS>
-					<connect nodeField="rotation" protoField="r" />
-					<connect nodeField="scale" protoField="s" />
-					<connect nodeField="translation" protoField="p" />
-				</IS>
-			</Transform>
-		</ProtoBody>
-	</ProtoDeclare>
-	<ProtoDeclare name="Label">
-		<ProtoInterface>
-				<field accessType="initializeOnly" type="SFVec3f" name="p" value="0 0 0" />
-				<field accessType="initializeOnly" type="SFFloat" name="sz" value="1" />
-				<field accessType="initializeOnly" type="MFString" name="c" value='' />
-				<field accessType="initializeOnly" type="SFVec3f" name="o" value="0 0 0" />
-				<field accessType="initializeOnly" type="SFColor" name="dc" value="1 1 1" />
-				<field accessType="initializeOnly" type="SFColor" name="ec" value="0 0 0" />
-				<field accessType="initializeOnly" type="SFColor" name="sc" value="0.20000000298023224 0.20000000298023224 0.20000000298023224" />
-				<field accessType="initializeOnly" type="SFFloat" name="sh" value="0" />
-				<field accessType="initializeOnly" type="SFFloat" name="tr" value="0" />
-		</ProtoInterface>
-		<ProtoBody>
-			<Transform>
-				<Billboard
-					axisOfRotation="0 0 0">
-					<Transform>
-						<Shape>
-							<Appearance>
-								<Material>
-									<IS>
-										<connect nodeField="emissiveColor" protoField="ec" />
-										<connect nodeField="diffuseColor" protoField="dc" />
-										<connect nodeField="shininess" protoField="sh" />
-										<connect nodeField="specularColor" protoField="sc" />
-										<connect nodeField="transparency" protoField="tr" />
-									</IS>
-								</Material>
-							</Appearance>
-							<Text>
-								<FontStyle>
-									<IS>
-										<connect nodeField="size" protoField="sz" />
-									</IS>
-								</FontStyle>
-								<IS>
-									<connect nodeField="string" protoField="c" />
-								</IS>
-							</Text>
-						</Shape>
-						<IS>
-							<connect nodeField="translation" protoField="o" />
-						</IS>
-					</Transform>
-				</Billboard>
-				<IS>
-					<connect nodeField="translation" protoField="p" />
-				</IS>
-			</Transform>
-		</ProtoBody>
-	</ProtoDeclare>
-	<Collision
-		enabled="false"
-		bboxCenter="0.36678299307823181 0.51822799444198608 -0.20266300439834595"
-		bboxSize="17.135400772094727 11.992300033569336 8.7749004364013672">
-		<ProtoInstance name="Ball" containerField="children">
-			<fieldValue name="p"
-				value="-4.940000057220459 -2.2699999809265137 0.55000001192092896" />
-			<fieldValue name="rad"
-				value="1.7999999523162842" />
-			<fieldValue name="dc"
-				value="1 0 1" />
-			<fieldValue name="sc"
-				value="0 0 0" />
-			<fieldValue name="sh"
-				value="0.20000000298023224" />
-		</ProtoInstance>
-		<ProtoInstance name="Ball" containerField="children">
-			<fieldValue name="p"
-				value="-5.8499999046325684 -2.630000114440918 -0.56000000238418579" />
-			<fieldValue name="rad"
-				value="1.3500000238418579" />
-			<fieldValue name="dc"
-				value="1 0 0" />
-			<fieldValue name="sc"
-				value="0 0 0" />
-			<fieldValue name="sh"
-				value="0.20000000298023224" />
-		</ProtoInstance>
-		<ProtoInstance name="Ball" containerField="children">
-			<fieldValue name="p"
-				value="-3.7400000095367432 -3.130000114440918 0.6600000262260437" />
-			<fieldValue name="rad"
-				value="1.3500000238418579" />
-			<fieldValue name="dc"
-				value="1 0 0" />
-			<fieldValue name="sc"
-				value="0 0 0" />
-			<fieldValue name="sh"
-				value="0.20000000298023224" />
-		</ProtoInstance>
-		<ProtoInstance name="Ball" containerField="children">
-			<fieldValue name="p"
-				value="-5.619999885559082 -2 1.8300000429153442" />
-			<fieldValue name="rad"
-				value="1.3500000238418579" />
-			<fieldValue name="dc"
-				value="1 0 0" />
-			<fieldValue name="sc"
-				value="0 0 0" />
-			<fieldValue name="sh"
-				value="0.20000000298023224" />
-		</ProtoInstance>
-		<ProtoInstance name="Ball" containerField="children">
-			<fieldValue name="p"
-				value="-3.2999999523162842 -0.73000001907348633 -1.1100000143051147" />
-			<fieldValue name="rad"
-				value="1.7999999523162842" />
-			<fieldValue name="dc"
-				value="1 0 1" />
-			<fieldValue name="sc"
-				value="0 0 0" />
-			<fieldValue name="sh"
-				value="0.20000000298023224" />
-		</ProtoInstance>
-		<ProtoInstance name="Ball" containerField="children">
-			<fieldValue name="p"
-				value="-3.9700000286102295 -0.059999998658895493 -2.2400000095367432" />
-			<fieldValue name="rad"
-				value="1.3500000238418579" />
-			<fieldValue name="dc"
-				value="1 0 0" />
-			<fieldValue name="sc"
-				value="0 0 0" />
-			<fieldValue name="sh"
-				value="0.20000000298023224" />
-		</ProtoInstance>
-		<ProtoInstance name="Ball" containerField="children">
-			<fieldValue name="p"
-				value="-2.690000057220459 -2.0699999332427979 -1.2999999523162842" />
-			<fieldValue name="rad"
-				value="1.3500000238418579" />
-			<fieldValue name="dc"
-				value="1 0 0" />
-			<fieldValue name="sc"
-				value="0 0 0" />
-			<fieldValue name="sh"
-				value="0.20000000298023224" />
-		</ProtoInstance>
-		<ProtoInstance name="Ball" containerField="children">
-			<fieldValue name="p"
-				value="-4.3499999046325684 -0.82999998331069946 0.10999999940395355" />
-			<fieldValue name="rad"
-				value="1.3500000238418579" />
-			<fieldValue name="dc"
-				value="1 0 0" />
-			<fieldValue name="sc"
-				value="0 0 0" />
-			<fieldValue name="sh"
-				value="0.20000000298023224" />
-		</ProtoInstance>
-		<ProtoInstance name="Ball" containerField="children">
-			<fieldValue name="p"
-				value="-2.1800000667572021 0.25999999046325684 -0.51999998092651367" />
-			<fieldValue name="rad"
-				value="1.3500000238418579" />
-			<fieldValue name="dc"
-				value="1 0 0" />
-			<fieldValue name="sc"
-				value="0 0 0" />
-			<fieldValue name="sh"
-				value="0.20000000298023224" />
-		</ProtoInstance>
-		<ProtoInstance name="Ball" containerField="children">
-			<fieldValue name="p"
-				value="-2.5099999904632568 1.2300000190734863 0.4699999988079071" />
-			<fieldValue name="rad"
-				value="1.7000000476837158" />
-			<fieldValue name="dc"
-				value="0.20000000298023224 0.20000000298023224 0.20000000298023224" />
-			<fieldValue name="sc"
-				value="0 0 0" />
-			<fieldValue name="sh"
-				value="0.20000000298023224" />
-		</ProtoInstance>
-		<ProtoInstance name="Ball" containerField="children">
-			<fieldValue name="p"
-				value="-1.3700000047683716 2.2100000381469727 0.70999997854232788" />
-			<fieldValue name="rad"
-				value="1.7000000476837158" />
-			<fieldValue name="dc"
-				value="0.20000000298023224 0.20000000298023224 0.20000000298023224" />
-			<fieldValue name="sc"
-				value="0 0 0" />
-			<fieldValue name="sh"
-				value="0.20000000298023224" />
-		</ProtoInstance>
-		<ProtoInstance name="Ball" containerField="children">
-			<fieldValue name="p"
-				value="-0.28999999165534973 1.5800000429153442 1.4099999666213989" />
-			<fieldValue name="rad"
-				value="1.3500000238418579" />
-			<fieldValue name="dc"
-				value="1 0 0" />
-			<fieldValue name="sc"
-				value="0 0 0" />
-			<fieldValue name="sh"
-				value="0.20000000298023224" />
-		</ProtoInstance>
-		<ProtoInstance name="Ball" containerField="children">
-			<fieldValue name="p"
-				value="-0.8399999737739563 2.75 -0.60000002384185791" />
-			<fieldValue name="rad"
-				value="1.7000000476837158" />
-			<fieldValue name="dc"
-				value="0.20000000298023224 0.20000000298023224 0.20000000298023224" />
-			<fieldValue name="sc"
-				value="0 0 0" />
-			<fieldValue name="sh"
-				value="0.20000000298023224" />
-		</ProtoInstance>
-		<ProtoInstance name="Ball" containerField="children">
-			<fieldValue name="p"
-				value="-1.059999942779541 4.1599998474121094 -0.70999997854232788" />
-			<fieldValue name="rad"
-				value="1.3500000238418579" />
-			<fieldValue name="dc"
-				value="1 0 0" />
-			<fieldValue name="sc"
-				value="0 0 0" />
-			<fieldValue name="sh"
-				value="0.20000000298023224" />
-		</ProtoInstance>
-		<ProtoInstance name="Ball" containerField="children">
-			<fieldValue name="p"
-				value="0.63999998569488525 2.4500000476837158 -0.62000000476837158" />
-			<fieldValue name="rad"
-				value="1.7000000476837158" />
-			<fieldValue name="dc"
-				value="0.20000000298023224 0.20000000298023224 0.20000000298023224" />
-			<fieldValue name="sc"
-				value="0 0 0" />
-			<fieldValue name="sh"
-				value="0.20000000298023224" />
-		</ProtoInstance>
-		<ProtoInstance name="Ball" containerField="children">
-			<fieldValue name="p"
-				value="1.4099999666213989 3.6500000953674316 -0.74000000953674316" />
-			<fieldValue name="rad"
-				value="1.3500000238418579" />
-			<fieldValue name="dc"
-				value="1 0 0" />
-			<fieldValue name="sc"
-				value="0 0 0" />
-			<fieldValue name="sh"
-				value="0.20000000298023224" />
-		</ProtoInstance>
-		<ProtoInstance name="Ball" containerField="children">
-			<fieldValue name="p"
-				value="0.94999998807907104 1.7300000190734863 0.68000000715255737" />
-			<fieldValue name="rad"
-				value="1.7000000476837158" />
-			<fieldValue name="dc"
-				value="0.20000000298023224 0.20000000298023224 0.20000000298023224" />
-			<fieldValue name="sc"
-				value="0 0 0" />
-			<fieldValue name="sh"
-				value="0.20000000298023224" />
-		</ProtoInstance>
-		<ProtoInstance name="Ball" containerField="children">
-			<fieldValue name="p"
-				value="1.5700000524520874 0.41999998688697815 0.41999998688697815" />
-			<fieldValue name="rad"
-				value="1.7000000476837158" />
-			<fieldValue name="dc"
-				value="0 0 1" />
-			<fieldValue name="sc"
-				value="0 0 0" />
-			<fieldValue name="sh"
-				value="0.20000000298023224" />
-		</ProtoInstance>
-		<ProtoInstance name="Ball" containerField="children">
-			<fieldValue name="p"
-				value="1 -0.79000002145767212 0.2199999988079071" />
-			<fieldValue name="rad"
-				value="1.7000000476837158" />
-			<fieldValue name="dc"
-				value="0.20000000298023224 0.20000000298023224 0.20000000298023224" />
-			<fieldValue name="sc"
-				value="0 0 0" />
-			<fieldValue name="sh"
-				value="0.20000000298023224" />
-		</ProtoInstance>
-		<ProtoInstance name="Ball" containerField="children">
-			<fieldValue name="p"
-				value="1.7400000095367432 -1.809999942779541 0.0099999997764825821" />
-			<fieldValue name="rad"
-				value="1.7000000476837158" />
-			<fieldValue name="dc"
-				value="0 0 1" />
-			<fieldValue name="sc"
-				value="0 0 0" />
-			<fieldValue name="sh"
-				value="0.20000000298023224" />
-		</ProtoInstance>
-		<ProtoInstance name="Ball" containerField="children">
-			<fieldValue name="p"
-				value="3.0099999904632568 -1.2300000190734863 0.070000000298023224" />
-			<fieldValue name="rad"
-				value="1.7000000476837158" />
-			<fieldValue name="dc"
-				value="0.20000000298023224 0.20000000298023224 0.20000000298023224" />
-			<fieldValue name="sc"
-				value="0 0 0" />
-			<fieldValue name="sh"
-				value="0.20000000298023224" />
-		</ProtoInstance>
-		<ProtoInstance name="Ball" containerField="children">
-			<fieldValue name="p"
-				value="4.3000001907348633 -1.8200000524520874 -0.070000000298023224" />
-			<fieldValue name="rad"
-				value="1.7000000476837158" />
-			<fieldValue name="dc"
-				value="0.20000000298023224 0.20000000298023224 0.20000000298023224" />
-			<fieldValue name="sc"
-				value="0 0 0" />
-			<fieldValue name="sh"
-				value="0.20000000298023224" />
-		</ProtoInstance>
-		<ProtoInstance name="Ball" containerField="children">
-			<fieldValue name="p"
-				value="4.570000171661377 -3 -0.30000001192092896" />
-			<fieldValue name="rad"
-				value="1.3500000238418579" />
-			<fieldValue name="dc"
-				value="1 0 0" />
-			<fieldValue name="sc"
-				value="0 0 0" />
-			<fieldValue name="sh"
-				value="0.20000000298023224" />
-		</ProtoInstance>
-		<ProtoInstance name="Ball" containerField="children">
-			<fieldValue name="p"
-				value="5.309999942779541 -0.88999998569488525 0.070000000298023224" />
-			<fieldValue name="rad"
-				value="1.7000000476837158" />
-			<fieldValue name="dc"
-				value="0 0 1" />
-			<fieldValue name="sc"
-				value="0 0 0" />
-			<fieldValue name="sh"
-				value="0.20000000298023224" />
-		</ProtoInstance>
-		<ProtoInstance name="Ball" containerField="children">
-			<fieldValue name="p"
-				value="5.130000114440918 0.46000000834465027 0.31999999284744263" />
-			<fieldValue name="rad"
-				value="1.7000000476837158" />
-			<fieldValue name="dc"
-				value="0.20000000298023224 0.20000000298023224 0.20000000298023224" />
-			<fieldValue name="sc"
-				value="0 0 0" />
-			<fieldValue name="sh"
-				value="0.20000000298023224" />
-		</ProtoInstance>
-		<ProtoInstance name="Ball" containerField="children">
-			<fieldValue name="p"
-				value="6.2300000190734863 1.190000057220459 0.41999998688697815" />
-			<fieldValue name="rad"
-				value="1.7000000476837158" />
-			<fieldValue name="dc"
-				value="0 0 1" />
-			<fieldValue name="sc"
-				value="0 0 0" />
-			<fieldValue name="sh"
-				value="0.20000000298023224" />
-		</ProtoInstance>
-		<ProtoInstance name="Ball" containerField="children">
-			<fieldValue name="p"
-				value="3.9300000667572021 1.0299999713897705 0.46000000834465027" />
-			<fieldValue name="rad"
-				value="1.7000000476837158" />
-			<fieldValue name="dc"
-				value="0 0 1" />
-			<fieldValue name="sc"
-				value="0 0 0" />
-			<fieldValue name="sh"
-				value="0.20000000298023224" />
-		</ProtoInstance>
-		<ProtoInstance name="Ball" containerField="children">
-			<fieldValue name="p"
-				value="2.9200000762939453 0.14000000059604645 0.33000001311302185" />
-			<fieldValue name="rad"
-				value="1.7000000476837158" />
-			<fieldValue name="dc"
-				value="0.20000000298023224 0.20000000298023224 0.20000000298023224" />
-			<fieldValue name="sc"
-				value="0 0 0" />
-			<fieldValue name="sh"
-				value="0.20000000298023224" />
-		</ProtoInstance>
-	</Collision>
-	<NavigationInfo
-		avatarSize="0.25 1.6000000238418579 0.75"
-		speed="4"
-		type='"EXAMINE" "FLY"' />
-	<Viewpoint
-		position="0.37000000476837158 0.51999998092651367 20.360000610351563"
-		description="overall default" />
-</Scene>
+<X3D profile="Interchange" version="3.3" xmlns:xsd="http://www.w3.org/2001/XMLSchema-instance" xsd:noNamespaceSchemaLocation="http://www.web3d.org/specifications/x3d-3.3.xsd">
+  <Scene>
+  <WorldInfo title="GDP cpk" info="&quot;Program: MolScriptSVG 2.1.2, Copyright (C) 1997-1998 Per J. Kraulis&quot; &quot;Author: jwm&quot;"/>
+  <ProtoDeclare name="Ball">
+    <ProtoInterface>
+      <field accessType="inputOutput" type="SFVec3f" name="p" value="0 0 0"/>
+      <field accessType="initializeOnly" type="SFFloat" name="rad" value="1.5"/>
+      <field accessType="initializeOnly" type="SFColor" name="dc" value="1 1 1"/>
+      <field accessType="initializeOnly" type="SFColor" name="ec" value="0 0 0"/>
+      <field accessType="initializeOnly" type="SFColor" name="sc" value="0.2 0.2 0.2"/>
+      <field accessType="initializeOnly" type="SFFloat" name="sh" value="0"/>
+      <field accessType="initializeOnly" type="SFFloat" name="tr" value="0"/>
+    </ProtoInterface>
+    <ProtoBody>
+      <Transform>
+        <Shape>
+          <Appearance>
+            <Material>
+              <IS>
+                <connect nodeField="diffuseColor" protoField="dc"/>
+                <connect nodeField="emissiveColor" protoField="ec"/>
+                <connect nodeField="specularColor" protoField="sc"/>
+                <connect nodeField="shininess" protoField="sh"/>
+                <connect nodeField="transparency" protoField="tr"/>
+              </IS>
+            </Material>
+          </Appearance>
+          <Sphere>
+            <IS>
+              <connect nodeField="radius" protoField="rad"/>
+            </IS>
+          </Sphere>
+        </Shape>
+        <IS>
+          <connect nodeField="translation" protoField="p"/>
+        </IS>
+      </Transform>
+    </ProtoBody>
+  </ProtoDeclare>
+  <ProtoDeclare name="Cyl">
+    <ProtoInterface>
+      <field accessType="inputOutput" type="SFVec3f" name="p" value="0 0 0"/>
+      <field accessType="inputOutput" type="SFRotation" name="r" value="0 0 1 0"/>
+      <field accessType="inputOutput" type="SFVec3f" name="s" value="1 1 1"/>
+      <field accessType="initializeOnly" type="SFColor" name="dc" value="1 1 1"/>
+      <field accessType="initializeOnly" type="SFColor" name="ec" value="0 0 0"/>
+      <field accessType="initializeOnly" type="SFColor" name="sc" value="0.2 0.2 0.2"/>
+      <field accessType="initializeOnly" type="SFFloat" name="sh" value="0"/>
+      <field accessType="initializeOnly" type="SFFloat" name="tr" value="0"/>
+    </ProtoInterface>
+    <ProtoBody>
+      <Transform>
+        <Shape>
+          <Appearance>
+            <Material>
+              <IS>
+                <connect nodeField="diffuseColor" protoField="dc"/>
+                <connect nodeField="emissiveColor" protoField="ec"/>
+                <connect nodeField="specularColor" protoField="sc"/>
+                <connect nodeField="shininess" protoField="sh"/>
+                <connect nodeField="transparency" protoField="tr"/>
+              </IS>
+            </Material>
+          </Appearance>
+          <Cylinder/>
+        </Shape>
+        <IS>
+          <connect nodeField="translation" protoField="p"/>
+          <connect nodeField="rotation" protoField="r"/>
+          <connect nodeField="scale" protoField="s"/>
+        </IS>
+      </Transform>
+    </ProtoBody>
+  </ProtoDeclare>
+  <ProtoDeclare name="Stick">
+    <ProtoInterface>
+      <field accessType="inputOutput" type="SFVec3f" name="p" value="0 0 0"/>
+      <field accessType="inputOutput" type="SFRotation" name="r" value="0 0 1 0"/>
+      <field accessType="inputOutput" type="SFVec3f" name="s" value="1 1 1"/>
+      <field accessType="initializeOnly" type="SFColor" name="dc" value="1 1 1"/>
+      <field accessType="initializeOnly" type="SFColor" name="ec" value="0 0 0"/>
+      <field accessType="initializeOnly" type="SFColor" name="sc" value="0.2 0.2 0.2"/>
+      <field accessType="initializeOnly" type="SFFloat" name="sh" value="0"/>
+      <field accessType="initializeOnly" type="SFFloat" name="tr" value="0"/>
+    </ProtoInterface>
+    <ProtoBody>
+      <Transform>
+        <Shape>
+          <Appearance>
+            <Material>
+              <IS>
+                <connect nodeField="diffuseColor" protoField="dc"/>
+                <connect nodeField="emissiveColor" protoField="ec"/>
+                <connect nodeField="specularColor" protoField="sc"/>
+                <connect nodeField="shininess" protoField="sh"/>
+                <connect nodeField="transparency" protoField="tr"/>
+              </IS>
+            </Material>
+          </Appearance>
+          <Extrusion spine="0 -1 0 0 1 0" crossSection="1 0 0.707107 -0.707107 -1.83697e-16 -1 -0.707107 -0.707107 -1 1.22465e-16 -0.707107 0.707107 6.12323e-17 1 0.707107 0.707107 1 0" beginCap="FALSE" endCap="FALSE" creaseAngle="1.7"/>
+        </Shape>
+        <IS>
+          <connect nodeField="translation" protoField="p"/>
+          <connect nodeField="rotation" protoField="r"/>
+          <connect nodeField="scale" protoField="s"/>
+        </IS>
+      </Transform>
+    </ProtoBody>
+  </ProtoDeclare>
+  <ProtoDeclare name="Label">
+    <ProtoInterface>
+      <field accessType="initializeOnly" type="SFVec3f" name="p" value="0 0 0"/>
+      <field accessType="initializeOnly" type="SFFloat" name="sz" value="1"/>
+      <field accessType="initializeOnly" type="MFString" name="c" value=""/>
+      <field accessType="initializeOnly" type="SFVec3f" name="o" value="0 0 0"/>
+      <field accessType="initializeOnly" type="SFColor" name="dc" value="1 1 1"/>
+      <field accessType="initializeOnly" type="SFColor" name="ec" value="0 0 0"/>
+      <field accessType="initializeOnly" type="SFColor" name="sc" value="0.2 0.2 0.2"/>
+      <field accessType="initializeOnly" type="SFFloat" name="sh" value="0"/>
+      <field accessType="initializeOnly" type="SFFloat" name="tr" value="0"/>
+    </ProtoInterface>
+    <ProtoBody>
+      <Transform>
+        <Billboard axisOfRotation="0 0 0">
+          <Transform>
+            <Shape>
+              <Appearance>
+                <Material>
+                  <IS>
+                    <connect nodeField="diffuseColor" protoField="dc"/>
+                    <connect nodeField="emissiveColor" protoField="ec"/>
+                    <connect nodeField="specularColor" protoField="sc"/>
+                    <connect nodeField="shininess" protoField="sh"/>
+                    <connect nodeField="transparency" protoField="tr"/>
+                  </IS>
+                </Material>
+              </Appearance>
+              <Text>
+                <FontStyle>
+                  <IS>
+                    <connect nodeField="size" protoField="sz"/>
+                  </IS>
+                </FontStyle>
+                <IS>
+                  <connect nodeField="string" protoField="c"/>
+                </IS>
+              </Text>
+            </Shape>
+            <IS>
+              <connect nodeField="translation" protoField="o"/>
+            </IS>
+          </Transform>
+        </Billboard>
+        <IS>
+          <connect nodeField="translation" protoField="p"/>
+        </IS>
+      </Transform>
+    </ProtoBody>
+  </ProtoDeclare>
+  <Collision collide="FALSE" bboxCenter="0.366783 0.518228 -0.202663" bboxSize="17.1354 11.9923 8.7749">
+    <ProtoInstance name="Ball">
+      <fieldValue name="p" value="-4.94 -2.27 0.55"/>
+      <fieldValue name="rad" value="1.8"/>
+      <fieldValue name="dc" value="1 0 1"/>
+      <fieldValue name="sc" value="0 0 0"/>
+      <fieldValue name="sh" value="0.2"/>
+    </ProtoInstance>
+    <ProtoInstance name="Ball">
+      <fieldValue name="p" value="-5.85 -2.63 -0.56"/>
+      <fieldValue name="rad" value="1.35"/>
+      <fieldValue name="dc" value="1 0 0"/>
+      <fieldValue name="sc" value="0 0 0"/>
+      <fieldValue name="sh" value="0.2"/>
+    </ProtoInstance>
+    <ProtoInstance name="Ball">
+      <fieldValue name="p" value="-3.74 -3.13 0.66"/>
+      <fieldValue name="rad" value="1.35"/>
+      <fieldValue name="dc" value="1 0 0"/>
+      <fieldValue name="sc" value="0 0 0"/>
+      <fieldValue name="sh" value="0.2"/>
+    </ProtoInstance>
+    <ProtoInstance name="Ball">
+      <fieldValue name="p" value="-5.62 -2.00 1.83"/>
+      <fieldValue name="rad" value="1.35"/>
+      <fieldValue name="dc" value="1 0 0"/>
+      <fieldValue name="sc" value="0 0 0"/>
+      <fieldValue name="sh" value="0.2"/>
+    </ProtoInstance>
+    <ProtoInstance name="Ball">
+      <fieldValue name="p" value="-3.30 -0.73 -1.11"/>
+      <fieldValue name="rad" value="1.8"/>
+      <fieldValue name="dc" value="1 0 1"/>
+      <fieldValue name="sc" value="0 0 0"/>
+      <fieldValue name="sh" value="0.2"/>
+    </ProtoInstance>
+    <ProtoInstance name="Ball">
+      <fieldValue name="p" value="-3.97 -0.06 -2.24"/>
+      <fieldValue name="rad" value="1.35"/>
+      <fieldValue name="dc" value="1 0 0"/>
+      <fieldValue name="sc" value="0 0 0"/>
+      <fieldValue name="sh" value="0.2"/>
+    </ProtoInstance>
+    <ProtoInstance name="Ball">
+      <fieldValue name="p" value="-2.69 -2.07 -1.30"/>
+      <fieldValue name="rad" value="1.35"/>
+      <fieldValue name="dc" value="1 0 0"/>
+      <fieldValue name="sc" value="0 0 0"/>
+      <fieldValue name="sh" value="0.2"/>
+    </ProtoInstance>
+    <ProtoInstance name="Ball">
+      <fieldValue name="p" value="-4.35 -0.83 0.11"/>
+      <fieldValue name="rad" value="1.35"/>
+      <fieldValue name="dc" value="1 0 0"/>
+      <fieldValue name="sc" value="0 0 0"/>
+      <fieldValue name="sh" value="0.2"/>
+    </ProtoInstance>
+    <ProtoInstance name="Ball">
+      <fieldValue name="p" value="-2.18 0.26 -0.52"/>
+      <fieldValue name="rad" value="1.35"/>
+      <fieldValue name="dc" value="1 0 0"/>
+      <fieldValue name="sc" value="0 0 0"/>
+      <fieldValue name="sh" value="0.2"/>
+    </ProtoInstance>
+    <ProtoInstance name="Ball">
+      <fieldValue name="p" value="-2.51 1.23 0.47"/>
+      <fieldValue name="rad" value="1.7"/>
+      <fieldValue name="dc" value="0.2 0.2 0.2"/>
+      <fieldValue name="sc" value="0 0 0"/>
+      <fieldValue name="sh" value="0.2"/>
+    </ProtoInstance>
+    <ProtoInstance name="Ball">
+      <fieldValue name="p" value="-1.37 2.21 0.71"/>
+      <fieldValue name="rad" value="1.7"/>
+      <fieldValue name="dc" value="0.2 0.2 0.2"/>
+      <fieldValue name="sc" value="0 0 0"/>
+      <fieldValue name="sh" value="0.2"/>
+    </ProtoInstance>
+    <ProtoInstance name="Ball">
+      <fieldValue name="p" value="-0.29 1.58 1.41"/>
+      <fieldValue name="rad" value="1.35"/>
+      <fieldValue name="dc" value="1 0 0"/>
+      <fieldValue name="sc" value="0 0 0"/>
+      <fieldValue name="sh" value="0.2"/>
+    </ProtoInstance>
+    <ProtoInstance name="Ball">
+      <fieldValue name="p" value="-0.84 2.75 -0.60"/>
+      <fieldValue name="rad" value="1.7"/>
+      <fieldValue name="dc" value="0.2 0.2 0.2"/>
+      <fieldValue name="sc" value="0 0 0"/>
+      <fieldValue name="sh" value="0.2"/>
+    </ProtoInstance>
+    <ProtoInstance name="Ball">
+      <fieldValue name="p" value="-1.06 4.16 -0.71"/>
+      <fieldValue name="rad" value="1.35"/>
+      <fieldValue name="dc" value="1 0 0"/>
+      <fieldValue name="sc" value="0 0 0"/>
+      <fieldValue name="sh" value="0.2"/>
+    </ProtoInstance>
+    <ProtoInstance name="Ball">
+      <fieldValue name="p" value="0.64 2.45 -0.62"/>
+      <fieldValue name="rad" value="1.7"/>
+      <fieldValue name="dc" value="0.2 0.2 0.2"/>
+      <fieldValue name="sc" value="0 0 0"/>
+      <fieldValue name="sh" value="0.2"/>
+    </ProtoInstance>
+    <ProtoInstance name="Ball">
+      <fieldValue name="p" value="1.41 3.65 -0.74"/>
+      <fieldValue name="rad" value="1.35"/>
+      <fieldValue name="dc" value="1 0 0"/>
+      <fieldValue name="sc" value="0 0 0"/>
+      <fieldValue name="sh" value="0.2"/>
+    </ProtoInstance>
+    <ProtoInstance name="Ball">
+      <fieldValue name="p" value="0.95 1.73 0.68"/>
+      <fieldValue name="rad" value="1.7"/>
+      <fieldValue name="dc" value="0.2 0.2 0.2"/>
+      <fieldValue name="sc" value="0 0 0"/>
+      <fieldValue name="sh" value="0.2"/>
+    </ProtoInstance>
+    <ProtoInstance name="Ball">
+      <fieldValue name="p" value="1.57 0.42 0.42"/>
+      <fieldValue name="rad" value="1.7"/>
+      <fieldValue name="dc" value="0 0 1"/>
+      <fieldValue name="sc" value="0 0 0"/>
+      <fieldValue name="sh" value="0.2"/>
+    </ProtoInstance>
+    <ProtoInstance name="Ball">
+      <fieldValue name="p" value="1.00 -0.79 0.22"/>
+      <fieldValue name="rad" value="1.7"/>
+      <fieldValue name="dc" value="0.2 0.2 0.2"/>
+      <fieldValue name="sc" value="0 0 0"/>
+      <fieldValue name="sh" value="0.2"/>
+    </ProtoInstance>
+    <ProtoInstance name="Ball">
+      <fieldValue name="p" value="1.74 -1.81 0.01"/>
+      <fieldValue name="rad" value="1.7"/>
+      <fieldValue name="dc" value="0 0 1"/>
+      <fieldValue name="sc" value="0 0 0"/>
+      <fieldValue name="sh" value="0.2"/>
+    </ProtoInstance>
+    <ProtoInstance name="Ball">
+      <fieldValue name="p" value="3.01 -1.23 0.07"/>
+      <fieldValue name="rad" value="1.7"/>
+      <fieldValue name="dc" value="0.2 0.2 0.2"/>
+      <fieldValue name="sc" value="0 0 0"/>
+      <fieldValue name="sh" value="0.2"/>
+    </ProtoInstance>
+    <ProtoInstance name="Ball">
+      <fieldValue name="p" value="4.30 -1.82 -0.07"/>
+      <fieldValue name="rad" value="1.7"/>
+      <fieldValue name="dc" value="0.2 0.2 0.2"/>
+      <fieldValue name="sc" value="0 0 0"/>
+      <fieldValue name="sh" value="0.2"/>
+    </ProtoInstance>
+    <ProtoInstance name="Ball">
+      <fieldValue name="p" value="4.57 -3.00 -0.30"/>
+      <fieldValue name="rad" value="1.35"/>
+      <fieldValue name="dc" value="1 0 0"/>
+      <fieldValue name="sc" value="0 0 0"/>
+      <fieldValue name="sh" value="0.2"/>
+    </ProtoInstance>
+    <ProtoInstance name="Ball">
+      <fieldValue name="p" value="5.31 -0.89 0.07"/>
+      <fieldValue name="rad" value="1.7"/>
+      <fieldValue name="dc" value="0 0 1"/>
+      <fieldValue name="sc" value="0 0 0"/>
+      <fieldValue name="sh" value="0.2"/>
+    </ProtoInstance>
+    <ProtoInstance name="Ball">
+      <fieldValue name="p" value="5.13 0.46 0.32"/>
+      <fieldValue name="rad" value="1.7"/>
+      <fieldValue name="dc" value="0.2 0.2 0.2"/>
+      <fieldValue name="sc" value="0 0 0"/>
+      <fieldValue name="sh" value="0.2"/>
+    </ProtoInstance>
+    <ProtoInstance name="Ball">
+      <fieldValue name="p" value="6.23 1.19 0.42"/>
+      <fieldValue name="rad" value="1.7"/>
+      <fieldValue name="dc" value="0 0 1"/>
+      <fieldValue name="sc" value="0 0 0"/>
+      <fieldValue name="sh" value="0.2"/>
+    </ProtoInstance>
+    <ProtoInstance name="Ball">
+      <fieldValue name="p" value="3.93 1.03 0.46"/>
+      <fieldValue name="rad" value="1.7"/>
+      <fieldValue name="dc" value="0 0 1"/>
+      <fieldValue name="sc" value="0 0 0"/>
+      <fieldValue name="sh" value="0.2"/>
+    </ProtoInstance>
+    <ProtoInstance name="Ball">
+      <fieldValue name="p" value="2.92 0.14 0.33"/>
+      <fieldValue name="rad" value="1.7"/>
+      <fieldValue name="dc" value="0.2 0.2 0.2"/>
+      <fieldValue name="sc" value="0 0 0"/>
+      <fieldValue name="sh" value="0.2"/>
+    </ProtoInstance>
+  </Collision>
+  <NavigationInfo speed="4" type="&quot;EXAMINE&quot; &quot;FLY&quot;"/>
+  <Viewpoint position="0.37 0.52 20.36" description="overall default"/>
+  </Scene>
 </X3D>

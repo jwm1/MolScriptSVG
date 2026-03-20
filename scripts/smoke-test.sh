@@ -42,7 +42,10 @@ run_case -x3d ras_std.in smoke_ras_std.x3d
 run_case -x3dv ras_std.in smoke_ras_std.x3dv
 run_case -webgl ras_std.in smoke_ras_std.webgl.html
 grep -q '<x3d-canvas id="molscript-scene"' "$EXAMPLES/smoke_ras_std.webgl.html"
-grep -q 'src="data:model/x3d+xml;charset=utf-8,' "$EXAMPLES/smoke_ras_std.webgl.html"
+grep -q '<textarea id="molscript-scene-data">' "$EXAMPLES/smoke_ras_std.webgl.html"
+grep -q "const xml = scene.value.trimStart();" "$EXAMPLES/smoke_ras_std.webgl.html"
+grep -q "new DOMParser().parseFromString(xml, 'application/xml')" "$EXAMPLES/smoke_ras_std.webgl.html"
+grep -q "canvas.appendChild(document.importNode(doc.documentElement, true));" "$EXAMPLES/smoke_ras_std.webgl.html"
 
 if command -v inkscape >/dev/null 2>&1; then
   echo "==> rasterizing smoke_ras_std.svg"
