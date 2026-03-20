@@ -1,0 +1,18 @@
+papers
+*~
+molscript
+molauto
+
+# Build products
+*.o
+*.a
+/code/*.o
+/code/clib/*.o
+/code/clib/clib.a
+
+# Local temporary files
+*.tmp
+*.log
+*.bak
+*.orig
+/.DS_Store

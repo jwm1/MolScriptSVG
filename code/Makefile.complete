@@ -1,0 +1,219 @@
+# Makefile
+#
+# MolScript v2.1.2, modernized build with optional OpenGL/image support.
+#
+# This file originally assumed a late-1990s UNIX setup with hand-installed
+# libraries under $(FREEWAREDIR). The OpenGL renderer code still builds on a
+# modern Linux system, but the old Makefile logic does not. The defaults below
+# use pkg-config and enable only the interactive OpenGL path by default.
+#
+# Optional image outputs can be enabled explicitly. The image backends prefer
+# a headless EGL context and fall back to GLUT if EGL initialization fails.
+#
+# Examples:
+#   make -f Makefile.complete
+#   make -f Makefile.complete USE_IMAGE=1
+#   make -f Makefile.complete USE_IMAGE=1 USE_PNG=1
+#   make -f Makefile.complete USE_IMAGE=1 USE_PNG=1 USE_JPEG=1 USE_GIF=1
+#
+# Per Kraulis
+#   1-Dec-1996  first attempts
+#  13-Sep-1997  rearranged optional implementations
+#  22-Oct-1997  modified for distribution
+#  19-Nov-1997  checked for distribution
+#  15-Aug-1998  reorganized for v2.1
+#   1-Nov-2014  rearranged directories for GitHub
+
+# Executables
+MOLSCRIPT = ../molscript
+MOLAUTO   = ../molauto
+
+# Command execution shell.
+SHELL = /bin/sh
+
+# Toolchain.
+CC ?= gcc
+PKG_CONFIG ?= pkg-config
+
+# Optimization flags:
+COPT ?= -O
+# Correctness flags:
+#CCHECK ?= -g -DSELECT_DEBUG
+CCHECK ?=
+
+# Feature toggles.
+USE_OPENGL ?= 1
+USE_IMAGE ?= 0
+USE_JPEG ?= 0
+USE_PNG ?= 0
+USE_GIF ?= 0
+
+# Third-party package metadata.
+LIBPNG_CFLAGS = $(shell $(PKG_CONFIG) --cflags libpng)
+LIBPNG_LIBS = $(shell $(PKG_CONFIG) --libs libpng)
+GDLIB_CFLAGS = $(shell $(PKG_CONFIG) --cflags gdlib)
+GDLIB_LIBS = $(shell $(PKG_CONFIG) --libs gdlib)
+EGL_CFLAGS = $(shell $(PKG_CONFIG) --cflags egl)
+EGL_LIBS = $(shell $(PKG_CONFIG) --libs egl)
+
+# OpenGL + GLUT + X11 via pkg-config.
+OPENGL_PKGS = glut glu gl x11
+OPENGLFLAG =
+OPENGLOBJ =
+OPENGLCLIBOBJ =
+GLUTLINK =
+
+ifeq ($(USE_OPENGL),1)
+OPENGLFLAG = -DOPENGL_SUPPORT $(shell $(PKG_CONFIG) --cflags $(OPENGL_PKGS))
+OPENGLOBJ = opengl.o
+OPENGLCLIBOBJ = ogl_utils.o ogl_body.o ogl_bitmap_character.o
+GLUTLINK = $(shell $(PKG_CONFIG) --libs $(OPENGL_PKGS))
+endif
+
+# Image file formats which require OpenGL support.
+IMAGEFLAG =
+IMAGEOBJ =
+
+ifeq ($(USE_IMAGE),1)
+ifneq ($(USE_OPENGL),1)
+$(error USE_IMAGE=1 requires USE_OPENGL=1)
+endif
+IMAGEFLAG = -DIMAGE_SUPPORT $(EGL_CFLAGS)
+IMAGEOBJ = image.o eps_img.o sgi_img.o
+endif
+
+# JPEG image file format; requires libjpeg.
+JPEGFLAG =
+JPEGOBJ =
+JPEGLINK =
+
+ifeq ($(USE_JPEG),1)
+ifneq ($(USE_IMAGE),1)
+$(error USE_JPEG=1 requires USE_IMAGE=1)
+endif
+JPEGFLAG = -DJPEG_SUPPORT
+JPEGOBJ = jpeg_img.o
+JPEGLINK = -ljpeg
+endif
+
+# PNG image file format; requires libpng and zlib.
+PNGFLAG =
+PNGOBJ =
+PNGLINK =
+ZLIBLINK =
+
+ifeq ($(USE_PNG),1)
+ifneq ($(USE_IMAGE),1)
+$(error USE_PNG=1 requires USE_IMAGE=1)
+endif
+PNGFLAG = -DPNG_SUPPORT $(LIBPNG_CFLAGS)
+PNGOBJ = png_img.o
+PNGLINK = $(LIBPNG_LIBS)
+endif
+
+# GIF image file format; requires libgd.
+GIFFLAG =
+GIFOBJ =
+GIFLINK =
+
+ifeq ($(USE_GIF),1)
+ifneq ($(USE_IMAGE),1)
+$(error USE_GIF=1 requires USE_IMAGE=1)
+endif
+GIFFLAG = -DGIF_SUPPORT $(GDLIB_CFLAGS)
+GIFOBJ = gif_img.o
+GIFLINK = $(GDLIB_LIBS)
+endif
+
+# General cc compile flags.
+CFLAGS = $(COPT) $(CCHECK) -Iclib $(OPENGLFLAG) $(IMAGEFLAG) $(JPEGFLAG) \
+         $(PNGFLAG) $(GIFFLAG)
+
+# GNU's bison; required instead of the ordinary yacc.
+YACC = bison
+YFLAGS = -d
+YLIB = 
+
+#------------------------------------------------------------
+OBJ = molscript.tab.o global.o lex.o col.o select.o \
+      state.o graphics.o segment.o coord.o xform.o \
+      postscript.o svg.o raster3d.o vrml.o x3d.o regex.o \
+      $(OPENGLOBJ) $(IMAGEOBJ) $(JPEGOBJ) $(PNGOBJ) $(GIFOBJ)
+
+#------------------------------------------------------------
+all: $(MOLSCRIPT) $(MOLAUTO)
+
+#------------------------------------------------------------
+clean:
+	(rm -f $(MOLSCRIPT) $(MOLAUTO) *.o core *~)
+	(cd clib; make clean)
+
+#------------------------------------------------------------
+$(MOLSCRIPT): $(OBJ) clib/clib.a
+	$(CC) -o $(MOLSCRIPT) $(COPT) $(OBJ) $(YLIB) clib/clib.a \
+              $(GLUTLINK) $(EGL_LIBS) $(JPEGLINK) $(PNGLINK) $(GIFLINK) $(ZLIBLINK) -lm
+
+molscript.tab.o: molscript.tab.c molscript.tab.h
+
+molscript.tab.c molscript.tab.h: molscript.y 
+	$(YACC) $(YFLAGS) molscript.y
+
+global.o: global.c global.h lex.h state.h graphics.h xform.h \
+	  postscript.h svg.h raster3d.h vrml.h x3d.h
+
+lex.o: lex.c lex.h global.h molscript.tab.h
+
+col.o: col.c col.h global.h lex.h state.h
+
+select.o: select.c select.h coord.h global.h state.h lex.h
+
+state.o: state.c state.h col.h global.h select.h
+
+graphics.o: graphics.c graphics.h coord.h state.h global.h lex.h \
+            select.h xform.h segment.h postscript.h svg.h raster3d.h vrml.h x3d.h
+
+segment.o: segment.c segment.h
+
+coord.o: coord.c coord.h global.h lex.h select.h
+
+xform.o: xform.c xform.h global.h select.h
+
+postscript.o: postscript.c postscript.h coord.h global.h \
+              graphics.h segment.h state.h
+
+svg.o: svg.c svg.h coord.h global.h graphics.h segment.h state.h
+
+raster3d.o: raster3d.c raster3d.h coord.h global.h graphics.h \
+            segment.h state.h
+
+vrml.o: vrml.c vrml.h col.h coord.h global.h graphics.h segment.h state.h
+
+x3d.o: x3d.c x3d.h col.h coord.h global.h graphics.h segment.h state.h
+
+regex.o: other/regex.c
+	$(CC) $(CFLAGS) -c -o ./regex.o other/regex.c
+
+opengl.o: opengl.c opengl.h col.h coord.h global.h graphics.h \
+          segment.h state.h lex.h select.h
+
+image.o: image.c image.h global.h graphics.h opengl.h
+
+eps_img.o: eps_img.c eps_img.h global.h graphics.h opengl.h
+
+sgi_img.o: sgi_img.c sgi_img.h global.h graphics.h image.h opengl.h
+
+jpeg_img.o: jpeg_img.c jpeg_img.h global.h graphics.h image.h opengl.h
+
+png_img.o: png_img.c png_img.h global.h graphics.h image.h opengl.h
+
+gif_img.o: gif_img.c gif_img.h global.h graphics.h image.h opengl.h
+
+#------------------------------------------------------------
+$(MOLAUTO): molauto.o clib/clib.a
+	$(CC) -o $(MOLAUTO) molauto.o clib/clib.a -lm
+
+molauto.o: molauto.c
+
+#------------------------------------------------------------
+clib/clib.a:
+	cd clib; make clib.a CFLAGS="-I. $(CFLAGS)" OPENGLCLIBOBJ="$(OPENGLCLIBOBJ)"

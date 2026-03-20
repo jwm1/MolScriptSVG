@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE X3D PUBLIC "ISO//Web3D//DTD X3D 3.3//EN" "http://www.web3d.org/specifications/x3d-3.3.dtd">
+<X3D profile="Interchange" version="3.3"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema-instance"
+     xsd:noNamespaceSchemaLocation="http://www.web3d.org/specifications/x3d-3.3.xsd">
+<head>
+	<meta name="generator" content="view3dscene, https://castle-engine.io/view3dscene.php" />
+	<meta name="source" content="molscript_x3d_93_1804289383.x3dv" />
+</head>
+<Scene>
+	<WorldInfo
+		title="c-H-Ras p21 protein (1-166), comples with GDP, Mg"
+		info='"Program: MolScriptSVG 2.1.2, Copyright (C) 1997-1998 Per J. Kraulis" "Author: jwm"' />
+	<ProtoDeclare name="Ball">
+		<ProtoInterface>
+				<field accessType="inputOutput" type="SFVec3f" name="p" value="0 0 0" />
+				<field accessType="initializeOnly" type="SFFloat" name="rad" value="1.5" />
+				<field accessType="initializeOnly" type="SFColor" name="dc" value="1 1 1" />
+				<field accessType="initializeOnly" type="SFColor" name="ec" value="0 0 0" />
+				<field accessType="initializeOnly" type="SFColor" name="sc" value="0.20000000298023224 0.20000000298023224 0.20000000298023224" />
+				<field accessType="initializeOnly" type="SFFloat" name="sh" value="0" />
+				<field accessType="initializeOnly" type="SFFloat" name="tr" value="0" />
+		</ProtoInterface>
+		<ProtoBody>
+			<Transform>
+				<Shape>
+					<Appearance>
+						<Material>
+							<IS>
+								<connect nodeField="emissiveColor" protoField="ec" />
+								<connect nodeField="diffuseColor" protoField="dc" />
+								<connect nodeField="shininess" protoField="sh" />
+								<connect nodeField="specularColor" protoField="sc" />
+								<connect nodeField="transparency" protoField="tr" />
+							</IS>
+						</Material>
+					</Appearance>
+					<Sphere>
+						<IS>
+							<connect nodeField="radius" protoField="rad" />
+						</IS>
+					</Sphere>
+				</Shape>
+				<IS>
+					<connect nodeField="translation" protoField="p" />
+				</IS>
+			</Transform>
+		</ProtoBody>
+	</ProtoDeclare>
+	<ProtoDeclare name="Cyl">
+		<ProtoInterface>
+				<field accessType="inputOutput" type="SFVec3f" name="p" value="0 0 0" />
+				<field accessType="inputOutput" type="SFRotation" name="r" value="0 0 1 0" />
+				<field accessType="inputOutput" type="SFVec3f" name="s" value="1 1 1" />
+				<field accessType="initializeOnly" type="SFColor" name="dc" value="1 1 1" />
+				<field accessType="initializeOnly" type="SFColor" name="ec" value="0 0 0" />
+				<field accessType="initializeOnly" type="SFColor" name="sc" value="0.20000000298023224 0.20000000298023224 0.20000000298023224" />
+				<field accessType="initializeOnly" type="SFFloat" name="sh" value="0" />
+				<field accessType="initializeOnly" type="SFFloat" name="tr" value="0" />
+		</ProtoInterface>
+		<ProtoBody>
+			<Transform>
+				<Shape>
+					<Appearance>
+						<Material>
+							<IS>
+								<connect nodeField="emissiveColor" protoField="ec" />
+								<connect nodeField="diffuseColor" protoField="dc" />
+								<connect nodeField="shininess" protoField="sh" />
+								<connect nodeField="specularColor" protoField="sc" />
+								<connect nodeField="transparency" protoField="tr" />
+							</IS>
+						</Material>
+					</Appearance>
+					<Cylinder />
+				</Shape>
+				<IS>
+					<connect nodeField="rotation" protoField="r" />
+					<connect nodeField="scale" protoField="s" />
+					<connect nodeField="translation" protoField="p" />
+				</IS>
+			</Transform>
+		</ProtoBody>
+	</ProtoDeclare>
+	<ProtoDeclare name="Stick">
+		<ProtoInterface>
+				<field accessType="inputOutput" type="SFVec3f" name="p" value="0 0 0" />
+				<field accessType="inputOutput" type="SFRotation" name="r" value="0 0 1 0" />
+				<field accessType="inputOutput" type="SFVec3f" name="s" value="1 1 1" />
+				<field accessType="initializeOnly" type="SFColor" name="dc" value="1 1 1" />
+				<field accessType="initializeOnly" type="SFColor" name="ec" value="0 0 0" />
+				<field accessType="initializeOnly" type="SFColor" name="sc" value="0.20000000298023224 0.20000000298023224 0.20000000298023224" />
+				<field accessType="initializeOnly" type="SFFloat" name="sh" value="0" />
+				<field accessType="initializeOnly" type="SFFloat" name="tr" value="0" />
+		</ProtoInterface>
+		<ProtoBody>
+			<Transform>
+				<Shape>
+					<Appearance>
+						<Material>
+							<IS>
+								<connect nodeField="emissiveColor" protoField="ec" />
+								<connect nodeField="diffuseColor" protoField="dc" />
+								<connect nodeField="shininess" protoField="sh" />
+								<connect nodeField="specularColor" protoField="sc" />
+								<connect nodeField="transparency" protoField="tr" />
+							</IS>
+						</Material>
+					</Appearance>
+					<Extrusion
+						spine="0 -1 0 0 1 0"
+						crossSection="1 0 0.70710700750350952 -0.70710700750350952 -1.8369700141799558E-16 -1 -0.70710700750350952 -0.70710700750350952 -1 1.2246500289587201E-16 -0.70710700750350952 0.70710700750350952 6.123230292458899E-17 1 0.70710700750350952 0.70710700750350952 1 0"
+						beginCap="false"
+						endCap="false"
+						creaseAngle="1.7000000476837158" />
+				</Shape>
+				<IS>
+					<connect nodeField="rotation" protoField="r" />
+					<connect nodeField="scale" protoField="s" />
+					<connect nodeField="translation" protoField="p" />
+				</IS>
+			</Transform>
+		</ProtoBody>
+	</ProtoDeclare>
+	<ProtoDeclare name="Label">
+		<ProtoInterface>
+				<field accessType="initializeOnly" type="SFVec3f" name="p" value="0 0 0" />
+				<field accessType="initializeOnly" type="SFFloat" name="sz" value="1" />
+				<field accessType="initializeOnly" type="MFString" name="c" value='' />
+				<field accessType="initializeOnly" type="SFVec3f" name="o" value="0 0 0" />
+				<field accessType="initializeOnly" type="SFColor" name="dc" value="1 1 1" />
+				<field accessType="initializeOnly" type="SFColor" name="ec" value="0 0 0" />
+				<field accessType="initializeOnly" type="SFColor" name="sc" value="0.20000000298023224 0.20000000298023224 0.20000000298023224" />
+				<field accessType="initializeOnly" type="SFFloat" name="sh" value="0" />
+				<field accessType="initializeOnly" type="SFFloat" name="tr" value="0" />
+		</ProtoInterface>
+		<ProtoBody>
+			<Transform>
+				<Billboard
+					axisOfRotation="0 0 0">
+					<Transform>
+						<Shape>
+							<Appearance>
+								<Material>
+									<IS>
+										<connect nodeField="emissiveColor" protoField="ec" />
+										<connect nodeField="diffuseColor" protoField="dc" />
+										<connect nodeField="shininess" protoField="sh" />
+										<connect nodeField="specularColor" protoField="sc" />
+										<connect nodeField="transparency" protoField="tr" />
+									</IS>
+								</Material>
+							</Appearance>
+							<Text>
+								<FontStyle>
+									<IS>
+										<connect nodeField="size" protoField="sz" />
+									</IS>
+								</FontStyle>
+								<IS>
+									<connect nodeField="string" protoField="c" />
+								</IS>
+							</Text>
+						</Shape>
+						<IS>
+							<connect nodeField="translation" protoField="o" />
+						</IS>
+					</Transform>
+				</Billboard>
+				<IS>
+					<connect nodeField="translation" protoField="p" />
+				</IS>
+			</Transform>
+		</ProtoBody>
+	</ProtoDeclare>
+</Scene>
+</X3D>
