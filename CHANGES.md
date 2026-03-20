@@ -1,8 +1,8 @@
 MolscriptSVG Changes
 ====================
 
-Unreleased
-----------
+MolScriptSVG 2.1.2
+------------------
 
 * Renamed this fork to MolScriptSVG 2.1.2 while keeping the executable name
   `molscript`.
@@ -17,3 +17,11 @@ Unreleased
 * Added EGL-first headless OpenGL image rendering, with fallback to hidden GLUT
   window rendering.
 * Updated example outputs and local example gallery support.
+
+Release Notes
+-------------
+
+This release turns the fork into a modernized, usable MolScript distribution
+while keeping compatibility with the historical `molscript` executable and
+script language. The main additions are SVG, native X3D/XML and WebGL output,
+plus restored OpenGL image export on modern Linux systems.

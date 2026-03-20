@@ -66,11 +66,11 @@ Version 2.1.2
 The first version of MolScript (written in Fortran 77) was released in
 1991, and its current version (2.1.2, written in C) in 1998.
 
-Please be aware that no changes have been made to the code since
-1998. The original OpenGL/image build expected a 1990s GLUT/GLX setup
-and no longer built cleanly on a modern Linux system. The `code/Makefile.complete`
-file has now been modernized to use `pkg-config` for OpenGL, PNG, JPEG and GIF
-dependencies.
+This fork keeps the upstream MolScript 2.1.2 language and executable name,
+but it is no longer a pristine 1998 code snapshot. The original OpenGL/image
+build expected a 1990s GLUT/GLX setup and no longer built cleanly on a modern
+Linux system. The `code/Makefile.complete` file has now been modernized to use
+`pkg-config` for OpenGL, PNG, JPEG and GIF dependencies.
 
 I have tested the `Makefile.basic` file, which builds an executable
 with support for PostScript, SVG, Raster3D, VRML and X3D. It works, at least on
@@ -78,7 +78,8 @@ Ubuntu 12.04. I have also verified that the [Raster3D software
 (v3.0)](http://skuld.bmsc.washington.edu/raster3d/html/raster3d.html)
 still works with MolScript.
 
-The SVG, X3D and WebGL backends are available in both the basic and complete builds:
+The SVG, X3D and WebGL backends are available in both the basic and complete
+builds:
 
 ```bash
 ./molscript -svg -in examples/ras_std.in -out ras_std.svg
@@ -124,6 +125,21 @@ This fork differs from the historical 2.1.2 release in a few important ways:
 * Updated the examples gallery to work from a local filesystem checkout and to
   include the generated SVG assets.
 * XML X3D and WebGL are now generated natively, without an external converter.
+
+Release Status
+--------------
+
+The current tree has been smoke-tested for:
+
+* `-svg`
+* `-x3d`
+* `-x3dv`
+* `-webgl`
+* OpenGL interactive mode via `-gl`
+* OpenGL-backed `-png`, `-jpeg` and `-gif`
+
+The generated example outputs under `examples/` are intended to be part of the
+repository for comparison and regression checking.
 
 For a quick smoke test after building:
 
