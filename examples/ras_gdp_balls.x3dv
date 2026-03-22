@@ -1,0 +1,345 @@
+#X3D V3.3 utf8
+PROFILE Interchange
+WorldInfo {
+title "GDP ball-and-stick"
+info [
+"Program: MolScriptSVG 2.1.2, Copyright (C) 1997-1998 Per J. Kraulis"
+"Author: jwm"
+]
+}
+PROTO Ball [
+inputOutput SFVec3f p 0 0 0
+initializeOnly SFFloat rad 1.5
+initializeOnly SFColor dc 1 1 1
+initializeOnly SFColor ec 0 0 0
+initializeOnly SFColor sc 0.2 0.2 0.2
+initializeOnly SFFloat sh 0
+initializeOnly SFFloat tr 0
+]
+{
+Transform {
+translation IS p
+children [
+Shape {
+appearance Appearance {
+material Material {
+diffuseColor IS dc
+emissiveColor IS ec
+specularColor IS sc
+shininess IS sh
+transparency IS tr
+}
+}
+geometry Sphere {
+radius IS rad
+}
+}
+]
+}
+}
+PROTO Cyl [
+inputOutput SFVec3f p 0 0 0
+inputOutput SFRotation r 0 0 1 0
+inputOutput SFVec3f s 1 1 1
+initializeOnly SFColor dc 1 1 1
+initializeOnly SFColor ec 0 0 0
+initializeOnly SFColor sc 0.2 0.2 0.2
+initializeOnly SFFloat sh 0
+initializeOnly SFFloat tr 0
+]
+{
+Transform {
+translation IS p
+rotation IS r
+scale IS s
+children [
+Shape {
+appearance Appearance {
+material Material {
+diffuseColor IS dc
+emissiveColor IS ec
+specularColor IS sc
+shininess IS sh
+transparency IS tr
+}
+}
+geometry Cylinder { }
+}
+]
+}
+}
+PROTO Stick [
+inputOutput SFVec3f p 0 0 0
+inputOutput SFRotation r 0 0 1 0
+inputOutput SFVec3f s 1 1 1
+initializeOnly SFColor dc 1 1 1
+initializeOnly SFColor ec 0 0 0
+initializeOnly SFColor sc 0.2 0.2 0.2
+initializeOnly SFFloat sh 0
+initializeOnly SFFloat tr 0
+]
+{
+Transform {
+translation IS p
+rotation IS r
+scale IS s
+children [
+Shape {
+appearance Appearance {
+material Material {
+diffuseColor IS dc
+emissiveColor IS ec
+specularColor IS sc
+shininess IS sh
+transparency IS tr
+}
+}
+geometry Extrusion {
+spine [0 -1 0, 0 1 0]
+crossSection [
+1 0 0.707107 -0.707107 -1.83697e-16 -1 -0.707107 -0.707107 -1 1.22465e-16 -0.707107 0.707107 6.12323e-17 1 0.707107 0.707107 1 0
+]
+beginCap FALSE
+endCap FALSE
+creaseAngle 1.7
+}
+}
+]
+}
+}
+PROTO Label [
+initializeOnly SFVec3f p 0 0 0
+initializeOnly SFFloat sz 1
+initializeOnly MFString c []
+initializeOnly SFVec3f o 0 0 0
+initializeOnly SFColor dc 1 1 1
+initializeOnly SFColor ec 0 0 0
+initializeOnly SFColor sc 0.2 0.2 0.2
+initializeOnly SFFloat sh 0
+initializeOnly SFFloat tr 0
+]
+{
+Transform {
+translation IS p
+children [
+Billboard {
+axisOfRotation 0 0 0
+children [
+Transform {
+translation IS o
+children [
+Shape {
+appearance Appearance {
+material Material {
+diffuseColor IS dc
+emissiveColor IS ec
+specularColor IS sc
+shininess IS sh
+transparency IS tr
+}
+}
+geometry Text {
+string IS c
+fontStyle FontStyle {
+size IS sz
+}
+}
+}
+]
+}
+]
+}
+]
+}
+}
+Collision {
+collide FALSE
+children [
+Ball {
+p -4.94 -2.27 0.55 rad 0.45 dc 1 0 1 sc 0 0 0 sh 0.2
+}
+Ball {
+p -5.85 -2.63 -0.56 rad 0.338 dc 1 0 0 sc 0 0 0 sh 0.2
+}
+Ball {
+p -3.74 -3.13 0.66 rad 0.338 dc 1 0 0 sc 0 0 0 sh 0.2
+}
+Ball {
+p -5.62 -2.00 1.83 rad 0.338 dc 1 0 0 sc 0 0 0 sh 0.2
+}
+Ball {
+p -3.30 -0.73 -1.11 rad 0.45 dc 1 0 1 sc 0 0 0 sh 0.2
+}
+Ball {
+p -3.97 -0.06 -2.24 rad 0.338 dc 1 0 0 sc 0 0 0 sh 0.2
+}
+Ball {
+p -2.69 -2.07 -1.30 rad 0.338 dc 1 0 0 sc 0 0 0 sh 0.2
+}
+Ball {
+p -4.35 -0.83 0.11 rad 0.338 dc 1 0 0 sc 0 0 0 sh 0.2
+}
+Ball {
+p -2.18 0.26 -0.52 rad 0.338 dc 1 0 0 sc 0 0 0 sh 0.2
+}
+Ball {
+p -2.51 1.23 0.47 rad 0.425 dc 0.2 0.2 0.2 sc 0 0 0 sh 0.2
+}
+Ball {
+p -1.37 2.21 0.71 rad 0.425 dc 0.2 0.2 0.2 sc 0 0 0 sh 0.2
+}
+Ball {
+p -0.29 1.58 1.41 rad 0.338 dc 1 0 0 sc 0 0 0 sh 0.2
+}
+Ball {
+p -0.84 2.75 -0.60 rad 0.425 dc 0.2 0.2 0.2 sc 0 0 0 sh 0.2
+}
+Ball {
+p -1.06 4.16 -0.71 rad 0.338 dc 1 0 0 sc 0 0 0 sh 0.2
+}
+Ball {
+p 0.64 2.45 -0.62 rad 0.425 dc 0.2 0.2 0.2 sc 0 0 0 sh 0.2
+}
+Ball {
+p 1.41 3.65 -0.74 rad 0.338 dc 1 0 0 sc 0 0 0 sh 0.2
+}
+Ball {
+p 0.95 1.73 0.68 rad 0.425 dc 0.2 0.2 0.2 sc 0 0 0 sh 0.2
+}
+Ball {
+p 1.57 0.42 0.42 rad 0.425 dc 0 0 1 sc 0 0 0 sh 0.2
+}
+Ball {
+p 1.00 -0.79 0.22 rad 0.425 dc 0.2 0.2 0.2 sc 0 0 0 sh 0.2
+}
+Ball {
+p 1.74 -1.81 0.01 rad 0.425 dc 0 0 1 sc 0 0 0 sh 0.2
+}
+Ball {
+p 3.01 -1.23 0.07 rad 0.425 dc 0.2 0.2 0.2 sc 0 0 0 sh 0.2
+}
+Ball {
+p 4.30 -1.82 -0.07 rad 0.425 dc 0.2 0.2 0.2 sc 0 0 0 sh 0.2
+}
+Ball {
+p 4.57 -3.00 -0.30 rad 0.338 dc 1 0 0 sc 0 0 0 sh 0.2
+}
+Ball {
+p 5.31 -0.89 0.07 rad 0.425 dc 0 0 1 sc 0 0 0 sh 0.2
+}
+Ball {
+p 5.13 0.46 0.32 rad 0.425 dc 0.2 0.2 0.2 sc 0 0 0 sh 0.2
+}
+Ball {
+p 6.23 1.19 0.42 rad 0.425 dc 0 0 1 sc 0 0 0 sh 0.2
+}
+Ball {
+p 3.93 1.03 0.46 rad 0.425 dc 0 0 1 sc 0 0 0 sh 0.2
+}
+Ball {
+p 2.92 0.14 0.33 rad 0.425 dc 0.2 0.2 0.2 sc 0 0 0 sh 0.2
+}
+Stick {
+p -5.3958 -2.44979 -0.00526138 r 0.772986 0 -0.634423 1.32217 s 0.2 0.743104 0.2 sc 0 0 0 sh 0.2
+}
+Stick {
+p -4.34248 -2.69778 0.606667 r -0.095515 0 0.995428 0.949584 s 0.2 0.741968 0.2 sc 0 0 0 sh 0.2
+}
+Stick {
+p -5.28171 -2.13171 1.19203 r -0.883358 0 -0.468699 1.7555 s 0.2 0.743185 0.2 sc 0 0 0 sh 0.2
+}
+Stick {
+p -4.6445 -1.5513 0.330071 r 0.594893 -0 0.803805 2.66652 s 0.2 0.808785 0.2 sc 0 0 0 sh 0.2
+}
+Stick {
+p -3.63535 -0.396571 -1.67326 r 0.860893 0 -0.508787 2.04527 s 0.2 0.743178 0.2 sc 0 0 0 sh 0.2
+}
+Stick {
+p -2.99465 -1.40147 -1.20382 r 0.30363 -0 0.95279 0.448509 s 0.2 0.742858 0.2 sc 0 0 0 sh 0.2
+}
+Stick {
+p -3.82433 -0.78485 -0.497767 r -0.75784 0 -0.652441 1.5085 s 0.2 0.807907 0.2 sc 0 0 0 sh 0.2
+}
+Stick {
+p -2.73796 -0.238377 -0.813883 r -0.461462 0 0.88716 2.23511 s 0.2 0.808347 0.2 sc 0 0 0 sh 0.2
+}
+Stick {
+p -2.34416 0.743525 -0.024696 r -0.946939 0 -0.321415 2.31763 s 0.2 0.717582 0.2 sc 0 0 0 sh 0.2
+}
+Stick {
+p -1.94183 1.72166 0.592163 r -0.206017 0 0.978548 2.27199 s 0.2 0.766637 0.2 sc 0 0 0 sh 0.2
+}
+Stick {
+p -0.828306 1.89489 1.06308 r -0.542841 0 0.839836 1.11169 s 0.2 0.723592 0.2 sc 0 0 0 sh 0.2
+}
+Stick {
+p -1.10298 2.48432 0.053784 r 0.926281 -0 0.376834 1.93379 s 0.2 0.763593 0.2 sc 0 0 0 sh 0.2
+}
+Stick {
+p 0.331176 1.65332 1.04886 r 0.509161 -0 0.860671 1.67892 s 0.2 0.723838 0.2 sc 0 0 0 sh 0.2
+}
+Stick {
+p -0.948791 3.45937 -0.656429 r 0.413403 0 -0.910548 2.96624 s 0.2 0.718833 0.2 sc 0 0 0 sh 0.2
+}
+Stick {
+p -0.0966357 2.60148 -0.613114 r 0.0112691 -0 0.999937 1.36663 s 0.2 0.757148 0.2 sc 0 0 0 sh 0.2
+}
+Stick {
+p 1.02617 3.04931 -0.678466 r 0.146762 -0 0.989172 2.56742 s 0.2 0.718315 0.2 sc 0 0 0 sh 0.2
+}
+Stick {
+p 0.794921 2.08985 0.0312433 r -0.973562 0 0.228423 1.07947 s 0.2 0.763389 0.2 sc 0 0 0 sh 0.2
+}
+Stick {
+p 1.25884 1.0751 0.553919 r 0.385908 -0 0.922537 0.474399 s 0.2 0.740415 0.2 sc 0 0 0 sh 0.2
+}
+Stick {
+p 1.28685 -0.183267 0.321528 r 0.340456 0 -0.94026 0.463074 s 0.2 0.675935 0.2 sc 0 0 0 sh 0.2
+}
+Stick {
+p 2.24337 0.278608 0.377364 r 0.0689305 -0 0.997621 1.36573 s 0.2 0.692563 0.2 sc 0 0 0 sh 0.2
+}
+Stick {
+p 1.37196 -1.29982 0.112851 r 0.277567 -0 0.960706 0.6401 s 0.2 0.643698 0.2 sc 0 0 0 sh 0.2
+}
+Stick {
+p 2.37686 -1.52214 0.040663 r -0.0534576 0 0.99857 1.99992 s 0.2 0.704336 0.2 sc 0 0 0 sh 0.2
+}
+Stick {
+p 3.65479 -1.52721 0.000353304 r 0.115326 -0 0.993328 1.13946 s 0.2 0.713123 0.2 sc 0 0 0 sh 0.2
+}
+Stick {
+p 2.96549 -0.546056 0.202788 r -0.935432 0 -0.353507 2.94417 s 0.2 0.700545 0.2 sc 0 0 0 sh 0.2
+}
+Stick {
+p 4.43246 -2.41257 -0.187471 r 0.638384 -0 0.769718 0.293225 s 0.2 0.617097 0.2 sc 0 0 0 sh 0.2
+}
+Stick {
+p 4.80374 -1.35607 -0.00337638 r -0.137805 0 0.990459 2.31055 s 0.2 0.697184 0.2 sc 0 0 0 sh 0.2
+}
+Stick {
+p 5.21955 -0.215149 0.194572 r -0.809811 0 -0.58669 2.91213 s 0.2 0.693689 0.2 sc 0 0 0 sh 0.2
+}
+Stick {
+p 5.68092 0.825503 0.373073 r -0.0921584 0 0.995744 2.15532 s 0.2 0.669277 0.2 sc 0 0 0 sh 0.2
+}
+Stick {
+p 4.52653 0.743331 0.392896 r -0.117448 0 -0.993079 2.01193 s 0.2 0.671739 0.2 sc 0 0 0 sh 0.2
+}
+Stick {
+p 3.42141 0.58357 0.397382 r 0.130873 0 -0.991399 0.851589 s 0.2 0.678833 0.2 sc 0 0 0 sh 0.2
+}
+]
+bboxCenter 0.235533 0.518228 -0.202663
+bboxSize 14.8479 9.96726 6.7499
+}
+NavigationInfo {
+speed 4
+type [
+"EXAMINE" "FLY"
+]
+}
+Viewpoint {
+position 0.24 0.52 17.61
+description "overall default"
+}

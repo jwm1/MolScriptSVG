@@ -1927,7 +1927,6 @@
 <polygon points="187.6181,465.0679 181.8885,476.8010 177.7691,474.8794 183.5888,462.9638" style="stroke:rgb(230,146,0);stroke-width:0.35;stroke-linejoin:round;stroke-linecap:round;fill:rgb(230,146,0)"/>
 <line x1="187.6181" y1="465.0679" x2="181.8885" y2="476.8010" style="stroke:rgb(0,0,0);stroke-width:0.976;stroke-linejoin:round;stroke-linecap:round;fill:none"/>
 <line x1="177.7691" y1="474.8794" x2="183.5888" y2="462.9638" style="stroke:rgb(0,0,0);stroke-width:0.976;stroke-linejoin:round;stroke-linecap:round;fill:none"/>
-<rect x="50.00" y="100.00" width="500.00" height="600.00" fill="none" stroke="rgb(0,0,0)" stroke-width="1"/>
 </g>
 </g>
 </svg>

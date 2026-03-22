@@ -4377,7 +4377,6 @@
 <polygon points="439.6915,624.1930 438.8165,625.8123 437.7826,625.2710 438.6701,623.6284" style="stroke:rgb(0,0,252);stroke-width:0.35;stroke-linejoin:round;stroke-linecap:round;fill:rgb(0,0,252)"/>
 <line x1="439.6915" y1="624.1930" x2="438.8165" y2="625.8123" style="stroke:rgb(0,0,0);stroke-width:0.999;stroke-linejoin:round;stroke-linecap:round;fill:none"/>
 <line x1="437.7826" y1="625.2710" x2="438.6701" y2="623.6284" style="stroke:rgb(0,0,0);stroke-width:0.999;stroke-linejoin:round;stroke-linecap:round;fill:none"/>
-<rect x="50.00" y="100.00" width="500.00" height="600.00" fill="none" stroke="rgb(0,0,0)" stroke-width="1"/>
 </g>
 </g>
 </svg>

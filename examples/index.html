@@ -272,9 +272,10 @@ showing the use of the
 <p>
 These images were generated directly from the PDB data set via the
 <a href="../docs/molauto.html">MolAuto</a> program, which produces
-first-approximation input files from a PDB file. It should be noted
-that the view orientation is not very good; MolAuto does not transform
-the coordinates in any way. 
+first-approximation input files from a PDB file. This fork also adds
+new MolAuto options for explicit framing/orientation and alternative
+colour presets, including a colourblind-friendly palette with blue
+strands and orange helices.
 </p>
 
 <table border cellpadding="5" style="font-size: small;">
@@ -326,6 +327,83 @@ the coordinates in any way.
     <a href="ras_molauto_nice.jpg">JPEG (large)</a>
     </td>
   </tr>
+
+<tr>
+  <td nowrap>-publication -stick<br/>-window 40 -rotate ... -translate -2 1 0</td>
+  <td>
+    <img src="ras_molauto_publication_svg.png"
+         alt="molauto publication" align=left width="180" height="180">
+  </td>
+  <td>
+    <a href="ras_molauto_publication.in">Input</a>
+    <br/>
+    <a href="ras_molauto_publication.ps">PostScript</a>
+    <br/>
+    <a href="ras_molauto_publication.svg">SVG</a>
+    <br/>
+    <a href="ras_molauto_publication_svg.png">PNG from SVG</a>
+    <br/>
+    <a href="ras_molauto_publication.x3d">X3D</a>
+    <br/>
+    <a href="ras_molauto_publication.x3dv">X3D Classic</a>
+    <br/>
+    <a href="ras_molauto_publication.webgl.html">WebGL</a>
+  </td>
+</tr>
+
+<tr>
+  <td nowrap>-colourblind -stick<br/>-window 40 -rotate ... -translate -2 1 0</td>
+  <td>
+    <img src="ras_molauto_colourblind_svg.png"
+         alt="molauto colourblind" align=left width="180" height="180">
+  </td>
+  <td>
+    <a href="ras_molauto_colourblind.in">Input</a>
+    <br/>
+    <a href="ras_molauto_colourblind.ps">PostScript</a>
+    <br/>
+    <a href="ras_molauto_colourblind.svg">SVG</a>
+    <br/>
+    <a href="ras_molauto_colourblind_svg.png">PNG from SVG</a>
+    <br/>
+    <a href="ras_molauto_colourblind.x3d">X3D</a>
+    <br/>
+    <a href="ras_molauto_colourblind.x3dv">X3D Classic</a>
+    <br/>
+    <a href="ras_molauto_colourblind.webgl.html">WebGL</a>
+    <p>
+    Colourblind-friendly fixed palette: blue strands, orange helices,
+    green coils, and yellow-orange turns.
+    </p>
+  </td>
+</tr>
+
+<tr>
+  <td nowrap>-ss_palette -stick<br/>-window 40 -rotate ... -translate -2 1 0</td>
+  <td>
+    <img src="ras_molauto_ss_palette_svg.png"
+         alt="molauto ss palette" align=left width="180" height="180">
+  </td>
+  <td>
+    <a href="ras_molauto_ss_palette.in">Input</a>
+    <br/>
+    <a href="ras_molauto_ss_palette.ps">PostScript</a>
+    <br/>
+    <a href="ras_molauto_ss_palette.svg">SVG</a>
+    <br/>
+    <a href="ras_molauto_ss_palette_svg.png">PNG from SVG</a>
+    <br/>
+    <a href="ras_molauto_ss_palette.x3d">X3D</a>
+    <br/>
+    <a href="ras_molauto_ss_palette.x3dv">X3D Classic</a>
+    <br/>
+    <a href="ras_molauto_ss_palette.webgl.html">WebGL</a>
+    <p>
+    Fixed secondary-structure palette: red helices, yellow strands,
+    grey coils, and green turns.
+    </p>
+  </td>
+</tr>
 
 </table>
 

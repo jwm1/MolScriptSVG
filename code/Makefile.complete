@@ -30,6 +30,7 @@ MOLAUTO   = ../molauto
 
 # Command execution shell.
 SHELL = /bin/sh
+.DEFAULT_GOAL := all
 
 # Toolchain.
 CC ?= gcc
@@ -43,10 +44,10 @@ CCHECK ?=
 
 # Feature toggles.
 USE_OPENGL ?= 1
-USE_IMAGE ?= 0
-USE_JPEG ?= 0
-USE_PNG ?= 0
-USE_GIF ?= 0
+USE_IMAGE ?= 1
+USE_JPEG ?= 1
+USE_PNG ?= 1
+USE_GIF ?= 1
 
 # Third-party package metadata.
 LIBPNG_CFLAGS = $(shell $(PKG_CONFIG) --cflags libpng)
@@ -143,6 +144,8 @@ OBJ = molscript.tab.o global.o lex.o col.o select.o \
 #------------------------------------------------------------
 all: $(MOLSCRIPT) $(MOLAUTO)
 
+$(OBJ): Makefile Makefile.complete Makefile.basic
+
 #------------------------------------------------------------
 clean:
 	(rm -f $(MOLSCRIPT) $(MOLAUTO) *.o core *~)
@@ -215,5 +218,8 @@ $(MOLAUTO): molauto.o clib/clib.a
 molauto.o: molauto.c
 
 #------------------------------------------------------------
-clib/clib.a:
+.PHONY: FORCE
+FORCE:
+
+clib/clib.a: FORCE
 	cd clib; make clib.a CFLAGS="-I. $(CFLAGS)" OPENGLCLIBOBJ="$(OPENGLCLIBOBJ)"

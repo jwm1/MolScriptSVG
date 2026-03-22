@@ -20,7 +20,10 @@ MolScriptSVG 2.1.2
 
 MolScriptSVG is a fork of MolScript, a program for displaying
 molecular 3D structures, such as proteins, in both schematic and
-detailed representations. As far as I can tell, MolScript is still the only program that can produce a high quality protein cartoon diagram in vector format. This fork extends the output modes of the original MolScript and fixes
+detailed representations. As far as I can tell, MolScript is still the
+only program that can produce high quality protein cartoon diagrams in
+vector format. This fork extends the output modes of the original
+MolScript and fixes OpenGL support.
 
 This fork also includes SVG, X3D and WebGL-oriented output
 backends. SVG is written directly from the MolScript geometry pipeline
@@ -167,6 +170,23 @@ builds:
 ./molscript -x3dv -in examples/ras_std.in -out ras_std.x3dv
 ./molscript -webgl -in examples/ras_std.in -out ras_std.webgl.html
 ```
+
+`molauto` has also been extended with a few modern convenience options:
+
+- `-window n`
+- `-rotate a11 a12 a13 a21 a22 a23 a31 a32 a33`
+- `-translate x y z`
+- `-ss_palette`
+- `-colourblind`
+- `-publication`
+
+The `-colourblind` preset uses a fixed high-contrast secondary-structure
+palette:
+
+- helices: orange
+- strands: blue
+- coils: green
+- turns: yellow-orange
 
 `-x3dv`, `-x3d` and `-webgl` are all generated natively by MolScriptSVG.
 The `-webgl` output is a self-contained HTML wrapper around the native XML X3D

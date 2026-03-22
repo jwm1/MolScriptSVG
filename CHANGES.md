@@ -11,6 +11,9 @@ MolScriptSVG 2.1.2
 * Added XML X3D output with `-x3d`, generated natively inside MolScriptSVG.
 * Added WebGL HTML output with `-webgl`, embedding native XML X3D for use
   with the X_ITE browser runtime.
+* Added new `molauto` options for framing/orientation (`-window`, `-rotate`,
+  `-translate`) and palette presets (`-ss_palette`, `-colourblind`,
+  `-publication`).
 * Modernized OpenGL build support in `code/Makefile.complete` for current Linux
   systems.
 * Restored OpenGL-backed PNG, JPEG and GIF output on modern systems.

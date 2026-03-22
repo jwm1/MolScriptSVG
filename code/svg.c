@@ -1324,12 +1324,6 @@ svg_finish_plot (void)
   fputs ("\"/>\n", file);
 
   db_output();
-  if (frame) {
-    fprintf (file, "<rect x=\"%.2f\" y=\"%.2f\" width=\"%.2f\" height=\"%.2f\" fill=\"none\" stroke=\"",
-             area[0], area[1], area[2] - area[0], area[3] - area[1]);
-    svg_write_colour (file, &black_colour);
-    fputs ("\" stroke-width=\"1\"/>\n", file);
-  }
   fputs ("</g>\n", file);
 
   if (message_mode)

@@ -38,6 +38,8 @@ const char copyright_str[] = "Copyright (C) 1997-1998 Per J. Kraulis";
 
 enum ss_modes { SS_PDB, SS_CA, SS_HB };
 enum ligand_modes { LIGAND_NO, LIGAND_BONDS, LIGAND_STICK, LIGAND_CPK };
+enum palette_modes { PALETTE_AUTO, PALETTE_SS, PALETTE_COLOURBLIND,
+                     PALETTE_PUBLICATION };
 
 int title_mode = TRUE;
 int centre_mode = TRUE;
@@ -48,8 +50,61 @@ int thin_mode = FALSE;
 int ligand_mode = LIGAND_BONDS;
 int colour_mode = TRUE;
 int ss_mode = SS_PDB;
+int palette_mode = PALETTE_AUTO;
+int window_mode = FALSE;
+int rotation_mode = FALSE;
+int translation_mode = FALSE;
+
+static double window_size = 0.0;
+static double rotation_matrix[9];
+static double translation_vector[3];
 
 static double hue, decrement;
+
+void fatal_error (const char *msg);
+void fatal_error_str (const char *msg, const char *str);
+
+
+/*------------------------------------------------------------*/
+static double
+parse_number (const char *opt, const char *str)
+{
+  char *end;
+  double value;
+
+  assert (opt);
+  assert (str);
+
+  value = strtod (str, &end);
+  if ((end == str) || (*end != '\0')) fatal_error_str ("invalid numeric value for", opt);
+
+  return value;
+}
+
+
+/*------------------------------------------------------------*/
+static int
+parse_number_option (const char *opt, int count, double *values)
+{
+  int slot, ix;
+
+  assert (opt);
+  assert (count > 0);
+  assert (values);
+
+  slot = args_exists ((char *) opt);
+  if (!slot) return FALSE;
+
+  if (slot + count >= args_number) fatal_error_str ("missing value(s) for", opt);
+
+  args_flag (slot);
+  for (ix = 0; ix < count; ix++) {
+    values[ix] = parse_number (opt, args_item (slot + ix + 1));
+    args_flag (slot + ix + 1);
+  }
+
+  return TRUE;
+}
 
 
 /*------------------------------------------------------------*/
@@ -99,10 +154,18 @@ process_arguments (void)
     fprintf (stderr, "Usage: molauto [options] pdbfile\n");
     fprintf (stderr, "  -notitle   do not output a title\n");
     fprintf (stderr, "  -nocentre  do not centre the molecule\n");
+    fprintf (stderr, "  -window n  emit a MolScript window command\n");
+    fprintf (stderr, "  -rotate a11 a12 a13 a21 a22 a23 a31 a32 a33\n");
+    fprintf (stderr, "             apply a manual rotation matrix\n");
+    fprintf (stderr, "  -translate x y z\n");
+    fprintf (stderr, "             apply a manual translation after centring/rotation\n");
     fprintf (stderr, "  -cylinder  use cylinders for helices\n");
     fprintf (stderr, "  -turns     use turns when specified, otherwise coil\n");
     fprintf (stderr, "  -nice      nicer rendering; rainbow colours, more segments\n");
     fprintf (stderr, "  -thin      set helix, strand, coil thickness to 0\n");
+    fprintf (stderr, "  -ss_palette use a fixed secondary-structure palette\n");
+    fprintf (stderr, "  -colourblind use a colourblind-friendly secondary-structure palette\n");
+    fprintf (stderr, "  -publication nicer geometry plus a muted publication palette\n");
     fprintf (stderr, "  -noligand  do not render ligand(s)\n");
     fprintf (stderr, "  -bonds     render ligand(s) using bonds (default)\n");
     fprintf (stderr, "  -stick     render ligand(s) using ball-and-stick\n");
@@ -122,6 +185,18 @@ process_arguments (void)
   if (slot) {
     centre_mode = FALSE;
     args_flag (slot);
+  }
+
+  if (parse_number_option ("-window", 1, &window_size)) {
+    window_mode = TRUE;
+  }
+
+  if (parse_number_option ("-rotate", 9, rotation_matrix)) {
+    rotation_mode = TRUE;
+  }
+
+  if (parse_number_option ("-translate", 3, translation_vector)) {
+    translation_mode = TRUE;
   }
 
   slot = args_exists ("-notitle");
@@ -184,6 +259,25 @@ process_arguments (void)
     args_flag (slot);
   }
 
+  slot = args_exists ("-ss_palette");
+  if (slot) {
+    palette_mode = PALETTE_SS;
+    args_flag (slot);
+  }
+
+  slot = args_exists ("-colourblind");
+  if (slot) {
+    palette_mode = PALETTE_COLOURBLIND;
+    args_flag (slot);
+  }
+
+  slot = args_exists ("-publication");
+  if (slot) {
+    palette_mode = PALETTE_PUBLICATION;
+    nice_mode = TRUE;
+    args_flag (slot);
+  }
+
   slot = args_exists ("-ss_hb");
   if (slot) {
     ss_mode = SS_HB;
@@ -208,6 +302,72 @@ process_arguments (void)
     fatal_error_str ("invalid argument: ", args_item (slot));
 
   return args_item (slot);
+}
+
+
+/*------------------------------------------------------------*/
+static void
+output_rgb_colour (double r, double g, double b)
+{
+  printf ("rgb %.4g %.4g %.4g", r, g, b);
+}
+
+
+/*------------------------------------------------------------*/
+static void
+output_palette_colour (char ss)
+{
+  assert (colour_mode);
+
+  switch (palette_mode) {
+
+  case PALETTE_SS:
+    switch (toupper (ss)) {
+    case 'H': output_rgb_colour (1.0, 0.0, 0.0); break;
+    case 'E': output_rgb_colour (1.0, 1.0, 0.0); break;
+    case 'T': output_rgb_colour (0.0, 0.7, 0.0); break;
+    default:  output_rgb_colour (0.65, 0.65, 0.65); break;
+    }
+    break;
+
+  case PALETTE_COLOURBLIND:
+    switch (toupper (ss)) {
+    case 'H': output_rgb_colour (0.835, 0.369, 0.0); break;
+    case 'E': output_rgb_colour (0.0, 0.447, 0.698); break;
+    case 'T': output_rgb_colour (0.902, 0.624, 0.0); break;
+    default:  output_rgb_colour (0.0, 0.620, 0.451); break;
+    }
+    break;
+
+  case PALETTE_PUBLICATION:
+    switch (toupper (ss)) {
+    case 'H': output_rgb_colour (0.78, 0.27, 0.25); break;
+    case 'E': output_rgb_colour (0.86, 0.72, 0.24); break;
+    case 'T': output_rgb_colour (0.39, 0.58, 0.26); break;
+    default:  output_rgb_colour (0.60, 0.60, 0.60); break;
+    }
+    break;
+
+  case PALETTE_AUTO:
+  default:
+    break;
+  }
+}
+
+
+/*------------------------------------------------------------*/
+static void
+output_scheme_colour (char ss)
+{
+  if (!colour_mode) return;
+
+  if (palette_mode == PALETTE_AUTO) {
+    output_hsb_decrement();
+  } else {
+    printf ("  set colourparts off, planecolour ");
+    output_palette_colour (ss);
+    printf (";\n");
+  }
 }
 
 
@@ -339,8 +499,10 @@ output_secondary_structure (mol3d *mol)
   if (colour_mode) {
     hue = 0.666666;
 
-    if (nice_mode) {
+    if ((palette_mode == PALETTE_AUTO) && nice_mode) {
       printf ("  set colourparts on, residuecolour amino-acids rainbow;\n\n");
+    } else if (palette_mode != PALETTE_AUTO) {
+      printf ("  set colourparts off;\n\n");
     } else {
       int parts = 0;
       ss = mol->first->secstruc;
@@ -362,15 +524,15 @@ output_secondary_structure (mol3d *mol)
   for (res = mol->first; res; res = res->next) {
     if (res->secstruc != ss) {
 
-      switch (ss) {
+	      switch (ss) {
 
-      case '-':
+	      case '-':
 	first = res;
 	break;
 
-      case ' ':
-	output_hsb_decrement();
-	printf ("  coil from %s to ", first->name);
+	      case ' ':
+		output_scheme_colour (ss);
+		printf ("  coil from %s to ", first->name);
 	switch (toupper (res->secstruc)) {
 	case '-':
 	  printf ("%s;\n", prev->name);
@@ -388,9 +550,9 @@ output_secondary_structure (mol3d *mol)
 	}
 	break;
 
-      case 'T':
-	output_hsb_decrement();
-	printf ("  turn from %s to ", first->name);
+	      case 'T':
+		output_scheme_colour (ss);
+		printf ("  turn from %s to ", first->name);
 	switch (toupper (res->secstruc)) {
 	case '-':
 	  printf ("%s;\n", prev->name);
@@ -405,9 +567,9 @@ output_secondary_structure (mol3d *mol)
 	}
 	break;
 
-      case 'H':
-	output_hsb_decrement();
-	if (cylinder_mode) {
+	      case 'H':
+		output_scheme_colour (ss);
+		if (cylinder_mode) {
 	  printf ("  cylinder from %s to ", first->name);
 	} else {
 	  printf ("  helix from %s to ", first->name);
@@ -431,9 +593,9 @@ output_secondary_structure (mol3d *mol)
 	}
 	break;
 
-      case 'E':
-	output_hsb_decrement();
-	printf ("  strand from %s to ", first->name);
+	      case 'E':
+		output_scheme_colour (ss);
+		printf ("  strand from %s to ", first->name);
 	switch (toupper (res->secstruc)) {
 	case '-':
 	  printf ("%s;\n", prev->name);
@@ -471,8 +633,25 @@ output_nucleotides (mol3d *mol)
   for (res = mol->first; res; res = res->next) {
     if (is_nucleic_acid_type (res->type)) {
       if (colour_mode) {
-	if (nice_mode) {
+	if ((palette_mode == PALETTE_AUTO) && nice_mode) {
 	  printf ("\n  set residuecolour nucleotides rainbow;");
+	} else if (palette_mode != PALETTE_AUTO) {
+	  printf ("\n  set colourparts off, planecolour ");
+	  switch (palette_mode) {
+	  case PALETTE_SS:
+	    output_rgb_colour (0.60, 0.20, 0.80);
+	    break;
+	  case PALETTE_COLOURBLIND:
+	    output_rgb_colour (0.80, 0.47, 0.65);
+	    break;
+	  case PALETTE_PUBLICATION:
+	    output_rgb_colour (0.58, 0.40, 0.72);
+	    break;
+	  case PALETTE_AUTO:
+	  default:
+	    break;
+	  }
+	  putchar (';');
 	} else {
 	  printf ("\n  set planecolour rgb 1 0.2 0.2;");
 	}
@@ -557,6 +736,7 @@ output_quoted_string (char *str)
 
 
 /*------------------------------------------------------------*/
+int
 main (int argc, char *argv[])
 {
   char *pdbfilename;
@@ -602,17 +782,45 @@ main (int argc, char *argv[])
     }
   }
 
-  printf ("plot\n\n  read mol ");
+  printf ("plot\n\n");
+
+  if (window_mode) {
+    printf ("  window %.4g;\n\n", window_size);
+  }
+
+  printf ("  read mol ");
   output_quoted_string (pdbfilename);
   printf (";\n\n");
 
-  if (centre_mode)
-    printf ("  transform atom * by centre position atom *;\n\n");
+  if (centre_mode || rotation_mode || translation_mode) {
+    printf ("  transform atom *\n");
+    if (centre_mode) {
+      printf ("    by centre position atom *\n");
+    }
+    if (rotation_mode) {
+      printf ("    by rotation\n");
+      printf ("      %.8g %.8g %.8g\n",
+	      rotation_matrix[0], rotation_matrix[1], rotation_matrix[2]);
+      printf ("      %.8g %.8g %.8g\n",
+	      rotation_matrix[3], rotation_matrix[4], rotation_matrix[5]);
+      printf ("      %.8g %.8g %.8g\n",
+	      rotation_matrix[6], rotation_matrix[7], rotation_matrix[8]);
+    }
+    if (translation_mode) {
+      printf ("    by translation %.8g %.8g %.8g\n",
+	      translation_vector[0], translation_vector[1], translation_vector[2]);
+    }
+    printf ("    ;\n\n");
+  }
 
   if (!nice_mode) printf ("  set segments 2;\n\n");
 
   if (thin_mode)
     printf ("  set strandthickness 0, helixthickness 0, coilradius 0;\n\n");
+
+  if (palette_mode == PALETTE_PUBLICATION) {
+    printf ("  set specularcolour white, smoothsteps 2;\n\n");
+  }
 
   output_secondary_structure (mol);
   output_nucleotides (mol);
