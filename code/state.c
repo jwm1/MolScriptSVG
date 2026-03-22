@@ -74,7 +74,7 @@ state_init (void)
   current_state->lightcolour = white_colour;
   current_state->lightintensity = 1.0;
   current_state->lightradius = 100.0;
-  if (output_mode == POSTSCRIPT_MODE) {
+  if (output_mode == POSTSCRIPT_MODE || output_mode == SVG_MODE) {
     current_state->linecolour = black_colour;
   } else {
     current_state->linecolour = white_colour;
