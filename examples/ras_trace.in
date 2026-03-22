@@ -6,7 +6,7 @@ title "c-H-ras p21 protein (1-166), complex with GDP and Mg"
 
 plot
 
-  window 20;
+  window 40;
 
   read mol "ras.pdb";
 
@@ -16,7 +16,7 @@ plot
       0.450861 0.724522 -0.521337
       0.328525 0.408374 0.851647
       0.829937 -0.555246 -0.0539039
-    by translation -2 -8 0
+    by translation -2 1 0
     ;
 
   set linecolour red;
