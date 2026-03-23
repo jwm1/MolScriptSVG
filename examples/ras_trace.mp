@@ -7,6 +7,13 @@ outputtemplate := "%j-%c.mps";
 % trace from 1 to 166 (166 residues)
 beginfig(1);
 % title: c-H-ras p21 protein (1-166), complex with GDP and Mg
+% image-frame transform matrix:
+%   [12.50000000 0.00000000 0.00000000 0.00000000]
+%   [0.00000000 12.50000000 0.00000000 0.00000000]
+%   [0.00000000 0.00000000 -1.00000000 0.00000000]
+%   [300.00000000 400.00000000 0.00000000 1.00000000]
+% image-frame coordinates are obtained as:
+%   [x' y' z' 1]^T = M * [x y z 1]^T
 fill (50.00,100.00)--(550.00,100.00)--(550.00,700.00)--(50.00,700.00)--cycle withcolor (1.0000,1.0000,1.0000);
 draw (197.0926,411.0352)--(219.7526,415.5929) withpen pencircle scaled 0.2544 withcolor (1.0000,0.0000,0.0000);
 draw (219.7526,415.5929)--(242.4126,420.1507) withpen pencircle scaled 0.2633 withcolor (1.0000,0.0000,0.0000);

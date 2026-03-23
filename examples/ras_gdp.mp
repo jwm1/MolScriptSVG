@@ -35,6 +35,13 @@ outputtemplate := "%j-%c.mps";
 % ball-and-stick for selected atoms (1 atoms)
 beginfig(1);
 % title: c-H-ras p21 protein (1-166), complex with GDP and Mg
+% image-frame transform matrix:
+%   [25.00000000 0.00000000 0.00000000 0.00000000]
+%   [0.00000000 25.00000000 0.00000000 0.00000000]
+%   [0.00000000 0.00000000 -1.00000000 0.00000000]
+%   [300.00000000 400.00000000 0.00000000 1.00000000]
+% image-frame coordinates are obtained as:
+%   [x' y' z' 1]^T = M * [x y z 1]^T
 fill (50.00,100.00)--(550.00,100.00)--(550.00,700.00)--(50.00,700.00)--cycle withcolor (1.0000,1.0000,1.0000);
 draw (315.4436,216.8622)--(283.7842,214.3625) withpen pencircle scaled 0.2612 withcolor (1.0000,1.0000,1.0000);
 fill (320.1605,209.1592)--(298.8229,213.4811)--(296.8657,203.6745)--(319.7696,199.1668)--cycle withcolor (0.0000,0.9991,0.7359);

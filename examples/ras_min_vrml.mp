@@ -32,6 +32,13 @@ outputtemplate := "%j-%c.mps";
 % bonds for selected atoms (1 atoms)
 beginfig(1);
 % title: c-H-Ras p21 protein (1-166), comples with GDP, Mg
+% image-frame transform matrix:
+%   [2.92299756 0.00000000 0.00000000 0.00000000]
+%   [0.00000000 2.92299756 0.00000000 0.00000000]
+%   [0.00000000 0.00000000 -1.00000000 0.00000000]
+%   [300.00000000 400.00000000 0.00000000 1.00000000]
+% image-frame coordinates are obtained as:
+%   [x' y' z' 1]^T = M * [x y z 1]^T
 fill (50.00,100.00)--(550.00,100.00)--(550.00,700.00)--(50.00,700.00)--cycle withcolor (1.0000,1.0000,1.0000);
 draw (463.9396,621.3933)--(460.1739,620.7341) withpen pencircle scaled 0.7717 withcolor (1.0000,1.0000,1.0000);
 draw (467.4324,621.9395)--(463.9396,621.3933) withpen pencircle scaled 0.7726 withcolor (1.0000,1.0000,1.0000);

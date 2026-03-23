@@ -464,6 +464,24 @@ mp_draw_axes (FILE *file, double matrix[4][4], double scale)
 
 /*------------------------------------------------------------*/
 static void
+mp_write_transform_comment (FILE *file, double matrix[4][4])
+{
+  int row;
+
+  assert (file);
+
+  fputs ("% image-frame transform matrix:\n", file);
+  for (row = 0; row < 4; row++) {
+    fprintf (file, "%%   [%.8f %.8f %.8f %.8f]\n",
+             matrix[row][0], matrix[row][1], matrix[row][2], matrix[row][3]);
+  }
+  fputs ("% image-frame coordinates are obtained as:\n", file);
+  fputs ("%   [x' y' z' 1]^T = M * [x y z 1]^T\n", file);
+}
+
+
+/*------------------------------------------------------------*/
+static void
 db_init (void)
 {
   int slot;
@@ -1289,6 +1307,7 @@ mp_finish_plot (void)
     mp_write_escaped (file, title, strlen (title), FALSE);
     fputc ('\n', file);
   }
+  mp_write_transform_comment (file, matrix);
   fprintf (file,
            "fill (%.2f,%.2f)--(%.2f,%.2f)--(%.2f,%.2f)--(%.2f,%.2f)--cycle withcolor ",
            area[0], area[1], area[2], area[1], area[2], area[3], area[0], area[3]);

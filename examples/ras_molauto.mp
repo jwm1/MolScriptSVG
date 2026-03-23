@@ -28,6 +28,13 @@ outputtemplate := "%j-%c.mps";
 % cpk for selected atoms (1 atoms)
 beginfig(1);
 % title: C-H-RAS P21 PROTEIN (CATALYTIC DOMAIN, RESIDUES 1 - 166) COMPLEXED WITH GDP AND MG (NMR, RESTRAINED MINIMIZED AVERAGE)
+% image-frame transform matrix:
+%   [11.36385487 0.00000000 0.00000000 0.00000000]
+%   [0.00000000 11.36385487 0.00000000 0.00000000]
+%   [0.00000000 0.00000000 -1.00000000 0.00000000]
+%   [300.00000000 400.00000000 0.00000000 1.00000000]
+% image-frame coordinates are obtained as:
+%   [x' y' z' 1]^T = M * [x y z 1]^T
 fill (50.00,100.00)--(550.00,100.00)--(550.00,700.00)--(50.00,700.00)--cycle withcolor (1.0000,1.0000,1.0000);
 fill (284.8511,444.4566)--(269.3466,444.9939)--(269.7670,440.4678)--(283.5983,440.0871)--cycle withcolor (0.9421,0.9942,0.0000);
 draw (284.8511,444.4566)--(269.3466,444.9939)--(269.7670,440.4678)--(283.5983,440.0871)--cycle withpen pencircle scaled 0.3500 withcolor (0.9421,0.9942,0.0000);

@@ -7,6 +7,13 @@ outputtemplate := "%j-%c.mps";
 % bonds for selected atoms (28 atoms)
 beginfig(1);
 % title: GDP bonds
+% image-frame transform matrix:
+%   [31.25000000 0.00000000 0.00000000 0.00000000]
+%   [0.00000000 31.25000000 0.00000000 0.00000000]
+%   [0.00000000 0.00000000 -1.00000000 0.00000000]
+%   [300.00000000 400.00000000 0.00000000 1.00000000]
+% image-frame coordinates are obtained as:
+%   [x' y' z' 1]^T = M * [x y z 1]^T
 fill (50.00,100.00)--(550.00,100.00)--(550.00,700.00)--(50.00,700.00)--cycle withcolor (1.0000,1.0000,1.0000);
 draw (186.3953,387.6071)--(175.9262,398.1753) withpen pencircle scaled 0.5949 withcolor (1.0000,0.0000,0.0000);
 draw (196.8643,377.0390)--(186.3953,387.6071) withpen pencircle scaled 0.7847 withcolor (1.0000,0.0000,1.0000);

@@ -7,6 +7,13 @@ outputtemplate := "%j-%c.mps";
 % cpk for selected atoms (28 atoms)
 beginfig(1);
 % title: GDP cpk
+% image-frame transform matrix:
+%   [31.25000000 0.00000000 0.00000000 0.00000000]
+%   [0.00000000 31.25000000 0.00000000 0.00000000]
+%   [0.00000000 0.00000000 -1.00000000 0.00000000]
+%   [300.00000000 400.00000000 0.00000000 1.00000000]
+% image-frame coordinates are obtained as:
+%   [x' y' z' 1]^T = M * [x y z 1]^T
 fill (50.00,100.00)--(550.00,100.00)--(550.00,700.00)--(50.00,700.00)--cycle withcolor (1.0000,1.0000,1.0000);
 fill fullcircle scaled 84.3750 shifted (175.9262,398.1753) withcolor (1.0000,0.0000,0.0000);
 draw fullcircle scaled 84.3750 shifted (175.9262,398.1753) withpen pencircle scaled 0.4615 withcolor (1.0000,1.0000,1.0000);
