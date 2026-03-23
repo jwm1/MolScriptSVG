@@ -1,6 +1,6 @@
 /* svg.c
 
-   MolScript v2.1.2
+   MolScriptSVG v2.1.4
 
    SVG
 

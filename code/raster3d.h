@@ -1,6 +1,6 @@
 /* raster3d.h
 
-   MolScript v2.1.2
+   MolScriptSVG v2.1.4
 
    Raster3D; input for the 'render' program.
 

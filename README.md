@@ -1,4 +1,4 @@
-MolScriptSVG 2.1.2
+MolScriptSVG 2.1.4
 ==================
 
     Copyright (C) 1997-1998 Per J. Kraulis
@@ -25,13 +25,14 @@ only program that can produce high quality protein cartoon diagrams in
 vector format. This fork extends the output modes of the original
 MolScript and fixes OpenGL support.
 
-This fork also includes SVG, X3D and WebGL-oriented output
-backends. SVG is written directly from the MolScript geometry pipeline
-and does not require any external SVG library. X3D output is available
-as both XML (`-x3d`) and Classic encoding (`-x3dv`). Both Classic and
-XML X3D are generated natively inside MolScriptSVG. The `-webgl` mode
-writes an HTML viewer that embeds the native XML X3D scene and
-displays it in the browser using the X_ITE WebGL runtime.
+This fork also includes SVG, MetaPost, X3D and WebGL-oriented output
+backends. SVG and MetaPost are written directly from the MolScript
+geometry pipeline and do not require any external library at export
+time. X3D output is available as both XML (`-x3d`) and Classic
+encoding (`-x3dv`). Both Classic and XML X3D are generated natively
+inside MolScriptSVG. The `-webgl` mode writes an HTML viewer that
+embeds the native XML X3D scene and displays it in the browser using
+the X_ITE WebGL runtime.
 
 Notes on syntax coverage and known grammar/doc mismatches are collected in
 [UNDOCUMENTED_FEATURES.md](UNDOCUMENTED_FEATURES.md).
@@ -49,7 +50,7 @@ Open Source
 MolScriptSVG is distributed as a fork under the MIT license in this GitHub
 repository. The original MolScript project is available at [MolScript](https://github.com/pekrau/MolScript)
 
-Version MolScriptSVG 2.1.2
+Version MolScriptSVG 2.1.4
 -------------
 
 The first version of MolScript (written in Fortran 77) was released in
@@ -123,6 +124,7 @@ with support for:
 
 - `-ps`
 - `-svg`
+- `-mp`
 - `-r3d`
 - `-wrl`
 - `-x3d`
@@ -156,16 +158,18 @@ Run:
 
 ```bash
 ./molscript -svg -in examples/ras_std.in -out ras_std.svg
+./molscript -mp -in examples/ras_std.in -out ras_std.mp
 ./molscript -x3d -in examples/ras_std.in -out ras_std.x3d
 ./molscript -x3dv -in examples/ras_std.in -out ras_std.x3dv
 ./molscript -webgl -in examples/ras_std.in -out ras_std.webgl.html
 ```
 
-The SVG, X3D and WebGL backends are available in both the basic and complete
+The SVG, MetaPost, X3D and WebGL backends are available in both the basic and complete
 builds:
 
 ```bash
 ./molscript -svg -in examples/ras_std.in -out ras_std.svg
+./molscript -mp -in examples/ras_std.in -out ras_std.mp
 ./molscript -x3d -in examples/ras_std.in -out ras_std.x3d
 ./molscript -x3dv -in examples/ras_std.in -out ras_std.x3dv
 ./molscript -webgl -in examples/ras_std.in -out ras_std.webgl.html
@@ -198,6 +202,7 @@ Fork Changes
 This fork differs from the historical 2.1.2 release in a few important ways:
 
 * Added direct SVG output with `-svg`.
+* Added MetaPost source output with `-mp`.
 * Added X3D output in both XML (`-x3d`) and Classic (`-x3dv`) encodings.
 * Added HTML WebGL viewer output with `-webgl`, backed by the X3D scene exporter.
 * Modernized the OpenGL build in `code/Makefile.complete` for current Linux
@@ -206,6 +211,7 @@ This fork differs from the historical 2.1.2 release in a few important ways:
 * Updated the examples gallery to work from a local filesystem checkout and to
   include the generated SVG assets.
 * XML X3D and WebGL are generated natively, without an external converter.
+* MetaPost output can optionally include projected axes and semantic comments.
 
 Release Status
 --------------
@@ -213,6 +219,7 @@ Release Status
 The current tree has been smoke-tested for:
 
 * `-svg`
+* `-mp`
 * `-x3d`
 * `-x3dv`
 * `-webgl`

@@ -1,6 +1,6 @@
 /* graphics.c
 
-   MolScript v2.1.2
+   MolScriptSVG v2.1.4
 
    Graphics: construct the geometries and call the output procedures.
 
@@ -101,6 +101,42 @@ msg_chain (char *type, mol3d_chain *ch)
     fprintf (stderr, "%s from %s to %s (%i residues)\n", type,
 	     (ch->residues[0])->name, (ch->residues[ch->length-1])->name,
 	     ch->length);
+}
+
+
+/*------------------------------------------------------------*/
+static void
+comment_chain (char *type, mol3d_chain *ch)
+{
+  char buffer[256];
+
+  assert (type);
+  assert (ch);
+
+  snprintf (buffer, sizeof (buffer), "%s from %s to %s (%i residues)",
+            type,
+            (ch->residues[0])->name,
+            (ch->residues[ch->length-1])->name,
+            ch->length);
+  output_comment (buffer);
+}
+
+
+/*------------------------------------------------------------*/
+static void
+comment_atom_selection (const char *type, int atom_count, int single_selection)
+{
+  char buffer[256];
+
+  assert (type);
+  assert (atom_count >= 0);
+
+  snprintf (buffer, sizeof (buffer),
+            "%s for %sselected atoms (%i atoms)",
+            type,
+            single_selection ? "" : "paired ",
+            atom_count);
+  output_comment (buffer);
 }
 
 
@@ -326,6 +362,7 @@ ball_and_stick (int single_selection)
       fprintf (stderr, "%i atoms selected for ball-and-stick\n", atom_count1);
 
     if (atoms1 == NULL) return;
+    comment_atom_selection ("ball-and-stick", atom_count1, TRUE);
 
     for (slot1 = 0; slot1 < atom_count1; slot1++) { /* balls output */
       radius = 0.25 * atoms1[slot1]->radius;
@@ -348,6 +385,7 @@ ball_and_stick (int single_selection)
     if (message_mode) {
       fprintf (stderr, "%i atoms in first set and %i atoms in second set for ball-and-stick\n", atom_count1, atom_count2);
     }
+    comment_atom_selection ("ball-and-stick", atom_count1 + atom_count2, FALSE);
 
     if (atoms1 == NULL) {
       if (atoms2 != NULL) free (atoms2);
@@ -460,6 +498,7 @@ bonds (int single_selection)
       fprintf (stderr, "%i atoms selected for bonds\n", atom_count1);
 
     if (atoms1 == NULL) return;
+    comment_atom_selection ("bonds", atom_count1, TRUE);
 
     atoms2 = atoms1;
     atom_count2 = atom_count1;
@@ -478,6 +517,7 @@ bonds (int single_selection)
 	       "%i atoms in first set and %i atoms in second set for bonds\n",
 	       atom_count1, atom_count2);
     }
+    comment_atom_selection ("bonds", atom_count1 + atom_count2, FALSE);
 
     if (atoms1 == NULL) {
       if (atoms2 != NULL) free (atoms2);
@@ -718,6 +758,7 @@ coil (int is_peptide_chain, int smoothing)
     if (ch->length < 2) continue;
 
     msg_chain (coilname, ch);
+    comment_chain (coilname, ch);
     points = get_atom_positions (ch);
 
     first = NULL;		/* find atom before or in first residue */
@@ -957,6 +998,7 @@ cpk (void)
   if (message_mode)
     fprintf (stderr, "%i atoms selected for cpk\n", atom_count);
   if (atoms == NULL) return;
+  comment_atom_selection ("cpk", atom_count, TRUE);
 
   for (slot = 0; slot < atom_count; slot++) {
     radius = atoms[slot]->radius;
@@ -985,6 +1027,7 @@ cylinder (void)
     if (ch->length < 3) continue;
 
     msg_chain ("cylinder", ch);
+    comment_chain ("cylinder", ch);
 
     v3_middle (&start, &(ch->atoms[0]->xyz), &(ch->atoms[2]->xyz));
     v3_middle (&finish, &(ch->atoms[ch->length-3]->xyz),
@@ -1061,6 +1104,7 @@ helix (void)
     if (ch->length < 3) continue;
 
     msg_chain ("helix", ch);
+    comment_chain ("helix", ch);
 
     points = get_atom_positions (ch); /* helix axis and tangent vectors */
     axes = malloc (ch->length * sizeof (vector3));
@@ -1627,6 +1671,7 @@ strand (void)
     if (ch->length < 3) continue;
 
     msg_chain ("strand", ch);
+    comment_chain ("strand", ch);
 
     points = get_atom_positions (ch);
 				/* normals for the strand */
@@ -1874,6 +1919,7 @@ trace (void)
     }
 
     msg_chain ("trace", ch);
+    comment_chain ("trace", ch);
   }
 
   output_line (TRUE);

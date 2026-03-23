@@ -1,12 +1,16 @@
 MolscriptSVG Changes
 ====================
 
-MolScriptSVG 2.1.2
+MolScriptSVG 2.1.4
 ------------------
 
-* Renamed this fork to MolScriptSVG 2.1.2 while keeping the executable name
+* Renamed this fork to MolScriptSVG while keeping the executable name
   `molscript`.
 * Added native SVG output with `-svg`.
+* Added MetaPost source output with `-mp`.
+* Added optional MetaPost axes/tick overlay with `-mpaxes`.
+* Added semantic comments to MetaPost output for secondary-structure and
+  selected atom-style drawing commands.
 * Added Classic X3D output with `-x3dv`.
 * Added XML X3D output with `-x3d`, generated natively inside MolScriptSVG.
 * Added WebGL HTML output with `-webgl`, embedding native XML X3D for use
@@ -19,7 +23,8 @@ MolScriptSVG 2.1.2
 * Restored OpenGL-backed PNG, JPEG and GIF output on modern systems.
 * Added EGL-first headless OpenGL image rendering, with fallback to hidden GLUT
   window rendering.
-* Updated example outputs and local example gallery support.
+* Updated example outputs and local example gallery support, including
+  MetaPost source files.
 
 Release Notes
 -------------

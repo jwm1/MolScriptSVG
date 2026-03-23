@@ -1,6 +1,6 @@
 /* select.c
 
-   MolScript v2.1.2
+   MolScriptSVG v2.1.4
 
    Atom and residue selection routines.
 

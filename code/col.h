@@ -1,6 +1,6 @@
 /* col.h
 
-   MolScript v2.1.2
+   MolScriptSVG v2.1.4
 
    Colour routine definitions.
 

@@ -1,6 +1,6 @@
 /* eps_img.h
 
-   MolScript v2.1.2
+   MolScriptSVG v2.1.4
 
    Encapsulated PostScript (EPS) image file.
 

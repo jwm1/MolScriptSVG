@@ -1,6 +1,6 @@
 /* global.c
 
-   MolScriptSVG 2.1.2
+   MolScriptSVG 2.1.4
 
    Global stuff.
 
@@ -21,6 +21,7 @@
 #include "xform.h"
 #include "postscript.h"
 #include "svg.h"
+#include "metapost.h"
 #include "raster3d.h"
 #include "vrml.h"
 #include "x3d.h"
@@ -45,7 +46,7 @@
 
 
 /*------------------------------------------------------------*/
-const char program_str[] = "MolScriptSVG 2.1.2";
+const char program_str[] = "MolScriptSVG 2.1.4";
 const char copyright_str[] = "Copyright (C) 1997-1998 Per J. Kraulis";
 char user_str[81];
 
@@ -195,6 +196,8 @@ process_arguments (int *argcp, char *argv[])
     fprintf (stderr, "Usage: molscript [options] < script > outfile\n");
     fprintf (stderr, "-ps -postscript      PostScript file output (default)\n");
     fprintf (stderr, "-svg                 SVG file output\n");
+    fprintf (stderr, "-mp -metapost        MetaPost source output\n");
+    fprintf (stderr, "-mpaxes              draw projected axes with distance ticks in MetaPost output\n");
     fprintf (stderr, "-r -raster3d [alias] Raster3D file output (for 'render'), alias=1,2,3\n");
     fprintf (stderr, "-vrml                VRML 2.0 file output\n");
     fprintf (stderr, "-x3d                 X3D XML file output\n");
@@ -244,6 +247,21 @@ process_arguments (int *argcp, char *argv[])
     if (output_mode != UNDEFINED_MODE) goto format_error;
     args_flag (slot);
     svg_set();
+  }
+
+  slot = args_exists ("-mp");
+  slot2 = args_exists ("-metapost");
+  if (slot || slot2) {
+    if (output_mode != UNDEFINED_MODE) goto format_error;
+    if (slot) args_flag (slot);
+    if (slot2) args_flag (slot2);
+    mp_set();
+  }
+
+  slot = args_exists ("-mpaxes");
+  if (slot) {
+    args_flag (slot);
+    mp_set_axes (TRUE);
   }
 
   slot = args_exists ("-r");

@@ -1,6 +1,6 @@
 /* vrml.c
 
-   MolScript v2.1.2
+   MolScriptSVG v2.1.4
 
    VRML V2.0
 

@@ -1,6 +1,6 @@
 /* sgi_img.c
 
-   MolScript v2.1.2
+   MolScriptSVG v2.1.4
 
    SGI image file.
 

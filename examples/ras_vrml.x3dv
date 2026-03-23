@@ -3,7 +3,7 @@ PROFILE Interchange
 WorldInfo {
 title "c-H-Ras p21 protein (1-166), comples with GDP, Mg"
 info [
-"Program: MolScriptSVG 2.1.2, Copyright (C) 1997-1998 Per J. Kraulis"
+"Program: MolScriptSVG 2.1.4, Copyright (C) 1997-1998 Per J. Kraulis"
 "Author: jwm"
 ]
 }

@@ -1,6 +1,6 @@
 /* gif_img.h
 
-   MolScript v2.1.2
+   MolScriptSVG v2.1.4
 
    GIF image file.
 

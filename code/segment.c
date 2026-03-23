@@ -1,6 +1,6 @@
 /* segment.c
 
-   MolScript v2.1.2
+   MolScriptSVG v2.1.4
 
    Segment data structure and routines.
 

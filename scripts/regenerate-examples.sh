@@ -18,6 +18,7 @@ for input in *.in; do
   echo "==> regenerating $base"
   "$MOLSCRIPT" -ps -in "$input" -out "$base.ps"
   "$MOLSCRIPT" -svg -in "$input" -out "$base.svg"
+  "$MOLSCRIPT" -mp -in "$input" -out "$base.mp"
   "$MOLSCRIPT" -x3d -in "$input" -out "$base.x3d"
   "$MOLSCRIPT" -x3dv -in "$input" -out "$base.x3dv"
   "$MOLSCRIPT" -webgl -in "$input" -out "$base.webgl.html"
@@ -36,10 +37,11 @@ else
   echo "warning: inkscape not found; skipping *_svg.png generation" >&2
 fi
 
-printf 'done: in=%s ps=%s svg=%s x3d=%s x3dv=%s webgl=%s svg_png=%s\n' \
+printf 'done: in=%s ps=%s svg=%s mp=%s x3d=%s x3dv=%s webgl=%s svg_png=%s\n' \
   "$(ls -1 *.in | wc -l)" \
   "$(ls -1 *.ps | wc -l)" \
   "$(ls -1 *.svg | wc -l)" \
+  "$(ls -1 *.mp | wc -l)" \
   "$(ls -1 *.x3d | wc -l)" \
   "$(ls -1 *.x3dv | wc -l)" \
   "$(ls -1 *.webgl.html | wc -l)" \
