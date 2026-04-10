@@ -1,13 +1,15 @@
 MolscriptSVG Changes
 ====================
 
-MolScriptSVG 2.1.4
+MolScriptSVG 2.1.5
 ------------------
 
 * Renamed this fork to MolScriptSVG while keeping the executable name
   `molscript`.
 * Added native SVG output with `-svg`.
 * Added MetaPost source output with `-mp`.
+* Added POV-Ray scene output with `-pov` / `-povray`.
+* Added `scripts/render-pov-examples.sh` and rendered POV example PNGs.
 * Added optional MetaPost axes/tick overlay with `-mpaxes`.
 * Added semantic comments to MetaPost output for secondary-structure and
   selected atom-style drawing commands.
@@ -24,7 +26,7 @@ MolScriptSVG 2.1.4
 * Added EGL-first headless OpenGL image rendering, with fallback to hidden GLUT
   window rendering.
 * Updated example outputs and local example gallery support, including
-  MetaPost source files.
+  MetaPost source files and POV-Ray rendered example images.
 
 Release Notes
 -------------

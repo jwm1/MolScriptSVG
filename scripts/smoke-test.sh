@@ -6,6 +6,8 @@ EXAMPLES="$ROOT/examples"
 MOLSCRIPT="$ROOT/molscript"
 SMOKE_FILES="
 $EXAMPLES/smoke_ras_std.svg
+$EXAMPLES/smoke_ras_std.pov
+$EXAMPLES/smoke_ras_std_pov.png
 $EXAMPLES/smoke_ras_std.x3d
 $EXAMPLES/smoke_ras_std.x3dv
 $EXAMPLES/smoke_ras_std.webgl.html
@@ -38,9 +40,13 @@ run_case() {
 }
 
 run_case -svg ras_std.in smoke_ras_std.svg
+run_case -pov ras_std.in smoke_ras_std.pov
 run_case -x3d ras_std.in smoke_ras_std.x3d
 run_case -x3dv ras_std.in smoke_ras_std.x3dv
 run_case -webgl ras_std.in smoke_ras_std.webgl.html
+grep -q '^#version 3.7;' "$EXAMPLES/smoke_ras_std.pov"
+grep -q '^camera {' "$EXAMPLES/smoke_ras_std.pov"
+grep -q '^light_source {' "$EXAMPLES/smoke_ras_std.pov"
 grep -q '<x3d-canvas id="molscript-scene"' "$EXAMPLES/smoke_ras_std.webgl.html"
 grep -q '<textarea id="molscript-scene-data">' "$EXAMPLES/smoke_ras_std.webgl.html"
 grep -q "const xml = scene.value.trimStart();" "$EXAMPLES/smoke_ras_std.webgl.html"
@@ -54,6 +60,18 @@ if command -v inkscape >/dev/null 2>&1; then
     test -s "$EXAMPLES/smoke_ras_std_svg.png"
   else
     echo "warning: skipping inkscape validation" >&2
+  fi
+fi
+
+if command -v povray >/dev/null 2>&1; then
+  echo "==> rendering smoke_ras_std.pov"
+  mkdir -p /tmp/povray_home
+  if HOME=/tmp/povray_home povray \
+      "+I$EXAMPLES/smoke_ras_std.pov" "+O$EXAMPLES/smoke_ras_std_pov.png" \
+      +FN +W600 +H600 +A0.2 +R3 -D >/dev/null 2>&1; then
+    test -s "$EXAMPLES/smoke_ras_std_pov.png"
+  else
+    echo "warning: skipping povray validation" >&2
   fi
 fi
 

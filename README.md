@@ -1,4 +1,4 @@
-MolScriptSVG 2.1.4
+MolScriptSVG 2.1.5
 ==================
 
     Copyright (C) 1997-1998 Per J. Kraulis
@@ -25,8 +25,8 @@ only program that can produce high quality protein cartoon diagrams in
 vector format. This fork extends the output modes of the original
 MolScript and fixes OpenGL support.
 
-This fork also includes SVG, MetaPost, X3D and WebGL-oriented output
-backends. SVG and MetaPost are written directly from the MolScript
+This fork also includes SVG, MetaPost, POV-Ray, X3D and WebGL-oriented output
+backends. SVG, MetaPost, and POV-Ray are written directly from the MolScript
 geometry pipeline and do not require any external library at export
 time. X3D output is available as both XML (`-x3d`) and Classic
 encoding (`-x3dv`). Both Classic and XML X3D are generated natively
@@ -50,7 +50,7 @@ Open Source
 MolScriptSVG is distributed as a fork under the MIT license in this GitHub
 repository. The original MolScript project is available at [MolScript](https://github.com/pekrau/MolScript)
 
-Version MolScriptSVG 2.1.4
+Version MolScriptSVG 2.1.5
 -------------
 
 The first version of MolScript (written in Fortran 77) was released in
@@ -125,6 +125,7 @@ with support for:
 - `-ps`
 - `-svg`
 - `-mp`
+- `-pov`
 - `-r3d`
 - `-wrl`
 - `-x3d`
@@ -159,17 +160,34 @@ Run:
 ```bash
 ./molscript -svg -in examples/ras_std.in -out ras_std.svg
 ./molscript -mp -in examples/ras_std.in -out ras_std.mp
+./molscript -pov -in examples/ras_std.in -out ras_std.pov
 ./molscript -x3d -in examples/ras_std.in -out ras_std.x3d
 ./molscript -x3dv -in examples/ras_std.in -out ras_std.x3dv
 ./molscript -webgl -in examples/ras_std.in -out ras_std.webgl.html
 ```
 
-The SVG, MetaPost, X3D and WebGL backends are available in both the basic and complete
+If `povray` is installed, the generated `.pov` scene files can be rendered to
+PNG images with:
+
+```bash
+./scripts/render-pov-examples.sh
+```
+
+The broader example refresh script:
+
+```bash
+./scripts/regenerate-examples.sh
+```
+
+will also render `*_pov.png` images automatically when `povray` is available.
+
+The SVG, MetaPost, POV-Ray, X3D and WebGL backends are available in both the basic and complete
 builds:
 
 ```bash
 ./molscript -svg -in examples/ras_std.in -out ras_std.svg
 ./molscript -mp -in examples/ras_std.in -out ras_std.mp
+./molscript -pov -in examples/ras_std.in -out ras_std.pov
 ./molscript -x3d -in examples/ras_std.in -out ras_std.x3d
 ./molscript -x3dv -in examples/ras_std.in -out ras_std.x3dv
 ./molscript -webgl -in examples/ras_std.in -out ras_std.webgl.html
@@ -203,6 +221,8 @@ This fork differs from the historical 2.1.2 release in a few important ways:
 
 * Added direct SVG output with `-svg`.
 * Added MetaPost source output with `-mp`.
+* Added POV-Ray scene output with `-pov` / `-povray`.
+* Added a POV-Ray example render script and rendered `*_pov.png` example images.
 * Added X3D output in both XML (`-x3d`) and Classic (`-x3dv`) encodings.
 * Added HTML WebGL viewer output with `-webgl`, backed by the X3D scene exporter.
 * Modernized the OpenGL build in `code/Makefile.complete` for current Linux
@@ -212,6 +232,8 @@ This fork differs from the historical 2.1.2 release in a few important ways:
   include the generated SVG assets.
 * XML X3D and WebGL are generated natively, without an external converter.
 * MetaPost output can optionally include projected axes and semantic comments.
+* POV-Ray output now uses fitted orthographic cameras and softer multi-light
+  scene defaults for rendered examples.
 
 Release Status
 --------------

@@ -1,6 +1,6 @@
 /* state.c
 
-   MolScriptSVG v2.1.4
+   MolScriptSVG v2.1.5
 
    Graphics state.
 

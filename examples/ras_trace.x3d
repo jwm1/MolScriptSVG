@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <X3D profile="Interchange" version="3.3" xmlns:xsd="http://www.w3.org/2001/XMLSchema-instance" xsd:noNamespaceSchemaLocation="http://www.web3d.org/specifications/x3d-3.3.xsd">
   <Scene>
-  <WorldInfo title="c-H-ras p21 protein (1-166), complex with GDP and Mg" info="&quot;Program: MolScriptSVG 2.1.4, Copyright (C) 1997-1998 Per J. Kraulis&quot; &quot;Author: jwm&quot;"/>
+  <WorldInfo title="c-H-ras p21 protein (1-166), complex with GDP and Mg" info="&quot;Program: MolScriptSVG 2.1.5, Copyright (C) 1997-1998 Per J. Kraulis&quot; &quot;Author: jwm&quot;"/>
   <ProtoDeclare name="Ball">
     <ProtoInterface>
       <field accessType="inputOutput" type="SFVec3f" name="p" value="0 0 0"/>

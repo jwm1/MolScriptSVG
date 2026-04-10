@@ -1,6 +1,6 @@
 /* global.h
 
-   MolScriptSVG v2.1.4
+   MolScriptSVG v2.1.5
 
    Global stuff.
 
@@ -32,6 +32,7 @@
 #define X3D_MODE        11
 #define WEBGL_MODE      12
 #define METAPOST_MODE   13
+#define POVRAY_MODE     14
 
 #define PRINT(str) fprintf(outfile,"%s",(str))
 

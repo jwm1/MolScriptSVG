@@ -138,7 +138,7 @@ YLIB =
 #------------------------------------------------------------
 OBJ = molscript.tab.o global.o lex.o col.o select.o \
       state.o graphics.o segment.o coord.o xform.o \
-      postscript.o svg.o metapost.o raster3d.o vrml.o x3d.o regex.o \
+      postscript.o svg.o metapost.o povray.o raster3d.o vrml.o x3d.o regex.o \
       $(OPENGLOBJ) $(IMAGEOBJ) $(JPEGOBJ) $(PNGOBJ) $(GIFOBJ)
 
 #------------------------------------------------------------
@@ -162,7 +162,7 @@ molscript.tab.c molscript.tab.h: molscript.y
 	$(YACC) $(YFLAGS) molscript.y
 
 global.o: global.c global.h lex.h state.h graphics.h xform.h \
-	  postscript.h svg.h metapost.h raster3d.h vrml.h x3d.h
+	  postscript.h svg.h metapost.h povray.h raster3d.h vrml.h x3d.h
 
 lex.o: lex.c lex.h global.h molscript.tab.h
 
@@ -187,6 +187,8 @@ postscript.o: postscript.c postscript.h coord.h global.h \
 svg.o: svg.c svg.h coord.h global.h graphics.h segment.h state.h
 
 metapost.o: metapost.c metapost.h coord.h global.h graphics.h segment.h state.h
+
+povray.o: povray.c povray.h coord.h global.h graphics.h segment.h state.h
 
 raster3d.o: raster3d.c raster3d.h coord.h global.h graphics.h \
             segment.h state.h
