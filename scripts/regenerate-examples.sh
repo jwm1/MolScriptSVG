@@ -25,18 +25,7 @@ for input in *.in; do
   "$MOLSCRIPT" -webgl -in "$input" -out "$base.webgl.html"
 done
 
-if command -v inkscape >/dev/null 2>&1; then
-  echo "==> rasterizing SVG outputs"
-  rm -f *_svg.png
-  for svg in *.svg; do
-    abs_svg="$EXAMPLES/$svg"
-    base=${svg%.svg}
-    abs_png="$EXAMPLES/${base}_svg.png"
-    inkscape "$abs_svg" --export-type=png --export-filename="$abs_png" >/dev/null 2>&1
-  done
-else
-  echo "warning: inkscape not found; skipping *_svg.png generation" >&2
-fi
+python3 "$ROOT/scripts/regenerate-svg-examples.py" --rasterize-only
 
 if command -v povray >/dev/null 2>&1; then
   echo "==> rendering POV-Ray outputs"

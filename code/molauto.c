@@ -20,6 +20,8 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
+#include <errno.h>
+#include <math.h>
 
 #include <args.h>
 #include <str_utils.h>
@@ -75,8 +77,10 @@ parse_number (const char *opt, const char *str)
   assert (opt);
   assert (str);
 
+  errno = 0;
   value = strtod (str, &end);
-  if ((end == str) || (*end != '\0')) fatal_error_str ("invalid numeric value for", opt);
+  if ((end == str) || (*end != '\0') || !isfinite (value) || errno == ERANGE)
+    fatal_error_str ("invalid numeric value for", opt);
 
   return value;
 }
@@ -147,6 +151,7 @@ char *
 process_arguments (void)
 {
   int slot;
+  char *filename;
 
   args_flag (0);
 
@@ -188,6 +193,7 @@ process_arguments (void)
   }
 
   if (parse_number_option ("-window", 1, &window_size)) {
+    if (window_size <= 0.0) fatal_error ("-window must be positive");
     window_mode = TRUE;
   }
 
@@ -301,7 +307,11 @@ process_arguments (void)
   if (args_item (slot) [0] == '-')
     fatal_error_str ("invalid argument: ", args_item (slot));
 
-  return args_item (slot);
+  filename = args_item (slot);
+  args_flag (slot);
+  slot = args_unflagged();
+  if (slot > 0) fatal_error_str ("unexpected argument:", args_item (slot));
+  return filename;
 }
 
 
@@ -381,6 +391,8 @@ set_secondary_structure (mol3d *mol)
 
   assert (mol);
 
+  if (!mol->first) fatal_error ("PDB file contains no residues");
+
   switch (ss_mode) {
 
   case SS_PDB:			/* has already been set, if data was there */
@@ -449,13 +461,14 @@ set_secondary_structure (mol3d *mol)
   first = mol->first;
   ss = toupper (first->secstruc);
   count = 1;
-  for (res = mol->first; res; res = res->next) {
-    if (res->secstruc == ss) {
+  for (res = first->next; ; res = res->next) {
+    if (res && res->secstruc == ss) {
       count++;
     } else {
       if (((ss == 'H') || (ss == 'E')) && (count < 3)) {
 	for (; first != res; first = first->next) first->secstruc = ' ';
       }
+      if (!res) break;
       first = res;
       ss = toupper (res->secstruc);
       count = 1;
@@ -768,16 +781,20 @@ main (int argc, char *argv[])
 	while ((*pos != '\0') && (*pos != ';')) ds_add (ds2, *pos++);
 	ds_right_adjust (ds2);
 	ds_left_adjust (ds2);
-	printf ("title ");
-	output_quoted_string (ds2->string);
-	printf ("\n\n");
+	if (ds2->length > 0) {
+	  printf ("title ");
+	  output_quoted_string (ds2->string);
+	  printf ("\n\n");
+	}
 	ds_delete (ds2);
       } else {
 	ds_right_adjust (ds);
 	ds_left_adjust (ds);
-	printf ("title ");
-	output_quoted_string (ds->string);
-	printf ("\n\n");
+	if (ds->length > 0) {
+	  printf ("title ");
+	  output_quoted_string (ds->string);
+	  printf ("\n\n");
+	}
       }
     }
   }

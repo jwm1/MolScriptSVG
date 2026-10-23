@@ -5,9 +5,9 @@
 # This file originally assumed a late-1990s UNIX setup with hand-installed
 # libraries under $(FREEWAREDIR). The OpenGL renderer code still builds on a
 # modern Linux system, but the old Makefile logic does not. The defaults below
-# use pkg-config and enable only the interactive OpenGL path by default.
+# use pkg-config and enable OpenGL and all image formats by default.
 #
-# Optional image outputs can be enabled explicitly. The image backends prefer
+# FreeType labels are optional (USE_FREETYPE=1). The image backends prefer
 # a headless EGL context and fall back to GLUT if EGL initialization fails.
 #
 # Examples:
@@ -48,6 +48,20 @@ USE_IMAGE ?= 1
 USE_JPEG ?= 1
 USE_PNG ?= 1
 USE_GIF ?= 1
+USE_FREETYPE ?= 0
+
+FONTFLAG =
+FONTLINK =
+ifeq ($(USE_FREETYPE),1)
+ifneq ($(USE_OPENGL),1)
+$(error USE_FREETYPE=1 requires USE_OPENGL=1)
+endif
+ifeq ($(shell $(PKG_CONFIG) --exists freetype2 && echo yes),)
+$(error USE_FREETYPE=1 requires the FreeType development package)
+endif
+FONTFLAG = -DFREETYPE_SUPPORT $(shell $(PKG_CONFIG) --cflags freetype2)
+FONTLINK = $(shell $(PKG_CONFIG) --libs freetype2)
+endif
 
 # Third-party package metadata.
 LIBPNG_CFLAGS = $(shell $(PKG_CONFIG) --cflags libpng)
@@ -128,7 +142,7 @@ endif
 
 # General cc compile flags.
 CFLAGS = $(COPT) $(CCHECK) -Iclib $(OPENGLFLAG) $(IMAGEFLAG) $(JPEGFLAG) \
-         $(PNGFLAG) $(GIFFLAG)
+         $(PNGFLAG) $(GIFFLAG) $(FONTFLAG)
 
 # GNU's bison; required instead of the ordinary yacc.
 YACC = bison
@@ -146,6 +160,13 @@ all: $(MOLSCRIPT) $(MOLAUTO)
 
 $(OBJ): Makefile Makefile.complete Makefile.basic
 
+# Recompile the font interface when switching optional FreeType support.
+.font-config: FORCE
+	@printf '%s\n' '$(USE_FREETYPE) $(FONTFLAG)' > .font-config.tmp
+	@if cmp -s .font-config.tmp .font-config; then rm .font-config.tmp; else mv .font-config.tmp .font-config; fi
+
+global.o: .font-config clib/ogl_bitmap_character.h
+
 #------------------------------------------------------------
 clean:
 	(rm -f $(MOLSCRIPT) $(MOLAUTO) *.o core *~)
@@ -154,7 +175,7 @@ clean:
 #------------------------------------------------------------
 $(MOLSCRIPT): $(OBJ) clib/clib.a
 	$(CC) -o $(MOLSCRIPT) $(COPT) $(OBJ) $(YLIB) clib/clib.a \
-              $(GLUTLINK) $(EGL_LIBS) $(JPEGLINK) $(PNGLINK) $(GIFLINK) $(ZLIBLINK) -lm
+              $(GLUTLINK) $(EGL_LIBS) $(JPEGLINK) $(PNGLINK) $(GIFLINK) $(ZLIBLINK) $(FONTLINK) -lm
 
 molscript.tab.o: molscript.tab.c molscript.tab.h
 
@@ -197,7 +218,9 @@ vrml.o: vrml.c vrml.h col.h coord.h global.h graphics.h segment.h state.h
 
 x3d.o: x3d.c x3d.h col.h coord.h global.h graphics.h segment.h state.h
 
-regex.o: other/regex.c
+select.o: other/regex.h
+
+regex.o: other/regex.c other/regex.h
 	$(CC) $(CFLAGS) -c -o ./regex.o other/regex.c
 
 opengl.o: opengl.c opengl.h col.h coord.h global.h graphics.h \
@@ -225,5 +248,5 @@ molauto.o: molauto.c
 .PHONY: FORCE
 FORCE:
 
-clib/clib.a: FORCE
-	cd clib; make clib.a CFLAGS="-I. $(CFLAGS)" OPENGLCLIBOBJ="$(OPENGLCLIBOBJ)"
+clib/clib.a: FORCE .font-config
+	+$(MAKE) -C clib clib.a CFLAGS="-I. $(CFLAGS)" OPENGLCLIBOBJ="$(OPENGLCLIBOBJ)" FONT_CONFIG=../.font-config

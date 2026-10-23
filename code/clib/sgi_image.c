@@ -29,6 +29,27 @@
 #define VERBATIM 0
 #define RLE 1
 
+/* SGI integers are big-endian and have fixed widths, unlike host longs. */
+static int
+write_uint (FILE *file, unsigned long value, int bytes)
+{
+  int shift;
+  for (shift = (bytes - 1) * 8; shift >= 0; shift -= 8)
+    if (fputc ((value >> shift) & 0xff, file) == EOF) return FALSE;
+  return TRUE;
+}
+
+static int
+write_tables (sgi_image *img)
+{
+  int slot;
+  for (slot = 0; slot < img->tablen; slot++)
+    if (!write_uint (img->file, img->start_table[slot], 4)) return FALSE;
+  for (slot = 0; slot < img->tablen; slot++)
+    if (!write_uint (img->file, img->length_table[slot], 4)) return FALSE;
+  return TRUE;
+}
+
 
 /*------------------------------------------------------------*/
 sgi_image *
@@ -36,7 +57,7 @@ sgiimg_create (void)
 {
   sgi_image *new;
 
-  new = malloc (sizeof (sgi_image));
+  new = calloc (1, sizeof (sgi_image));
   new->xsize = 500;
   new->ysize = 500;
   new->zsize = 3;		/* RGB by default */
@@ -63,6 +84,8 @@ sgiimg_delete (sgi_image *img)
 
   if (img->file) sgiimg_file_close (img);
 
+  free (img->start_table);
+  free (img->length_table);
   free (img);
 }
 
@@ -234,38 +257,35 @@ sgiimg_file_create (sgi_image *img, char *filename)
 int
 sgiimg_file_init (sgi_image *img)
 {
-  short magic = 474;
   char dummy = 0;
-  long colormap = 0;
   int slot;
 
   assert (img);
   assert (img->file != NULL);
 
-  if (fwrite (&magic, 2, 1, img->file) < 1) return FALSE;
+  if (!write_uint (img->file, 474, 2)) return FALSE;
 
   fwrite (&(img->storage), 1, 1, img->file);
   fwrite (&(img->bpc), 1, 1, img->file);
-  fwrite (&(img->dimension), 2, 1, img->file);
-  fwrite (&(img->xsize), 2, 1, img->file);
-  fwrite (&(img->ysize), 2, 1, img->file);
-  fwrite (&(img->zsize), 2, 1, img->file);
-  fwrite (&(img->pinmin), 4, 1, img->file);
-  fwrite (&(img->pinmax), 4, 1, img->file);
+  write_uint (img->file, img->dimension, 2);
+  write_uint (img->file, img->xsize, 2);
+  write_uint (img->file, img->ysize, 2);
+  write_uint (img->file, img->zsize, 2);
+  write_uint (img->file, img->pinmin, 4);
+  write_uint (img->file, img->pinmax, 4);
   for (slot = 0; slot < 4; slot++) fwrite (&dummy, 1, 1, img->file);
   fwrite (&(img->name[0]), 1, 80, img->file);
-  fwrite (&colormap, 4, 1, img->file);
+  write_uint (img->file, 0, 4);
   for (slot = 0; slot < 404; slot++) fwrite (&dummy, 1, 1, img->file);
 
   if (img->storage == RLE) {
-    fwrite (img->start_table, 4, img->tablen, img->file);
-    fwrite (img->length_table, 4, img->tablen, img->file);
+    if (!write_tables (img)) return FALSE;
   }
 
   img->current_channel = 0;
   img->current_rownum = 0;
 
-  return TRUE;
+  return !ferror (img->file);
 }
 
 
@@ -296,8 +316,7 @@ sgiimg_file_close (sgi_image *img)
 
   if (img->storage == RLE) {
     fseek (img->file, 512, SEEK_SET);
-    fwrite (img->start_table, 4, img->tablen, img->file);
-    fwrite (img->length_table, 4, img->tablen, img->file);
+    write_tables (img);
   }
   fclose (img->file);
   img->file = NULL;

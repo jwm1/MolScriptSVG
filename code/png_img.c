@@ -1,6 +1,6 @@
 /* png_img.c
 
-   MolScriptSVG v2.1.5
+   MolScriptSVG v2.2
 
    PNG image.
 
@@ -112,15 +112,23 @@ pngi_finish_output (void)
   image_render();
 
   buffer = malloc (output_width * 3 * sizeof (unsigned char));
+  if (!buffer) yyerror ("png_img: could not allocate row buffer");
+
+  /* The setjmp in first_plot is no longer on the stack. */
+  if (setjmp (png_jmpbuf (png_ptr))) {
+    free (buffer);
+    png_destroy_write_struct (&png_ptr, &info_ptr);
+    image_close();
+    yyerror ("png_img: could not write PNG image");
+  }
 
   for (row = output_height - 1; row >= 0; row--) {
     glReadPixels (0, row, output_width, 1, GL_RGB, GL_UNSIGNED_BYTE, buffer);
     png_write_row (png_ptr, (png_bytep) buffer);
   }
 
-  free (buffer);
-
   png_write_end (png_ptr, NULL);
+  free (buffer);
   png_destroy_write_struct (&png_ptr, &info_ptr);
 
   image_close();

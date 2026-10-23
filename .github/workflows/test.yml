@@ -1,0 +1,56 @@
+name: Build and regression tests
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        build: [basic, bitmap, freetype]
+    env:
+      LIBGL_ALWAYS_SOFTWARE: '1'
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install build and test dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential bison pkg-config \
+            freeglut3-dev libgl1-mesa-dev libglu1-mesa-dev libegl1-mesa-dev \
+            libx11-dev libpng-dev libjpeg-dev libgd-dev libfreetype-dev \
+            python3-pil python3-cairosvg fonts-dejavu-core \
+            xvfb xauth x11-utils xdotool ghostscript
+      - name: Build
+        env:
+          BUILD: ${{ matrix.build }}
+        run: |
+          case "$BUILD" in
+            basic) make -C code -f Makefile.basic -j2 ;;
+            bitmap) make -C code -j2 ;;
+            freetype) make -C code -j2 USE_FREETYPE=1 ;;
+          esac
+      - name: SVG and MolAuto regressions
+        run: |
+          python3 scripts/test-svg.py
+          python3 scripts/test-backends-molauto.py
+      - name: Geometry and image regressions
+        run: xvfb-run -a python3 scripts/test-rendering.py
+      - name: Example format checks
+        env:
+          BUILD: ${{ matrix.build }}
+        run: |
+          if [ "$BUILD" = basic ]; then
+            python3 scripts/test-output-formats.py
+          else
+            python3 scripts/test-output-formats.py --images
+          fi

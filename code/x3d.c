@@ -1,6 +1,6 @@
 /* x3d.c
 
-   MolScriptSVG v2.1.5
+   MolScriptSVG v2.2
 
    X3D Classic
 
@@ -302,8 +302,13 @@ x3d_normalize_value (dynstring *out, const char *raw, boolean keep_string_quotes
       quote = raw[slot];
       for (slot++; raw[slot] != '\0'; slot++) {
         ds_add (out, raw[slot]);
+        if (raw[slot] == '\\' && raw[slot + 1] != '\0') {
+          ds_add (out, raw[++slot]);
+          continue;
+        }
         if (raw[slot] == quote) break;
       }
+      if (raw[slot] == '\0') break;
     }
   }
 
@@ -610,7 +615,10 @@ x3d_next_token (char **cursor)
   if (**cursor == '"' || **cursor == '\'') {
     char quote = **cursor;
     (*cursor)++;
-    while (**cursor && **cursor != quote) (*cursor)++;
+    while (**cursor && **cursor != quote) {
+      if (**cursor == '\\' && (*cursor)[1]) (*cursor)++;
+      (*cursor)++;
+    }
     if (**cursor == quote) (*cursor)++;
   } else {
     while (**cursor && !isspace ((unsigned char) **cursor)) (*cursor)++;
@@ -755,7 +763,7 @@ x3d_convert_classic_to_xml_stream (FILE *xml_out, FILE *classic_infile,
   if (include_xml_declaration) {
     fputs ("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n", xml_out);
   }
-  fputs ("<X3D profile=\"Interchange\" version=\"3.3\" "
+  fputs ("<X3D profile=\"Immersive\" version=\"3.3\" "
          "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema-instance\" "
          "xsd:noNamespaceSchemaLocation=\"http://www.web3d.org/specifications/x3d-3.3.xsd\">\n",
          xml_out);
@@ -1049,8 +1057,9 @@ x3d_convert_classic_to_webgl_html (void)
          "        const xml = scene.value.trimStart();\n"
          "        console.log('MolScriptSVG WebGL: parsing XML scene', xml.length);\n"
          "        const doc = new DOMParser().parseFromString(xml, 'application/xml');\n"
-         "        if (doc.documentElement.nodeName === 'parsererror') {\n"
-         "          throw new Error(doc.documentElement.textContent || 'X3D XML parse error');\n"
+         "        const parseError = doc.querySelector('parsererror');\n"
+         "        if (parseError) {\n"
+         "          throw new Error(parseError.textContent || 'X3D XML parse error');\n"
          "        }\n"
          "        canvas.appendChild(document.importNode(doc.documentElement, true));\n"
          "        console.log('MolScriptSVG WebGL: scene attached');\n"
@@ -1129,7 +1138,7 @@ x3d_header (void)
   assert (indent_valid_state());
 
   indent_needs_blank = FALSE;
-  if (fprintf (indent_file, "#X3D V3.3 utf8\nPROFILE Interchange\n") < 0)
+  if (fprintf (indent_file, "#X3D V3.3 utf8\nPROFILE Immersive\n") < 0)
     return -1;
   return 0;
 }
@@ -2251,7 +2260,8 @@ x3d_cylinder (vector3 *v1, vector3 *v2)
   angle = v3_angle (&dir, &yaxis);
   if (angle > 0.0) {
     v3_cross_product (&rot, &yaxis, &dir);
-    v3_normalize (&rot);
+    if (v3_length (&rot) < 1.0e-10) rot = xaxis;
+    else v3_normalize (&rot);
   } else {
     rot = yaxis;
   }
@@ -2562,7 +2572,8 @@ x3d_stick (vector3 *v1, vector3 *v2, double r1, double r2, colour *c)
   angle = v3_angle (&dir, &yaxis);
   if (angle > 0.0) {
     v3_cross_product (&rot, &yaxis, &dir);
-    v3_normalize (&rot);
+    if (v3_length (&rot) < 1.0e-10) rot = xaxis;
+    else v3_normalize (&rot);
   } else {
     rot = yaxis;
   }
@@ -3160,8 +3171,7 @@ x3d_object (int code, vector3 *triplets, int count)
     x3d_finish_list();
     x3d_finish_node();
     x3d_finish_node();
-    x3d_finish_node();
-    point_count += count;
+    point_count += count / 2;
     break;
 
   case OBJ_LINES:

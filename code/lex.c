@@ -1,6 +1,6 @@
 /* lex.c
 
-   MolScriptSVG v2.1.5
+   MolScriptSVG v2.2
 
    Input lexer.
 
@@ -352,6 +352,7 @@ igetc (void)
 {
   int c;
 
+  if (!in_source) return EOF;
   if (in_source->file) {
     c = fgetc (in_source->file);
     if (c == EOF) {
@@ -391,6 +392,7 @@ igetc (void)
 static void
 iungetc (int c)
 {
+  if (c == EOF || !in_source) return;
   if (in_source->file) {
     ungetc (c, in_source->file);
   } else {

@@ -1,6 +1,6 @@
 /* vrml.c
 
-   MolScriptSVG v2.1.5
+   MolScriptSVG v2.2
 
    VRML V2.0
 
@@ -1119,7 +1119,8 @@ vrml_cylinder (vector3 *v1, vector3 *v2)
   angle = v3_angle (&dir, &yaxis);
   if (angle > 0.0) {
     v3_cross_product (&rot, &yaxis, &dir);
-    v3_normalize (&rot);
+    if (v3_length (&rot) < 1.0e-10) rot = xaxis;
+    else v3_normalize (&rot);
   } else {
     rot = yaxis;
   }
@@ -1429,7 +1430,8 @@ vrml_stick (vector3 *v1, vector3 *v2, double r1, double r2, colour *c)
   angle = v3_angle (&dir, &yaxis);
   if (angle > 0.0) {
     v3_cross_product (&rot, &yaxis, &dir);
-    v3_normalize (&rot);
+    if (v3_length (&rot) < 1.0e-10) rot = xaxis;
+    else v3_normalize (&rot);
   } else {
     rot = yaxis;
   }
@@ -2026,8 +2028,7 @@ vrml_object (int code, vector3 *triplets, int count)
     vrml_finish_list();
     vrml_finish_node();
     vrml_finish_node();
-    vrml_finish_node();
-    point_count += count;
+    point_count += count / 2;
     break;
 
   case OBJ_LINES:

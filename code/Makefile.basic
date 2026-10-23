@@ -100,7 +100,9 @@ vrml.o: vrml.c vrml.h col.h coord.h global.h graphics.h segment.h state.h
 
 x3d.o: x3d.c x3d.h col.h coord.h global.h graphics.h segment.h state.h
 
-regex.o: other/regex.c
+select.o: other/regex.h
+
+regex.o: other/regex.c other/regex.h
 	$(CC) $(CFLAGS) -c -o ./regex.o other/regex.c
 
 #------------------------------------------------------------

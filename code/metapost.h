@@ -1,6 +1,6 @@
 /* metapost.h
 
-   MolScript v2.1.5
+   MolScript v2.2
 
    MetaPost file.
 */

@@ -1,0 +1,99 @@
+%!PS-Adobe-3.0
+%%BoundingBox: (atend)
+%%Title: SVG review: translucent points, borders and triangle surfaces
+%%Creator: MolScriptSVG 2.2, Copyright (C) 1997-1998 Per J. Kraulis
+%%For: jwm
+%%DocumentNeededResources: font Times-Roman Symbol
+%%Pages: 1
+%%EndComments
+%%BeginProlog
+50 dict begin
+/R { setrgbcolor } bind def
+/G { setgray } bind def
+/H { sethsbcolor } bind def
+/LW { setlinewidth } bind def
+/D { 0 setdash 0 setlinecap } bind def
+/ND { [] 0 setdash 1 setlinecap } bind def
+/RS { gsave setrgbcolor } bind def
+/HS { gsave sethsbcolor } bind def
+/GS { gsave setgray } bind def
+/M { moveto } bind def
+/L { moveto lineto stroke } bind def
+/PT { 2 copy moveto lineto stroke } bind def
+/SC { 1 G } def
+/SS { newpath 0 360 arc gsave SC fill grestore stroke } bind def
+/SD {
+  3 copy newpath 0 360 arc gsave SC fill 0 setgray 0.5 setlinewidth
+  3 copy 0.94 mul 260 350 arc stroke 3 copy 0.87 mul 275 335 arc stroke
+  3 copy 0.79 mul 295 315 arc stroke 3 copy 0.8 mul 115 135 arc
+  3 copy 0.6 mul 135 115 arcn closepath gsave 1 setgray fill grestore stroke
+  3 copy 0.7 mul 115 135 arc stroke 3 copy 0.6 mul 124.9 125 arc
+  0.8 mul 125 125.1 arc stroke grestore stroke
+ } bind def
+/T { moveto lineto lineto fill grestore } bind def
+/T1 { 4 copy 10 4 roll T moveto lineto stroke } bind def
+/P { moveto lineto lineto lineto fill grestore } bind def
+/P1 { 4 copy 12 4 roll P moveto lineto stroke } bind def
+/P2 { 8 2 roll P1 } bind def
+/P3 { 8 4 roll P1 } bind def
+/P4 { 8 -2 roll P1 } bind def
+/P12 { 8 copy P moveto lineto lineto stroke pop pop } bind def
+/P13 { 8 copy P moveto lineto moveto lineto stroke } bind def
+/P14 { 8 copy P 8 -2 roll moveto lineto lineto stroke pop pop } bind def
+/P23 { 8 2 roll P12 } bind def
+/P34 { 8 4 roll P12 } bind def
+/P123 { 8 copy P moveto lineto lineto lineto stroke } bind def
+/P134 { 8 copy P 4 2 roll moveto lineto 4 2 roll lineto lineto stroke } bind def
+/P1234 { 8 copy P moveto lineto lineto lineto closepath stroke } bind def
+/FR { /Times-Roman findfont } bind def
+/FG { /Symbol findfont } bind def
+/PR { scalefont setfont show } bind def
+/C {
+  1 index scalefont setfont
+  exch stringwidth pop -2 div exch -3 div rmoveto
+ } bind def
+/CR90 {
+  1 index scalefont setfont
+  exch stringwidth pop -2 div exch 3 div exch rmoveto
+ } bind def
+/R90 { gsave currentpoint translate 90 rotate } bind def
+/PRB { gsave setlinewidth 3 copy scalefont setfont
+  false charpath BC stroke grestore } bind def
+/EA {
+  matrix currentmatrix 8 1 roll 7 -2 roll translate
+  4 -1 roll rotate 3 -1 roll 1 scale 0 0 5 2 roll arc setmatrix
+ } bind def
+/SP { moveto lineto -90 90 EA closepath gsave } bind def
+/SF { fill grestore stroke } bind def
+%%EndProlog
+%%BeginSetup
+%%IncludeResource: font Times-Roman
+%%IncludeResource: font Symbol
+1 setlinejoin 1 LW 0 G ND newpath
+%%EndSetup
+%%Page: 1 1
+/MolScriptPlotSave save def
+0 0 moveto 600 0 lineto 600 300 lineto 0 300 lineto closepath gsave
+/BC { 1 G } def
+gsave BC fill grestore
+clip newpath
+1 0 0 R
+12 LW
+100.00 150.00 PT
+225.00 150.00 PT
+0 0 1 RS 450.00 200.00 450.00 100.00 350.00 100.00 T
+0 0 1 RS 350.00 200.00 450.00 200.00 350.00 100.00 T
+0 G
+100.00 75.00 M (Opaque) 12.00 FR C
+(Opaque) FR 12.00 PR
+225.00 75.00 M (Half transparent) 12.00 FR C
+(Half transparent) FR 12.00 PR
+400.00 75.00 M (Translucent mesh) 12.00 FR C
+(Translucent mesh) FR 12.00 PR
+grestore stroke
+MolScriptPlotSave restore
+end
+showpage
+%%Trailer
+%%BoundingBox: 0 0 600 300
+%%EOF

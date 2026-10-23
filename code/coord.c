@@ -1,6 +1,6 @@
 /* coord.c
 
-   MolScriptSVG v2.1.5
+   MolScriptSVG v2.2
 
    Coordinate data handling.
 
@@ -12,6 +12,7 @@
 
 #include <assert.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "clib/str_utils.h"
 
@@ -113,6 +114,10 @@ read_coordinate_file (char *filename)
     for (res = mol2->first; res; res = res->next) {/* change '*' to ''' to */
       res_count++;		                   /* avoid clash with */
       for (at = res->first; at; at = at->next) {   /* MolScript wildcard */
+	if (!isfinite (at->xyz.x) || !isfinite (at->xyz.y) || !isfinite (at->xyz.z)) {
+	  exit_on_error = TRUE;
+	  yyerror ("degenerate geometry: PDB contains non-finite atom coordinates");
+	}
 	at_count++;
 	str_exchange (at->name, '*', '\'');
       }

@@ -1,6 +1,6 @@
 /* postscript.c
 
-   MolScriptSVG v2.1.5
+   MolScriptSVG v2.2
 
    PostScript
 
@@ -81,6 +81,7 @@ enum db_codes { LINE_CODE, POINT_CODE, SPHERE_CODE,
 static depth_db_entry *depth_array = NULL;
 static int depth_alloc = 0;
 static int depth_count = 0;
+static boolean bounding_box_valid = FALSE;
 
 static line_db_entry *line_array = NULL;
 static int line_alloc = 0;
@@ -735,7 +736,6 @@ db_label_output (depth_db_entry *de)
 {
   label_db_entry *lae;
   int len, slot, prev_greek, greek, first;
-  int *labelmask;
 
   assert (de);
 
@@ -762,13 +762,11 @@ db_label_output (depth_db_entry *de)
   if (de->st->labelrotation) fprintf (outfile, "R90\n");
 
   if (de->st->labelmasklength > 0) {
-    labelmask = calloc (len, sizeof (int));
-    memcpy (labelmask, de->st->labelmask, de->st->labelmasklength);
-
     first = 0;
     prev_greek = (de->st->labelmask[0] / 3) == 1;
     for (slot = 1; slot < len; slot++) {
-      greek = (de->st->labelmask[slot] / 3) == 1;
+      greek = slot < de->st->labelmasklength &&
+              (de->st->labelmask[slot] / 3) == 1;
       if (greek != prev_greek) {
 	db_string_output (lae->str + first, slot - first, prev_greek, de);
 	first = slot;
@@ -776,8 +774,6 @@ db_label_output (depth_db_entry *de)
       }
     }
     db_string_output (lae->str + first, len - first, prev_greek, de);
-
-    free (labelmask);
 
   } else {
     db_string_output (lae->str, len, FALSE, de);
@@ -999,6 +995,7 @@ void
 ps_first_plot (void)
 {
   if (!first_plot) return;
+  bounding_box_valid = FALSE;
 
   set_outfile ("w");
 
@@ -1090,7 +1087,7 @@ ps_finish_output (void)
   PRINT ("end\n");
   PRINT ("showpage\n");
   PRINT ("%%Trailer\n");
-  if (bounding_box[0] < 0.0) {
+  if (!bounding_box_valid) {
     i0 = floor (default_area[0]);
     i1 = floor (default_area[1]);
     i2 = ceil (default_area[2]);
@@ -1133,11 +1130,12 @@ ps_finish_plot (void)
   double temp_matrix[4][4];
   double scale;
 
-  if (bounding_box[0] < 0.0) {
+  if (!bounding_box_valid) {
     bounding_box[0] = area[0];
     bounding_box[1] = area[1];
     bounding_box[2] = area[2];
     bounding_box[3] = area[3];
+    bounding_box_valid = TRUE;
   } else {
     if (area[0] < bounding_box[0]) bounding_box[0] = area[0];
     if (area[1] < bounding_box[1]) bounding_box[1] = area[1];
@@ -1206,6 +1204,10 @@ ps_set_area (void)
 {
   assert (dstack_size == 4);
 
+  if (!isfinite (dstack[0]) || !isfinite (dstack[1]) ||
+      !isfinite (dstack[2]) || !isfinite (dstack[3]) ||
+      dstack[2] <= dstack[0] || dstack[3] <= dstack[1])
+    yyerror ("invalid area values");
   set_area_values (dstack[0], dstack[1], dstack[2], dstack[3]);
   clear_dstack ();
 
@@ -1237,6 +1239,11 @@ ps_coil (void)
   v3_difference (&dir, &((cs+1)->p), &(cs->p));
   v3_normalize (&dir);
   v3_cross_product (&perp, &dir, &zaxis);
+  if (v3_length (&perp) < 1.0e-10) {
+    perp = xaxis;
+    col = current_state->colourparts ? &cs->c : &current_state->planecolour;
+    db_sphere (&cs->p, current_state->coilradius * depthcue (cs->p.z, current_state), col, FALSE);
+  }
   v3_normalize (&perp);
   v3_scaled (&dir,
 	     current_state->coilradius * depthcue (cs->p.z, current_state),
@@ -1264,6 +1271,11 @@ ps_coil (void)
     }
     v3_normalize (&dir);
     v3_cross_product (&perp, &dir, &zaxis);
+    if (v3_length (&perp) < 1.0e-10) {
+      perp = prev_perp;
+      col = current_state->colourparts ? &cs->c : &current_state->planecolour;
+      db_sphere (&cs->p, current_state->coilradius * depthcue (cs->p.z, current_state), col, FALSE);
+    }
     v3_normalize (&perp);
     radius = current_state->coilradius * depthcue (cs->p.z, current_state);
     v3_sum_scaled (&p2, &(cs->p), radius, &perp);
@@ -1938,7 +1950,7 @@ ps_object (int code, vector3 *triplets, int count)
     break;
 
   case OBJ_POINTS_COLOURS:
-    for (slot = 0; slot < count; slot++) {
+    for (slot = 0; slot < count; slot += 2) {
       v = triplets + slot + 1;
       rgb.x = v->x;
       rgb.y = v->y;

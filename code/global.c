@@ -1,6 +1,6 @@
 /* global.c
 
-   MolScriptSVG 2.1.5
+   MolScriptSVG 2.2
 
    Global stuff.
 
@@ -29,6 +29,7 @@
 
 #ifdef OPENGL_SUPPORT
 #include "opengl.h"
+#include "clib/ogl_bitmap_character.h"
 #ifdef IMAGE_SUPPORT
 #include "image.h"
 #include "eps_img.h"
@@ -47,7 +48,7 @@
 
 
 /*------------------------------------------------------------*/
-const char program_str[] = "MolScriptSVG 2.1.5";
+const char program_str[] = "MolScriptSVG 2.2";
 const char copyright_str[] = "Copyright (C) 1997-1998 Per J. Kraulis";
 char user_str[81];
 
@@ -222,6 +223,13 @@ process_arguments (int *argcp, char *argv[])
 #endif
 #endif
     fprintf (stderr, "-accum number        image accumulation steps, number>=1 (only OpenGL & images)\n");
+    fprintf (stderr, "-labelfont mode      OpenGL/image labels: bitmap (default) or freetype\n");
+    fprintf (stderr, "-fontfile path       font file required for FreeType labels\n");
+#ifdef FREETYPE_SUPPORT
+    fprintf (stderr, "                    FreeType support: enabled\n");
+#else
+    fprintf (stderr, "                    FreeType support: disabled\n");
+#endif
 #endif
     fprintf (stderr, "-pretty              nicely formatted output (VRML only)\n");
     fprintf (stderr, "-size width height   size of output image (pixels; default 500 500)\n");
@@ -424,6 +432,26 @@ process_arguments (int *argcp, char *argv[])
     } else {
       argument_error ("no number given for option -accum", -1);
     }
+  }
+
+  {
+    const char *font_mode = "bitmap", *font_file = NULL, *error;
+    slot = args_exists ("-labelfont");
+    if (slot) {
+      font_mode = args_item (slot + 1);
+      if (!font_mode || font_mode[0] == '-') argument_error ("missing -labelfont mode", -1);
+      args_flag (slot);
+      args_flag (slot + 1);
+    }
+    slot = args_exists ("-fontfile");
+    if (slot) {
+      font_file = args_item (slot + 1);
+      if (!font_file || font_file[0] == '-') argument_error ("missing -fontfile path", -1);
+      args_flag (slot);
+      args_flag (slot + 1);
+    }
+    error = ogl_font_configure (font_mode, font_file);
+    if (error) argument_error (error, -1);
   }
 
 #endif /* OPENGL_SUPPORT */

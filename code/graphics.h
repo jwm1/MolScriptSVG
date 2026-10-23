@@ -1,6 +1,6 @@
 /* graphics.h
 
-   MolScriptSVG v2.1.5
+   MolScriptSVG v2.2
 
    Graphics: construct the geometries and call the output procedures.
 

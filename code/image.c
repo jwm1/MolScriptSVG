@@ -1,6 +1,6 @@
 /* image.c
 
-   MolScriptSVG v2.1.5
+   MolScriptSVG v2.2
 
    Image file general output routines.
 
@@ -20,6 +20,7 @@
 
 #include <assert.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
@@ -165,6 +166,7 @@ image_try_egl (void)
     return FALSE;
   }
 
+  /* EGL pbuffers use the back buffer, even when reported as single-buffered. */
   glDrawBuffer (GL_BACK);
   glReadBuffer (GL_BACK);
   image_backend = IMAGE_BACKEND_EGL;
@@ -177,7 +179,13 @@ static void
 image_glut_first_plot (void)
 {
   GLboolean bparam;
+  int argc = 1;
+  char name[] = "molscript";
+  char *argv[] = {name, NULL, NULL};
 
+  if (getenv ("OPENGL_DIRECT")) argv[argc++] = "-direct";
+  else if (getenv ("OPENGL_INDIRECT")) argv[argc++] = "-indirect";
+  glutInit (&argc, argv);
   glutInitWindowPosition (0, 0);
   glutInitWindowSize (output_width, output_height);
   if (ogl_accum() != 0) {
@@ -217,13 +225,21 @@ image_glut_first_plot (void)
 void
 image_first_plot (void)
 {
+  const char *requested = getenv ("MOLSCRIPT_IMAGE_BACKEND");
+  if (!requested) requested = "auto";
+  if (strcmp (requested, "auto") && strcmp (requested, "egl") && strcmp (requested, "glut"))
+    yyerror ("MOLSCRIPT_IMAGE_BACKEND must be auto, egl or glut");
   if (! first_plot)
     yyerror ("only one plot per input file allowed for image file output");
 
   image_backend = IMAGE_BACKEND_NONE;
-  if (! image_try_egl()) {
+  if (!strcmp (requested, "glut") || !image_try_egl()) {
+    if (!strcmp (requested, "egl")) yyerror ("could not create requested EGL image context");
+    if (!getenv ("DISPLAY")) yyerror ("GLUT image rendering requires an X11 DISPLAY");
     image_glut_first_plot();
   }
+  if (message_mode)
+    fprintf (stderr, "Image backend: %s\n", image_backend == IMAGE_BACKEND_EGL ? "EGL" : "GLUT");
 }
 
 
@@ -239,6 +255,7 @@ image_render (void)
   glDisable (GL_DITHER);
   glDisable (GL_FOG);
   glDisable (GL_LIGHTING);
+  glPixelStorei (GL_PACK_ALIGNMENT, 1);
   glFinish();
 }
 

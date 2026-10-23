@@ -1,6 +1,6 @@
 /* svg.c
 
-   MolScriptSVG v2.1.5
+   MolScriptSVG v2.2
 
    SVG
 
@@ -240,7 +240,7 @@ svg_write_escaped (FILE *file, char *str, int len, int strip_percent)
 /*------------------------------------------------------------*/
 static void
 svg_write_line (FILE *file, vector3 *v1, vector3 *v2, colour *stroke,
-                double linewidth, double dash)
+                double linewidth, double dash, double opacity)
 {
   assert (file);
   assert (v1);
@@ -274,7 +274,7 @@ svg_write_path_points (FILE *file, vector3 *points, int count)
 static void
 svg_write_polygon (FILE *file, vector3 *points, int count,
                    colour *stroke, colour *fill,
-                   double linewidth, double dash)
+                   double linewidth, double dash, double opacity)
 {
   assert (file);
   assert (points);
@@ -290,16 +290,18 @@ svg_write_polygon (FILE *file, vector3 *points, int count,
 
 /*------------------------------------------------------------*/
 static void
-svg_write_filled_polygon (FILE *file, vector3 *points, int count, colour *fill)
+svg_write_filled_polygon (FILE *file, vector3 *points, int count,
+                          colour *fill, double opacity)
 {
   assert (file);
   assert (points);
   assert (count >= 3);
   assert (fill);
 
-  /* Match fill and stroke to suppress visible antialiasing seams between
-     adjacent polygons; explicit black outlines are emitted separately. */
-  svg_write_polygon (file, points, count, fill, fill, SVG_SEAM_STROKE_WIDTH, 0.0);
+  /* Overlapping sealing strokes darken translucent mesh edges. Use them
+     only for opaque facets; explicit outlines are emitted separately. */
+  svg_write_polygon (file, points, count, opacity == 1.0 ? fill : NULL, fill,
+                     SVG_SEAM_STROKE_WIDTH, 0.0, opacity);
 }
 
 
@@ -307,7 +309,7 @@ svg_write_filled_polygon (FILE *file, vector3 *points, int count, colour *fill)
 static void
 svg_write_circle (FILE *file, vector3 *center, double radius,
                   colour *stroke, colour *fill,
-                  double linewidth, double dash)
+                  double linewidth, double dash, double opacity)
 {
   assert (file);
   assert (center);
@@ -341,7 +343,7 @@ svg_point_on_circle (vector3 *point, vector3 *center, double radius,
 static void
 svg_write_arc (FILE *file, vector3 *center, double radius,
                double start_degrees, double end_degrees,
-               int clockwise, colour *stroke, double linewidth)
+               int clockwise, colour *stroke, double linewidth, double opacity)
 {
   vector3 start;
   vector3 end;
@@ -378,7 +380,7 @@ svg_write_arc (FILE *file, vector3 *center, double radius,
 
 /*------------------------------------------------------------*/
 static void
-svg_write_donald_duck (FILE *file, vector3 *center, double radius)
+svg_write_donald_duck (FILE *file, vector3 *center, double radius, double opacity)
 {
   vector3 outer_start;
   vector3 outer_end;
@@ -389,11 +391,11 @@ svg_write_donald_duck (FILE *file, vector3 *center, double radius)
   assert (radius >= 0.0);
 
   svg_write_arc (file, center, radius * 0.94, 260.0, 350.0, FALSE,
-                 &black_colour, 0.5);
+                 &black_colour, 0.5, opacity);
   svg_write_arc (file, center, radius * 0.87, 275.0, 335.0, FALSE,
-                 &black_colour, 0.5);
+                 &black_colour, 0.5, opacity);
   svg_write_arc (file, center, radius * 0.79, 295.0, 315.0, FALSE,
-                 &black_colour, 0.5);
+                 &black_colour, 0.5, opacity);
 
   svg_point_on_circle (&outer_start, center, radius * 0.8, 115.0);
   svg_point_on_circle (&outer_end, center, radius * 0.8, 135.0);
@@ -408,11 +410,11 @@ svg_write_donald_duck (FILE *file, vector3 *center, double radius)
   fputs ("/>\n", file);
 
   svg_write_arc (file, center, radius * 0.7, 115.0, 135.0, FALSE,
-                 &black_colour, 0.5);
+                 &black_colour, 0.5, opacity);
   svg_write_arc (file, center, radius * 0.6, 124.9, 125.0, FALSE,
-                 &black_colour, 0.5);
+                 &black_colour, 0.5, opacity);
   svg_write_arc (file, center, radius * 0.8, 125.0, 125.1, FALSE,
-                 &black_colour, 0.5);
+                 &black_colour, 0.5, opacity);
 }
 
 
@@ -431,7 +433,7 @@ svg_write_label_text (FILE *file, char *str, int len, state *st)
     first = 0;
     prev_greek = (st->labelmask[0] / 3) == 1;
     for (slot = 1; slot < len; slot++) {
-      greek = (st->labelmask[slot] / 3) == 1;
+      greek = slot < st->labelmasklength && (st->labelmask[slot] / 3) == 1;
       if (greek != prev_greek) {
         fprintf (file, "<tspan%s>",
                  prev_greek ? " font-family=\"Symbol\"" : "");
@@ -886,34 +888,36 @@ db_plane_output (depth_db_entry *de, char *plane_type)
   points[3] = pe->p4;
 
   if (str_eq ("P", plane_type)) {
-    svg_write_filled_polygon (file, points, 4, &(pe->col));
+    svg_write_filled_polygon (file, points, 4, &(pe->col),
+                              1.0 - de->st->transparency);
   } else {
     stroke = de->st->linecolour;
     linewidth = depthcue (de->depth, de->st) * de->st->linewidth;
-    svg_write_filled_polygon (file, points, 4, &(pe->col));
+    svg_write_filled_polygon (file, points, 4, &(pe->col),
+                              1.0 - de->st->transparency);
 
     if (str_eq ("P1", plane_type) || str_eq ("P12", plane_type) ||
         str_eq ("P13", plane_type) || str_eq ("P14", plane_type) ||
         str_eq ("P123", plane_type) || str_eq ("P134", plane_type) ||
         str_eq ("P1234", plane_type))
       svg_write_line (file, &(pe->p1), &(pe->p2), &stroke, linewidth,
-                      de->st->linedash);
+                      de->st->linedash, 1.0 - de->st->transparency);
     if (str_eq ("P2", plane_type) || str_eq ("P12", plane_type) ||
         str_eq ("P23", plane_type) || str_eq ("P123", plane_type) ||
         str_eq ("P1234", plane_type))
       svg_write_line (file, &(pe->p2), &(pe->p3), &stroke, linewidth,
-                      de->st->linedash);
+                      de->st->linedash, 1.0 - de->st->transparency);
     if (str_eq ("P3", plane_type) || str_eq ("P13", plane_type) ||
         str_eq ("P23", plane_type) || str_eq ("P34", plane_type) ||
         str_eq ("P123", plane_type) || str_eq ("P134", plane_type) ||
         str_eq ("P1234", plane_type))
       svg_write_line (file, &(pe->p3), &(pe->p4), &stroke, linewidth,
-                      de->st->linedash);
+                      de->st->linedash, 1.0 - de->st->transparency);
     if (str_eq ("P4", plane_type) || str_eq ("P14", plane_type) ||
         str_eq ("P34", plane_type) || str_eq ("P134", plane_type) ||
         str_eq ("P1234", plane_type))
       svg_write_line (file, &(pe->p4), &(pe->p1), &stroke, linewidth,
-                      de->st->linedash);
+                      de->st->linedash, 1.0 - de->st->transparency);
   }
 
   plane_output_count++;
@@ -941,11 +945,12 @@ db_tri_output (depth_db_entry *de, char *tri_type)
   points[0] = pe->p1;
   points[1] = pe->p2;
   points[2] = pe->p3;
-  svg_write_filled_polygon (file, points, 3, &(pe->col));
+  svg_write_filled_polygon (file, points, 3, &(pe->col),
+                            1.0 - de->st->transparency);
   if (! str_eq ("T", tri_type)) {
     svg_write_line (file, &(pe->p1), &(pe->p2), &(de->st->linecolour),
                     depthcue (de->depth, de->st) * de->st->linewidth,
-                    de->st->linedash);
+                    de->st->linedash, 1.0 - de->st->transparency);
   }
 
   plane_output_count++;
@@ -963,11 +968,14 @@ db_label_output (depth_db_entry *de)
 
   assert (de);
 
+  if (de->st->transparency == 1.0) return;
   file = svg_body;
   lae = label_array + de->slot;
   len = strlen (lae->str);
   size = depthcue (de->depth, de->st) * de->st->labelsize;
 
+  if (de->st->transparency > 0.0)
+    fprintf (file, "<g opacity=\"%.17g\">\n", 1.0 - de->st->transparency);
   fprintf (file, "<text transform=\"translate(%.2f %.2f) scale(1 -1)",
            lae->pos.x, lae->pos.y);
   if (de->st->labelrotation) fputs (" rotate(-90)", file);
@@ -989,6 +997,7 @@ db_label_output (depth_db_entry *de)
   fputc ('>', file);
   svg_write_label_text (file, lae->str, len, de->st);
   fputs ("</text>\n", file);
+  if (de->st->transparency > 0.0) fputs ("</g>\n", file);
 
   label_output_count++;
 }
@@ -1019,6 +1028,11 @@ db_output (void)
   for (slot = 0; slot < depth_count; slot++) {
     de = depth_array + slot;
 
+    if (de->st->transparency == 1.0) continue;
+    /* Composite each depth-sorted primitive once, including its fill,
+       border and highlights. Labels also use this in the second pass. */
+    if (de->code != LABEL_CODE && de->st->transparency > 0.0)
+      fprintf (file, "<g opacity=\"%.17g\">\n", 1.0 - de->st->transparency);
     switch (de->code) {
 
     case LINE_CODE:
@@ -1026,7 +1040,7 @@ db_output (void)
       svg_write_line (file, &(le->v1), &(le->v2),
                       le->c ? le->c : &(de->st->linecolour),
                       depthcue (de->depth, de->st) * de->st->linewidth,
-                      de->st->linedash);
+                      de->st->linedash, 1.0 - de->st->transparency);
       line_output_count++;
       break;
 
@@ -1037,7 +1051,7 @@ db_output (void)
                         pte->c ? pte->c : &(de->st->linecolour),
                         pte->c ? pte->c : &(de->st->linecolour),
                         depthcue (de->depth, de->st) * de->st->linewidth,
-                        0.0);
+                        0.0, 1.0 - de->st->transparency);
       point_output_count++;
       break;
 
@@ -1046,8 +1060,9 @@ db_output (void)
       svg_write_circle (file, &(se->v), se->rad,
                         &(de->st->linecolour), &(se->col),
                         depthcue (de->depth, de->st) * de->st->linewidth,
-                        de->st->linedash);
-      if (se->donald_duck) svg_write_donald_duck (file, &(se->v), se->rad);
+                        de->st->linedash, 1.0 - de->st->transparency);
+      if (se->donald_duck) svg_write_donald_duck (file, &(se->v), se->rad,
+                                                  1.0 - de->st->transparency);
       sphere_output_count++;
       break;
 
@@ -1128,13 +1143,25 @@ db_output (void)
       points[3].y = ste->p2.y - ste->perp.y * ste->taper;
       svg_write_polygon (file, points, 4, &(de->st->linecolour), &(ste->col),
                          depthcue (de->depth, de->st) * de->st->linewidth,
-                         de->st->linedash);
+                         de->st->linedash, 1.0 - de->st->transparency);
       stick_output_count++;
       break;
     }
+    if (de->code != LABEL_CODE && de->st->transparency > 0.0)
+      fputs ("</g>\n", file);
   }
 
-  for (slot = 0; slot < depth_count; slot++) {	/* unclipped labels */
+}
+
+
+/*------------------------------------------------------------*/
+static void
+db_unclipped_labels_output (void)
+{
+  int slot;
+  depth_db_entry *de;
+
+  for (slot = 0; slot < depth_count; slot++) {
     de = depth_array + slot;
     if ((de->code == LABEL_CODE) &&
 	(! de->st->labelclip)) db_label_output (de);
@@ -1211,7 +1238,7 @@ svg_finish_output (void)
   double x0, y0, x1, y1, width, height;
   int ch;
 
-  if (bounding_box[0] < 0.0) {
+  if (svg_plot_count == 0) {
     x0 = default_area[0];
     y0 = default_area[1];
     x1 = default_area[2];
@@ -1276,7 +1303,7 @@ svg_finish_plot (void)
 
   file = svg_body;
 
-  if (bounding_box[0] < 0.0) {
+  if (svg_plot_count == 0) {
     bounding_box[0] = area[0];
     bounding_box[1] = area[1];
     bounding_box[2] = area[2];
@@ -1325,6 +1352,7 @@ svg_finish_plot (void)
 
   db_output();
   fputs ("</g>\n", file);
+  db_unclipped_labels_output();
 
   if (message_mode)
     fprintf (stderr,
@@ -1344,11 +1372,14 @@ svg_set_area (void)
 {
   assert (dstack_size == 4);
 
+  if (! isfinite (dstack[0]) || ! isfinite (dstack[1]) ||
+      ! isfinite (dstack[2]) || ! isfinite (dstack[3]) ||
+      dstack[2] <= dstack[0] || dstack[3] <= dstack[1]) {
+    yyerror ("invalid area values");
+    return;
+  }
   set_area_values (dstack[0], dstack[1], dstack[2], dstack[3]);
   clear_dstack ();
-
-  if ((area[2] < area[0]) || (area[3] < area[1]))
-    yyerror ("invalid area values");
 }
 
 
@@ -1375,6 +1406,11 @@ svg_coil (void)
   v3_difference (&dir, &((cs+1)->p), &(cs->p));
   v3_normalize (&dir);
   v3_cross_product (&perp, &dir, &zaxis);
+  if (v3_length (&perp) < 1.0e-10) {
+    perp = xaxis;
+    col = current_state->colourparts ? &cs->c : &current_state->planecolour;
+    db_sphere (&cs->p, current_state->coilradius * depthcue (cs->p.z, current_state), col, FALSE);
+  }
   v3_normalize (&perp);
   v3_scaled (&dir,
 	     current_state->coilradius * depthcue (cs->p.z, current_state),
@@ -1402,6 +1438,11 @@ svg_coil (void)
     }
     v3_normalize (&dir);
     v3_cross_product (&perp, &dir, &zaxis);
+    if (v3_length (&perp) < 1.0e-10) {
+      perp = prev_perp;
+      col = current_state->colourparts ? &cs->c : &current_state->planecolour;
+      db_sphere (&cs->p, current_state->coilradius * depthcue (cs->p.z, current_state), col, FALSE);
+    }
     v3_normalize (&perp);
     radius = current_state->coilradius * depthcue (cs->p.z, current_state);
     v3_sum_scaled (&p2, &(cs->p), radius, &perp);
@@ -2076,7 +2117,7 @@ svg_object (int code, vector3 *triplets, int count)
     break;
 
   case OBJ_POINTS_COLOURS:
-    for (slot = 0; slot < count; slot++) {
+    for (slot = 0; slot < count; slot += 2) {
       v = triplets + slot + 1;
       rgb.x = v->x;
       rgb.y = v->y;

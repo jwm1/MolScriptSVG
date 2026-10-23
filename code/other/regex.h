@@ -16,6 +16,12 @@
 #ifndef REGEX_H
 #define REGEX_H 1
 
+/* This V8 interface is not ABI-compatible with the POSIX functions used
+   by shared libraries such as graphics drivers. Keep its symbols private. */
+#define regcomp molscript_regcomp
+#define regexec molscript_regexec
+#define regerror molscript_regerror
+
 #define NSUBEXP  10
 
 typedef struct regexp {

@@ -1,0 +1,28 @@
+title "SVG review: translucent points, borders and triangle surfaces"
+plot
+  area 0 0 600 300;
+  window 12;
+  slab 20;
+  background white;
+  set segmentsize 100, shading 0, depthcue 0;
+  set linewidth 12, linecolour red;
+  object inline;
+P 1
+-8 0 0
+Q
+  set transparency 0.5;
+  object inline;
+P 1
+-3 0 0
+Q
+  set planecolour blue;
+  object inline;
+T 6
+2 -2 0 6 -2 0 6 2 0
+2 -2 0 6 2 0 2 2 0
+Q
+  set transparency 0, linecolour black, linewidth 0.5, labelsize 12;
+  label -8 -3 0 "Opaque";
+  label -3 -3 0 "Half transparent";
+  label 4 -3 0 "Translucent mesh";
+end_plot

@@ -1,6 +1,6 @@
 /* sgi_img.c
 
-   MolScriptSVG v2.1.5
+   MolScriptSVG v2.2
 
    SGI image file.
 
@@ -74,25 +74,28 @@ sgii_finish_output (void)
   image_render();
 
   row = malloc (output_width * sizeof (unsigned char));
+  if (!row) yyerror ("could not allocate SGI row buffer");
 
   for (rownum = 0; rownum < output_height; rownum++) {
     glReadPixels (0, rownum, output_width, 1, GL_RED, GL_UNSIGNED_BYTE, row);
-    sgiimg_write_next_char_row (image, row);
+    if (!sgiimg_write_next_char_row (image, row)) yyerror ("could not write SGI row");
   }
 
   for (rownum = 0; rownum < output_height; rownum++) {
     glReadPixels (0, rownum, output_width, 1, GL_GREEN, GL_UNSIGNED_BYTE, row);
-    sgiimg_write_next_char_row (image, row);
+    if (!sgiimg_write_next_char_row (image, row)) yyerror ("could not write SGI row");
   }
 
   for (rownum = 0; rownum < output_height; rownum++) {
     glReadPixels (0, rownum, output_width, 1, GL_BLUE, GL_UNSIGNED_BYTE, row);
-    sgiimg_write_next_char_row (image, row);
+    if (!sgiimg_write_next_char_row (image, row)) yyerror ("could not write SGI row");
   }
 
   free (row);
 
   sgiimg_file_close (image);
+  sgiimg_delete (image);
+  image = NULL;
 
   image_close();
 }

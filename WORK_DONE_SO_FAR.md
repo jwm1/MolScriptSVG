@@ -1,8 +1,11 @@
 MolScriptSVG Work Summary
 =========================
 
-Current baseline
-----------------
+Historical baseline (2.1.5)
+---------------------------
+
+This is the earlier work summary. For the 2.2 release, see
+[CHANGES.md](CHANGES.md) and [RELEASE_NOTES_2.2.md](RELEASE_NOTES_2.2.md).
 
 - Project renamed from `MolScript` to `MolScriptSVG`.
 - Executable name kept as `molscript`.

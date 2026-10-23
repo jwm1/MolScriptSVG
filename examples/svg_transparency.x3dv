@@ -1,0 +1,239 @@
+#X3D V3.3 utf8
+PROFILE Immersive
+WorldInfo {
+title "SVG review: translucent points, borders and triangle surfaces"
+info [
+"Program: MolScriptSVG 2.2, Copyright (C) 1997-1998 Per J. Kraulis"
+"Author: jwm"
+]
+}
+PROTO Ball [
+inputOutput SFVec3f p 0 0 0
+initializeOnly SFFloat rad 1.5
+initializeOnly SFColor dc 1 1 1
+initializeOnly SFColor ec 0 0 0
+initializeOnly SFColor sc 0.2 0.2 0.2
+initializeOnly SFFloat sh 0
+initializeOnly SFFloat tr 0
+]
+{
+Transform {
+translation IS p
+children [
+Shape {
+appearance Appearance {
+material Material {
+diffuseColor IS dc
+emissiveColor IS ec
+specularColor IS sc
+shininess IS sh
+transparency IS tr
+}
+}
+geometry Sphere {
+radius IS rad
+}
+}
+]
+}
+}
+PROTO Cyl [
+inputOutput SFVec3f p 0 0 0
+inputOutput SFRotation r 0 0 1 0
+inputOutput SFVec3f s 1 1 1
+initializeOnly SFColor dc 1 1 1
+initializeOnly SFColor ec 0 0 0
+initializeOnly SFColor sc 0.2 0.2 0.2
+initializeOnly SFFloat sh 0
+initializeOnly SFFloat tr 0
+]
+{
+Transform {
+translation IS p
+rotation IS r
+scale IS s
+children [
+Shape {
+appearance Appearance {
+material Material {
+diffuseColor IS dc
+emissiveColor IS ec
+specularColor IS sc
+shininess IS sh
+transparency IS tr
+}
+}
+geometry Cylinder { }
+}
+]
+}
+}
+PROTO Stick [
+inputOutput SFVec3f p 0 0 0
+inputOutput SFRotation r 0 0 1 0
+inputOutput SFVec3f s 1 1 1
+initializeOnly SFColor dc 1 1 1
+initializeOnly SFColor ec 0 0 0
+initializeOnly SFColor sc 0.2 0.2 0.2
+initializeOnly SFFloat sh 0
+initializeOnly SFFloat tr 0
+]
+{
+Transform {
+translation IS p
+rotation IS r
+scale IS s
+children [
+Shape {
+appearance Appearance {
+material Material {
+diffuseColor IS dc
+emissiveColor IS ec
+specularColor IS sc
+shininess IS sh
+transparency IS tr
+}
+}
+geometry Extrusion {
+spine [0 -1 0, 0 1 0]
+crossSection [
+1 0 0.707107 -0.707107 -1.83697e-16 -1 -0.707107 -0.707107 -1 1.22465e-16 -0.707107 0.707107 6.12323e-17 1 0.707107 0.707107 1 0
+]
+beginCap FALSE
+endCap FALSE
+creaseAngle 1.7
+}
+}
+]
+}
+}
+PROTO Label [
+initializeOnly SFVec3f p 0 0 0
+initializeOnly SFFloat sz 1
+initializeOnly MFString c []
+initializeOnly SFVec3f o 0 0 0
+initializeOnly SFColor dc 1 1 1
+initializeOnly SFColor ec 0 0 0
+initializeOnly SFColor sc 0.2 0.2 0.2
+initializeOnly SFFloat sh 0
+initializeOnly SFFloat tr 0
+]
+{
+Transform {
+translation IS p
+children [
+Billboard {
+axisOfRotation 0 0 0
+children [
+Transform {
+translation IS o
+children [
+Shape {
+appearance Appearance {
+material Material {
+diffuseColor IS dc
+emissiveColor IS ec
+specularColor IS sc
+shininess IS sh
+transparency IS tr
+}
+}
+geometry Text {
+string IS c
+fontStyle FontStyle {
+size IS sz
+}
+}
+}
+]
+}
+]
+}
+]
+}
+}
+Collision {
+collide FALSE
+children [
+Shape {
+appearance Appearance {
+material Material {
+emissiveColor 1 0 0
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry PointSet {
+coord Coordinate {
+point [
+-8.00 0.00 0.00
+]
+}
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+emissiveColor 1 0 0
+ambientIntensity 0.2
+shininess 0.2
+transparency 0.5
+}
+}
+geometry PointSet {
+coord Coordinate {
+point [
+-3.00 0.00 0.00
+]
+}
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+diffuseColor 0 0 1
+ambientIntensity 0.2
+shininess 0.2
+transparency 0.5
+}
+}
+geometry IndexedFaceSet {
+solid FALSE
+coord Coordinate {
+point [
+2.00 -2.00 0.00 6.00 -2.00 0.00 6.00 2.00 0.00 2.00 -2.00 0.00 6.00 2.00 0.00 2.00 2.00 0.00
+]
+}
+coordIndex [
+0 1 2 -1 3 4 5 -1
+]
+}
+}
+Label {
+p -8.00 -3.00 0.00 c "Opaque" dc 0 0 0 sc 0 0 0 sh 0.2 sz 0.6
+}
+Label {
+p -3.00 -3.00 0.00 c "Half transparent" dc 0 0 0 sc 0 0 0 sh 0.2 sz 0.6
+}
+Label {
+p 4.00 -3.00 0.00 c "Translucent mesh" dc 0 0 0 sc 0 0 0 sh 0.2 sz 0.6
+}
+]
+bboxCenter -1 -0.5 0
+bboxSize 16 7 2
+}
+NavigationInfo {
+speed 4
+type [
+"EXAMINE" "FLY"
+]
+}
+Background {
+skyColor [
+1 1 1
+]
+}
+Viewpoint {
+position -1.00 -0.50 19.20
+description "overall default"
+}

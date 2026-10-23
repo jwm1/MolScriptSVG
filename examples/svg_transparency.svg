@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0.00 0.00 600.00 300.00" width="600.00" height="300.00">
+<title>SVG review: translucent points, borders and triangle surfaces</title>
+<desc>MolScriptSVG 2.2, Copyright (C) 1997-1998 Per J. Kraulis</desc>
+<g transform="translate(0 300.00) scale(1 -1)">
+<clipPath id="plot-clip-1"><rect x="0.00" y="0.00" width="600.00" height="300.00"/></clipPath>
+<g clip-path="url(#plot-clip-1)">
+<rect x="0.00" y="0.00" width="600.00" height="300.00" fill="rgb(255,255,255)"/>
+<circle cx="100.0000" cy="150.0000" r="6.0000" style="stroke:rgb(255,0,0);stroke-width:12;stroke-linejoin:round;stroke-linecap:round;fill:rgb(255,0,0)"/>
+<g opacity="0.5">
+<circle cx="225.0000" cy="150.0000" r="6.0000" style="stroke:rgb(255,0,0);stroke-width:12;stroke-linejoin:round;stroke-linecap:round;fill:rgb(255,0,0)"/>
+</g>
+<g opacity="0.5">
+<polygon points="350.0000,100.0000 450.0000,100.0000 450.0000,200.0000" style="stroke:none;fill:rgb(0,0,255)"/>
+</g>
+<g opacity="0.5">
+<polygon points="350.0000,100.0000 450.0000,200.0000 350.0000,200.0000" style="stroke:none;fill:rgb(0,0,255)"/>
+</g>
+</g>
+<text transform="translate(100.00 75.00) scale(1 -1)" font-size="12.00" font-family="Times-Roman" text-anchor="middle" dominant-baseline="middle" fill="rgb(0,0,0)">Opaque</text>
+<text transform="translate(225.00 75.00) scale(1 -1)" font-size="12.00" font-family="Times-Roman" text-anchor="middle" dominant-baseline="middle" fill="rgb(0,0,0)">Half transparent</text>
+<text transform="translate(400.00 75.00) scale(1 -1)" font-size="12.00" font-family="Times-Roman" text-anchor="middle" dominant-baseline="middle" fill="rgb(0,0,0)">Translucent mesh</text>
+</g>
+</svg>

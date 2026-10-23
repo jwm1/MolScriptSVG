@@ -9,6 +9,7 @@ molauto
 /code/*.o
 /code/clib/*.o
 /code/clib/clib.a
+/code/.font-config
 
 # Local temporary files
 *.tmp
@@ -16,3 +17,6 @@ molauto
 *.bak
 *.orig
 /.DS_Store
+/dist/
+__pycache__/
+*.pyc

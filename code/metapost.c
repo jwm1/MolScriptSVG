@@ -1,6 +1,6 @@
 /* metapost.c
 
-   MolScript v2.1.5
+   MolScript v2.2
 
    MetaPost
 
@@ -473,10 +473,11 @@ mp_write_transform_comment (FILE *file, double matrix[4][4])
   fputs ("% image-frame transform matrix:\n", file);
   for (row = 0; row < 4; row++) {
     fprintf (file, "%%   [%.8f %.8f %.8f %.8f]\n",
-             matrix[row][0], matrix[row][1], matrix[row][2], matrix[row][3]);
+             matrix[0][row], matrix[1][row], matrix[2][row], matrix[3][row]);
   }
   fputs ("% image-frame coordinates are obtained as:\n", file);
   fputs ("%   [x' y' z' 1]^T = M * [x y z 1]^T\n", file);
+  fputs ("% Input xyz are view coordinates, after MolScript atom transformations.\n", file);
 }
 
 
@@ -1336,6 +1337,10 @@ mp_set_area (void)
 {
   assert (dstack_size == 4);
 
+  if (!isfinite (dstack[0]) || !isfinite (dstack[1]) ||
+      !isfinite (dstack[2]) || !isfinite (dstack[3]) ||
+      dstack[2] <= dstack[0] || dstack[3] <= dstack[1])
+    yyerror ("invalid area values");
   set_area_values (dstack[0], dstack[1], dstack[2], dstack[3]);
   clear_dstack ();
 
@@ -1367,6 +1372,11 @@ mp_coil (void)
   v3_difference (&dir, &((cs+1)->p), &(cs->p));
   v3_normalize (&dir);
   v3_cross_product (&perp, &dir, &zaxis);
+  if (v3_length (&perp) < 1.0e-10) {
+    perp = xaxis;
+    col = current_state->colourparts ? &cs->c : &current_state->planecolour;
+    db_sphere (&cs->p, current_state->coilradius * depthcue (cs->p.z, current_state), col, FALSE);
+  }
   v3_normalize (&perp);
   v3_scaled (&dir,
 	     current_state->coilradius * depthcue (cs->p.z, current_state),
@@ -1394,6 +1404,11 @@ mp_coil (void)
     }
     v3_normalize (&dir);
     v3_cross_product (&perp, &dir, &zaxis);
+    if (v3_length (&perp) < 1.0e-10) {
+      perp = prev_perp;
+      col = current_state->colourparts ? &cs->c : &current_state->planecolour;
+      db_sphere (&cs->p, current_state->coilradius * depthcue (cs->p.z, current_state), col, FALSE);
+    }
     v3_normalize (&perp);
     radius = current_state->coilradius * depthcue (cs->p.z, current_state);
     v3_sum_scaled (&p2, &(cs->p), radius, &perp);
@@ -2068,7 +2083,7 @@ mp_object (int code, vector3 *triplets, int count)
     break;
 
   case OBJ_POINTS_COLOURS:
-    for (slot = 0; slot < count; slot++) {
+    for (slot = 0; slot < count; slot += 2) {
       v = triplets + slot + 1;
       rgb.x = v->x;
       rgb.y = v->y;

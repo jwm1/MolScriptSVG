@@ -1,5 +1,5 @@
 %{
-/* MolScript v2.1.2
+/* MolScriptSVG v2.2
  
    bison (GNU's yacc) parser definition
 

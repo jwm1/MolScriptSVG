@@ -1,6 +1,6 @@
 /* opengl.c
 
-   MolScriptSVG v2.1.5
+   MolScriptSVG v2.2
 
    OpenGL
 
@@ -874,9 +874,30 @@ ogl_render_lists (void)
   if ((accum != 0) && (display_mode == VIEW_MODE)) {
 
     int point;
+    GLint accum_bits;
+    size_t pixel, samples = (size_t) output_width * output_height * 3;
+    unsigned short *sum = NULL;
+    unsigned char *rgb = NULL;
     GLfloat fraction = 1.0 / (GLfloat) accum;
     float xpix = 2.0 * aspect_window_x * window_scale / (float) output_width;
     float ypix = 2.0 * aspect_window_y * window_scale / (float) output_height;
+
+    glGetIntegerv (GL_ACCUM_RED_BITS, &accum_bits);
+    if (!accum_bits) {
+      /* EGL pbuffers commonly have no legacy accumulation buffer. */
+      sum = calloc (samples, sizeof (*sum));
+      rgb = malloc (samples);
+      if (!sum || !rgb) {
+        free (sum);
+        free (rgb);
+        exit_on_error = TRUE;
+        yyerror ("could not allocate software accumulation buffer");
+      }
+      glPushClientAttrib (GL_CLIENT_PIXEL_STORE_BIT);
+      glPixelStorei (GL_PACK_ALIGNMENT, 1);
+      glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
+      if (message_mode) fprintf (stderr, "Using software accumulation (%d samples)\n", accum);
+    }
 
     for (point = 0; point < accum; point++) {
       glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -911,14 +932,43 @@ ogl_render_lists (void)
 
       glPopMatrix();
 
-      if (point == 0) {
+      if (sum) {
+        glReadPixels (0, 0, output_width, output_height, GL_RGB, GL_UNSIGNED_BYTE, rgb);
+        for (pixel = 0; pixel < samples; pixel++) sum[pixel] += rgb[pixel];
+      } else if (point == 0) {
 	glAccum (GL_LOAD, fraction);
       } else {
 	glAccum (GL_ACCUM, fraction);
       }
     }
 
-    glAccum (GL_RETURN, 1.0);
+    if (sum) {
+      for (pixel = 0; pixel < samples; pixel++) rgb[pixel] = (sum[pixel] + accum / 2) / accum;
+      glPushAttrib (GL_ENABLE_BIT | GL_PIXEL_MODE_BIT | GL_CURRENT_BIT);
+      glDisable (GL_DEPTH_TEST);
+      glDisable (GL_LIGHTING);
+      glDisable (GL_BLEND);
+      glDisable (GL_FOG);
+      glMatrixMode (GL_PROJECTION);
+      glPushMatrix();
+      glLoadIdentity();
+      glMatrixMode (GL_MODELVIEW);
+      glPushMatrix();
+      glLoadIdentity();
+      glRasterPos2f (-1.0, -1.0);
+      glPixelZoom (1.0, 1.0);
+      glDrawPixels (output_width, output_height, GL_RGB, GL_UNSIGNED_BYTE, rgb);
+      glPopMatrix();
+      glMatrixMode (GL_PROJECTION);
+      glPopMatrix();
+      glMatrixMode (GL_MODELVIEW);
+      glPopAttrib();
+      glPopClientAttrib();
+      free (rgb);
+      free (sum);
+    } else {
+      glAccum (GL_RETURN, 1.0);
+    }
 
   } else {
 

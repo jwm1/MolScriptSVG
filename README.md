@@ -1,5 +1,35 @@
-MolScriptSVG 2.1.5
+MolScriptSVG 2.2
 ==================
+
+Version 2.2 adds display-independent bitmap/FreeType labels, safer geometry,
+and fixes across SVG, image export, X3D and MolAuto. The executables remain
+`molscript` and `molauto`. Generated example files are included.
+
+See the [2.2 release notes](RELEASE_NOTES_2.2.md), [changelog](CHANGES.md),
+[example gallery](examples/index.html) and [release procedure](RELEASING.md).
+The repository is [jwm1/MolScriptSVG](https://github.com/jwm1/MolScriptSVG).
+
+Build, run regression tests, and refresh all SVG/PNG examples with:
+
+```bash
+make -C code
+python3 scripts/test-svg.py
+python3 scripts/test-backends-molauto.py
+python3 scripts/test-rendering.py
+python3 scripts/test-webgl-browser.py
+python3 scripts/test-output-formats.py --images
+python3 scripts/regenerate-svg-examples.py
+```
+
+The preview script uses CairoSVG when installed, otherwise Inkscape. It checks
+SVG XML and PNG signatures and stages new files before replacing old previews.
+The format check uses available external readers; `--images` requires Pillow
+and working EGL. Headless labels use a bundled bitmap font, with optional
+FreeType support. See [RENDERING_TESTS.md](RENDERING_TESTS.md) for font options,
+geometry checks, browser tests and remaining coverage gaps.
+The [transparency example](examples/svg_transparency.svg) compares opaque and
+half-transparent geometry; its [PNG preview](examples/svg_transparency_svg.png)
+is also included.
 
     Copyright (C) 1997-1998 Per J. Kraulis
     Copyright (C) 2026 James W. Murray
@@ -50,7 +80,7 @@ Open Source
 MolScriptSVG is distributed as a fork under the MIT license in this GitHub
 repository. The original MolScript project is available at [MolScript](https://github.com/pekrau/MolScript)
 
-Version MolScriptSVG 2.1.5
+Version MolScriptSVG 2.2
 -------------
 
 The first version of MolScript (written in Fortran 77) was released in
@@ -65,11 +95,10 @@ Linux system. The `code/Makefile.complete` file has now been modernized to use
 Build
 -----
 
-The default build path is now:
+From the repository root, the default full build is:
 
 ```bash
-cd code
-make
+make -C code -j4
 ```
 
 `code/Makefile` delegates to `Makefile.complete`, so plain `make` builds the
@@ -92,15 +121,15 @@ full MolScriptSVG binary by default.
 To build the minimal version explicitly:
 
 ```bash
-cd code
-make -f Makefile.basic
+make -C code clean
+make -C code -f Makefile.basic -j4
 ```
 
 To rebuild the full version explicitly:
 
 ```bash
-cd code
-make -f Makefile.complete clean all
+make -C code clean
+make -C code -f Makefile.complete -j4
 ```
 
 ### Full-build dependencies
@@ -114,6 +143,21 @@ development packages for:
 - libjpeg
 - libgd
 - zlib
+
+A C compiler, GNU Make and Bison are also required for development builds.
+On Debian/Ubuntu, install the full build and optional FreeType dependencies:
+
+```bash
+sudo apt install build-essential bison pkg-config freeglut3-dev \
+  libgl1-mesa-dev libglu1-mesa-dev libegl1-mesa-dev libx11-dev \
+  libpng-dev libjpeg-dev libgd-dev zlib1g-dev libfreetype-dev
+make -C code -j4 USE_FREETYPE=1
+```
+
+FreeType is opt-in; omit `USE_FREETYPE=1` for bundled bitmap fonts only.
+Clean before switching between basic and complete builds. The FreeType toggle
+alone is tracked automatically. Test dependencies and optional checks are in
+[RENDERING_TESTS.md](RENDERING_TESTS.md).
 
 If those are present, `make` should produce:
 
@@ -145,6 +189,23 @@ The image-output path prefers a headless EGL OpenGL context. That avoids
 opening an X11 window and allows `-png`, `-jpeg` and `-gif` rendering without
 a working X11 display. If EGL initialization fails, MolScriptSVG falls back to
 the hidden GLUT window path for compatibility.
+
+Labels no longer depend on GLUT font initialization. The default
+`-labelfont bitmap` uses a bundled printable-ASCII font. To enable optional
+TrueType/OpenType fonts, install the FreeType development package (for example,
+`libfreetype-dev` on Debian/Ubuntu), then build with `make -C code USE_FREETYPE=1`.
+Select one with `-labelfont freetype -fontfile /path/to/font.ttf`.
+Both paths currently use monochrome bitmap glyphs, not antialiased text.
+SVG and PostScript label rendering is unchanged.
+
+`MOLSCRIPT_IMAGE_BACKEND=auto|egl|glut` selects the image context; the default
+is `auto`. Forced EGL never falls back to X11. Accumulation antialiasing
+(`-accum`) uses software accumulation when the context has no accumulation
+buffer.
+
+Compare the labelled [bitmap preview](examples/ras_gdp_bitmap.png) and
+[FreeType preview](examples/ras_gdp_freetype.png). Commands and test coverage
+are in [RENDERING_TESTS.md](RENDERING_TESTS.md).
 
 ### Example commands
 

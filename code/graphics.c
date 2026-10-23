@@ -1,6 +1,6 @@
 /* graphics.c
 
-   MolScriptSVG v2.1.5
+   MolScriptSVG v2.2
 
    Graphics: construct the geometries and call the output procedures.
 
@@ -34,6 +34,50 @@
 #define HELIX_ALPHA (to_radians(32.0))
 #define HELIX_BETA (to_radians(-11.0))
 
+/* Reject undefined tangents rather than propagating NaNs into every backend. */
+static void
+normalize_direction (vector3 *v)
+{
+  double length = v3_length (v);
+  if (!isfinite (length) || length < 1.0e-10) {
+    exit_on_error = TRUE;
+    yyerror ("degenerate geometry: zero or non-finite direction; check backbone coordinates");
+  }
+  v3_scale (v, 1.0 / length);
+}
+
+/* A straight backbone has no unique normal. Pick the least-aligned axis. */
+static void
+normalize_normal (vector3 *normal, const vector3 *direction)
+{
+  if (v3_length (normal) < 1.0e-10) {
+    vector3 axis = {0.0, 0.0, 0.0}, dir = *direction;
+    normalize_direction (&dir);
+    if (fabs (dir.x) <= fabs (dir.y) && fabs (dir.x) <= fabs (dir.z)) axis.x = 1.0;
+    else if (fabs (dir.y) <= fabs (dir.z)) axis.y = 1.0;
+    else axis.z = 1.0;
+    v3_cross_product (normal, &dir, &axis);
+  }
+  normalize_direction (normal);
+}
+
+static void
+validate_chain (mol3d_chain *ch)
+{
+  int slot;
+  for (slot = 0; slot < ch->length; slot++) {
+    vector3 *v = &ch->atoms[slot]->xyz;
+    if (!isfinite (v->x) || !isfinite (v->y) || !isfinite (v->z) ||
+        (slot > 0 && v3_distance (v, &ch->atoms[slot-1]->xyz) < 1.0e-8)) {
+      char message[256];
+      snprintf (message, sizeof (message),
+                "degenerate geometry near residue %s: non-finite or coincident backbone coordinates",
+                ch->residues[slot]->name);
+      exit_on_error = TRUE;
+      yyerror (message);
+    }
+  }
+}
 
 /*============================================================*/
 boolean frame;
@@ -269,6 +313,7 @@ set_extent (void)
     slab = fabs (center.z - size.z);
     d = fabs (center.z + size.z);
     if (d > slab) slab = d;
+    if (slab < 1.0e-6) slab = 1.0; /* planar objects and label-only scenes */
     if (message_mode)
       fprintf (stderr, "setting slab to %.2f\n", 2.0 * slab);
   }
@@ -758,6 +803,7 @@ coil (int is_peptide_chain, int smoothing)
     if (ch->length < 2) continue;
 
     msg_chain (coilname, ch);
+    validate_chain (ch);
     comment_chain (coilname, ch);
     points = get_atom_positions (ch);
 
@@ -896,7 +942,7 @@ coil (int is_peptide_chain, int smoothing)
       }
 				/* coil plane coordinates */
       v3_difference (&dir, &(coil_segments[1].p), &(coil_segments[0].p));
-      v3_normalize (&dir);
+      normalize_direction (&dir);
       v3_cross_product (&normal, &side, &dir);
       if (v3_length (&normal) < 1.0e-6) {
 	v3_initialize (&side, 0.0, 1.0, 0.0);
@@ -906,9 +952,9 @@ coil (int is_peptide_chain, int smoothing)
 	  v3_cross_product (&normal, &side, &dir);
 	}
       }
-      v3_normalize (&normal);
+      normalize_direction (&normal);
       v3_cross_product (&side, &dir, &normal);
-      v3_normalize (&side);
+      normalize_direction (&side);
 
       cs = coil_segments;
       v3_sum_scaled (&(cs->p1), &(cs->p), radius, &normal);
@@ -924,9 +970,9 @@ coil (int is_peptide_chain, int smoothing)
 	v3_difference (&dir, &(coil_segments[slot+1].p),
 		             &(coil_segments[slot-1].p));
 	v3_cross_product (&side, &dir, &normal);
-	v3_normalize (&side);
+	normalize_direction (&side);
 	v3_cross_product (&normal, &side, &dir);
-	v3_normalize (&normal);
+	normalize_direction (&normal);
 
 	cs = coil_segments + slot;
 	v3_sum_scaled (&(cs->p1), &(cs->p), radius, &normal);
@@ -942,9 +988,9 @@ coil (int is_peptide_chain, int smoothing)
       v3_difference (&dir, &(coil_segments[coil_segment_count-1].p),
 		           &(coil_segments[coil_segment_count-2].p));
       v3_cross_product (&side, &dir, &normal);
-      v3_normalize (&side);
+      normalize_direction (&side);
       v3_cross_product (&normal, &side, &dir);
-      v3_normalize (&normal);
+      normalize_direction (&normal);
 
       cs = coil_segments + coil_segment_count - 1;
       v3_sum_scaled (&(cs->p1), &(cs->p), radius, &normal);
@@ -960,13 +1006,13 @@ coil (int is_peptide_chain, int smoothing)
       for (slot = 0; slot < coil_segment_count; slot++) {
 	cs = coil_segments + slot;
 	v3_difference (&(cs->n1), &(cs->p1), &(cs->p));
-	v3_normalize (&(cs->n1));
+	normalize_direction (&(cs->n1));
 	v3_difference (&(cs->n2), &(cs->p2), &(cs->p));
-	v3_normalize (&(cs->n2));
+	normalize_direction (&(cs->n2));
 	v3_difference (&(cs->n3), &(cs->p3), &(cs->p));
-	v3_normalize (&(cs->n3));
+	normalize_direction (&(cs->n3));
 	v3_difference (&(cs->n4), &(cs->p4), &(cs->p));
-	v3_normalize (&(cs->n4));
+	normalize_direction (&(cs->n4));
       }
 
       output_coil();
@@ -1027,6 +1073,7 @@ cylinder (void)
     if (ch->length < 3) continue;
 
     msg_chain ("cylinder", ch);
+    validate_chain (ch);
     comment_chain ("cylinder", ch);
 
     v3_middle (&start, &(ch->atoms[0]->xyz), &(ch->atoms[2]->xyz));
@@ -1037,12 +1084,12 @@ cylinder (void)
       vector3 vec1, vec2, rvec;
 
       v3_difference (&vec, &(ch->atoms[2]->xyz), &(ch->atoms[0]->xyz));
-      v3_normalize (&vec);
+      normalize_direction (&vec);
 
       v3_difference (&vec1, &(ch->atoms[1]->xyz), &(ch->atoms[0]->xyz));
       v3_difference (&vec2, &(ch->atoms[2]->xyz), &(ch->atoms[1]->xyz));
       v3_cross_product (&rvec, &vec1, &vec2);
-      v3_normalize (&rvec);
+      normalize_normal (&rvec, &vec);
 
       v3_scaled (&dir, cos (HELIX_ALPHA), &rvec);
       v3_add_scaled (&dir, sin (HELIX_ALPHA), &vec);
@@ -1051,7 +1098,7 @@ cylinder (void)
       v3_difference (&dir, &finish, &start);
     }
 
-    v3_normalize (&dir);
+    normalize_direction (&dir);
 
     v3_difference (&vec, &(ch->atoms[2]->xyz), &(ch->atoms[0]->xyz));
     v3_scaled (&top, - 0.5 * v3_length (&vec) *
@@ -1104,6 +1151,7 @@ helix (void)
     if (ch->length < 3) continue;
 
     msg_chain ("helix", ch);
+    validate_chain (ch);
     comment_chain ("helix", ch);
 
     points = get_atom_positions (ch); /* helix axis and tangent vectors */
@@ -1113,12 +1161,12 @@ helix (void)
     for (slot = 1; slot < ch->length - 1; slot++) {
 				/* helix direction vector at (i) */
       v3_difference (&cvec, points + slot + 1, points + slot - 1);
-      v3_normalize (&cvec);
+      normalize_direction (&cvec);
 				/* normal vector for plane (i-1),(i),(i+1) */
       v3_difference (&vec1, points + slot, points + slot - 1);
       v3_difference (&vec2, points + slot + 1, points + slot);
       v3_cross_product (&rvec, &vec1, &vec2);
-      v3_normalize (&rvec);
+      normalize_normal (&rvec, &cvec);
 				/* helix axis at (i) */
       v3_scaled (&vec1, cos (HELIX_ALPHA), &rvec);
       v3_scaled (&vec2, sin (HELIX_ALPHA), &cvec);
@@ -1151,10 +1199,10 @@ helix (void)
     *(axes + ch->length - 1) = *(axes + ch->length - 2);
 				/* helix terminii tangents */
     v3_difference (&vec1, points + 1, &(ca_first->xyz));
-    v3_normalize (&vec1);
+    normalize_direction (&vec1);
     v3_scaled (tangents, HELIX_HERMITE_FACTOR, &vec1);
     v3_difference (&vec1, &(ca_last->xyz), points + ch->length - 2);
-    v3_normalize (&vec1);
+    normalize_direction (&vec1);
     v3_scaled (tangents + ch->length - 1, HELIX_HERMITE_FACTOR, &vec1);
 
     if (current_state->colourparts) {
@@ -1169,7 +1217,7 @@ helix (void)
     v3_sum_scaled (&(hs->p2), points, -coilradius, axes);
     hs->a = *axes;
     v3_cross_product (&(hs->n), tangents, axes);
-    v3_normalize (&(hs->n));
+    normalize_direction (&(hs->n));
     if (col) hs->c = *col;
     ext3d_update (points, coilradius);
 
@@ -1189,7 +1237,7 @@ helix (void)
       hs->a = *axes;
       hermite_get_tangent (&dir, t);
       v3_cross_product (&(hs->n), &dir, axes);
-      v3_normalize (&(hs->n));
+      normalize_direction (&(hs->n));
       if (current_state->colourparts &&
 	  (segment == segments / 2)) col = &(ch->residues[1]->colour);
       if (col) hs->c = *col;
@@ -1202,7 +1250,7 @@ helix (void)
     v3_sum_scaled (&(hs->p2), points + 1, -halfwidth, axes + 1);
     hs->a = *(axes + 1);
     v3_cross_product (&(hs->n), tangents + 1, axes + 1);
-    v3_normalize (&(hs->n));
+    normalize_direction (&(hs->n));
     if (col) hs->c = *col;
     ext3d_update (points + 1, halfwidth);
 
@@ -1217,13 +1265,13 @@ helix (void)
 	hs = helix_segment_next();
 	v3_scaled (&(hs->a), 1.0 - t, axes + slot);
 	v3_add_scaled (&(hs->a), t, axes + slot + 1);
-	v3_normalize (&(hs->a));
+	normalize_direction (&(hs->a));
 	hermite_get (&pos, t);
 	v3_sum_scaled (&(hs->p1), &pos, halfwidth, &(hs->a));
 	v3_sum_scaled (&(hs->p2), &pos, -halfwidth, &(hs->a));
 	hermite_get_tangent (&dir, t);
 	v3_cross_product (&(hs->n), &dir, &(hs->a));
-	v3_normalize (&(hs->n));
+	normalize_direction (&(hs->n));
 	if (current_state->colourparts && (segment == segments / 2))
 	  col = &(ch->residues[slot+1]->colour);
 	if (col) hs->c = *col;
@@ -1235,7 +1283,7 @@ helix (void)
       v3_sum_scaled (&(hs->p2), points + slot + 1, -halfwidth, axes + slot +1);
       hs->a = *(axes + slot + 1);
       v3_cross_product (&(hs->n), tangents + slot + 1, axes + slot + 1);
-      v3_normalize (&(hs->n));
+      normalize_direction (&(hs->n));
       if (col) hs->c = *col;
       ext3d_update (points + slot + 1, halfwidth);
     }
@@ -1256,7 +1304,7 @@ helix (void)
       hs->a = *(axes + ch->length - 1);
       hermite_get_tangent (&dir, t);
       v3_cross_product (&(hs->n), &dir, axes + ch->length - 1);
-      v3_normalize (&(hs->n));
+      normalize_direction (&(hs->n));
       if (current_state->colourparts && (segment == segments / 2))
 	  col = &(ch->residues[ch->length-2]->colour);
       if (col) hs->c = *col;
@@ -1271,7 +1319,7 @@ helix (void)
     hs->a = *(axes + ch->length - 1);
     v3_cross_product (&(hs->n),
 		      tangents + ch->length - 1, axes + ch->length - 1);
-    v3_normalize (&(hs->n));
+    normalize_direction (&(hs->n));
     if (col) hs->c = *col;
     ext3d_update (points + ch->length - 1, coilradius);
 
@@ -1671,6 +1719,7 @@ strand (void)
     if (ch->length < 3) continue;
 
     msg_chain ("strand", ch);
+    validate_chain (ch);
     comment_chain ("strand", ch);
 
     points = get_atom_positions (ch);
@@ -1679,7 +1728,8 @@ strand (void)
     for (slot = 1; slot < ch->length - 1; slot++) {
       v3_middle (&pos, points + slot - 1, points + slot + 1);
       v3_difference (normals + slot, points + slot, &pos);
-      v3_normalize (normals + slot);
+      v3_difference (&dir, points + slot + 1, points + slot - 1);
+      normalize_normal (normals + slot, &dir);
     }
 				/* just copy the normals for the terminii */
     *(normals) = *(normals + 1);
@@ -1699,7 +1749,7 @@ strand (void)
     for (slot = 1; slot < ch->length - 1; slot++) {
       v3_sum (&dir, normals + slot - 1, normals + slot);
       v3_add (&dir, normals + slot + 1);
-      v3_normalize (&dir);
+      normalize_direction (&dir);
       *(smoothed + slot) = dir;
     }
     for (slot = 1; slot < ch->length - 1; slot++) {
@@ -1711,17 +1761,17 @@ strand (void)
     v3_difference (&dir, points + 1, points);
     v3_cross_product (&side, &dir, normals);
     v3_cross_product (normals, &side, &dir);
-    v3_normalize (normals);
+    normalize_normal (normals, &dir);
     for (slot = 1; slot < ch->length - 1; slot++) {
       v3_difference (&dir, points + slot + 1, points + slot - 1);
       v3_cross_product (&side, &dir, normals + slot);
       v3_cross_product (normals + slot, &side, &dir);
-      v3_normalize (normals + slot);
+      normalize_normal (normals + slot, &dir);
     }
     v3_difference (&dir, points + ch->length - 1, points + ch->length - 2);
     v3_cross_product (&side, &dir, normals + ch->length - 1);
     v3_cross_product (normals + ch->length - 1, &side, &dir);
-    v3_normalize (normals + ch->length - 1);
+    normalize_normal (normals + ch->length - 1, &dir);
 
     if (current_state->colourparts) {
       col = &(ch->residues[0]->colour);
@@ -1732,7 +1782,7 @@ strand (void)
     strand_segment_init();
 				/* strand body */
     v3_difference (&dir2, points + 1, points);
-    v3_normalize (&dir2);
+    normalize_direction (&dir2);
     v3_difference (&vec2, points + 1, points);
     v3_scale (&vec2, STRAND_HERMITE_FACTOR);
 
@@ -1740,7 +1790,7 @@ strand (void)
 
       dir1 = dir2;		/* direction vectors */
       v3_difference (&dir2, points + slot + 2, points + slot);
-      v3_normalize (&dir2);
+      normalize_direction (&dir2);
       vec1 = vec2;		/* Hermite spline vectors */
       v3_difference (&vec2, points + slot + 2, points + slot);
       v3_scale (&vec2, STRAND_HERMITE_FACTOR);
@@ -1754,7 +1804,7 @@ strand (void)
 	v3_scaled (&normal, 1.0 - t, normals + slot);
 	v3_add_scaled (&normal, t, normals + slot + 1);
 	v3_cross_product (&side, &normal, &dir);
-	v3_normalize (&side);
+	normalize_direction (&side);
 	if (current_state->colourparts &&
 	    (segment == segments / 2)) col = &(ch->residues[slot+1]->colour);
 	ss = strand_segment_next();
@@ -1778,7 +1828,7 @@ strand (void)
     dir = dir2;
     normal = *(normals + ch->length - 2);
     v3_cross_product (&side, &normal, &dir);
-    v3_normalize (&side);
+    normalize_direction (&side);
     pos = *(points + ch->length - 2);
     ss = strand_segment_next();
     v3_sum_scaled (&(ss->p1), &pos, width, &side);
@@ -1814,13 +1864,13 @@ strand (void)
 
     dir1 = dir2;
     v3_difference (&dir2, points + ch->length - 1, points + ch->length - 2);
-    v3_normalize (&dir1);
+    normalize_direction (&dir1);
     v3_middle (&dir, &dir1, &dir2);
     v3_middle (&pos, points + ch->length - 2, points + ch->length - 1);
     v3_middle (&normal, normals + ch->length - 2, normals + ch->length - 1);
-    v3_normalize (&normal);
+    normalize_direction (&normal);
     v3_cross_product (&side, &normal, &dir);
-    v3_normalize (&side);
+    normalize_direction (&side);
     ss = strand_segment_next();
     v3_sum_scaled (&(ss->p1), &pos, 0.75 * width, &side);
     v3_add_scaled (&(ss->p1), thickness, &normal);

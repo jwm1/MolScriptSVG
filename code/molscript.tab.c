@@ -152,7 +152,7 @@
 
 #line 1 "molscript.y"
 
-/* MolScriptSVG v2.1.5
+/* MolScriptSVG v2.2
  
    bison (GNU's yacc) parser definition
 

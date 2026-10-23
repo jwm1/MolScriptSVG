@@ -1,10 +1,19 @@
 <html>
 <head>
-<title>MolScriptSVG 2.1.5: Output formats</title>
+<title>MolScriptSVG 2.2: Output formats</title>
 <link href="style.css" type="text/css" rel="stylesheet"></link>
 </head>
 
 <body>
+
+<h2>MolScriptSVG 2.2 output additions</h2>
+<p>The fork adds <code>-svg</code>, <code>-mp</code> (MetaPost),
+<code>-pov</code> (POV-Ray), <code>-x3d</code> (XML),
+<code>-x3dv</code> (Classic X3D) and <code>-webgl</code> (HTML/X_ITE).
+These scene exporters are available in basic and complete builds.
+See <a href="../README.md">README</a> for examples and
+<a href="../RENDERING_TESTS.md">headless font options and limitations</a>.
+The remaining format reference includes historical upstream descriptions.</p>
 
 <h1 align=center>Output formats</h1>
 
@@ -339,9 +348,9 @@ The image file output mode depends entirely on the
 <a href="#OpenGL">OpenGL implementation</a>. If your computer system
 does not allow an <a href="installation.html">installation</a> using
 the OpenGL implementation, then none of the image file output formats
-will be available. Also, the current version relies on the X window
-system extension GLX for OpenGL, which implies that a UNIX system is
-required. 
+will be available. MolScriptSVG prefers a headless EGL context; X11/GLX is
+only needed for the GLUT fallback and interactive window. Labels can use
+bundled bitmap fonts or optional FreeType without an X display.
 <p>
 The image is created via the OpenGL rendering system in exactly the
 same way as the <a href="#OpenGL">interactive OpenGL</a> mode, 
