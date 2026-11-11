@@ -3,7 +3,7 @@ PROFILE Immersive
 WorldInfo {
 title "SVG review: translucent points, borders and triangle surfaces"
 info [
-"Program: MolScriptSVG 2.2, Copyright (C) 1997-1998 Per J. Kraulis"
+"Program: MolScriptSVG 2.3, Copyright (C) 1997-1998 Per J. Kraulis"
 "Author: jwm"
 ]
 }
@@ -38,6 +38,8 @@ radius IS rad
 }
 }
 PROTO Cyl [
+initializeOnly SFBool tc TRUE
+initializeOnly SFBool bc TRUE
 inputOutput SFVec3f p 0 0 0
 inputOutput SFRotation r 0 0 1 0
 inputOutput SFVec3f s 1 1 1
@@ -63,7 +65,10 @@ shininess IS sh
 transparency IS tr
 }
 }
-geometry Cylinder { }
+geometry Cylinder {
+top IS tc
+bottom IS bc
+}
 }
 ]
 }
@@ -111,6 +116,7 @@ PROTO Label [
 initializeOnly SFVec3f p 0 0 0
 initializeOnly SFFloat sz 1
 initializeOnly MFString c []
+initializeOnly MFString family ["SERIF"]
 initializeOnly SFVec3f o 0 0 0
 initializeOnly SFColor dc 1 1 1
 initializeOnly SFColor ec 0 0 0
@@ -141,6 +147,7 @@ transparency IS tr
 geometry Text {
 string IS c
 fontStyle FontStyle {
+family IS family
 size IS sz
 }
 }
@@ -210,13 +217,13 @@ coordIndex [
 }
 }
 Label {
-p -8.00 -3.00 0.00 c "Opaque" dc 0 0 0 sc 0 0 0 sh 0.2 sz 0.6
+p -8.00 -3.00 0.00 c "Opaque" family "SERIF" dc 0 0 0 sc 0 0 0 sh 0.2 sz 0.6
 }
 Label {
-p -3.00 -3.00 0.00 c "Half transparent" dc 0 0 0 sc 0 0 0 sh 0.2 sz 0.6
+p -3.00 -3.00 0.00 c "Half transparent" family "SERIF" dc 0 0 0 sc 0 0 0 sh 0.2 sz 0.6
 }
 Label {
-p 4.00 -3.00 0.00 c "Translucent mesh" dc 0 0 0 sc 0 0 0 sh 0.2 sz 0.6
+p 4.00 -3.00 0.00 c "Translucent mesh" family "SERIF" dc 0 0 0 sc 0 0 0 sh 0.2 sz 0.6
 }
 ]
 bboxCenter -1 -0.5 0

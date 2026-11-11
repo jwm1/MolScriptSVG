@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MolScriptSVG 2.3</title>
+  <script defer src="https://cdn.jsdelivr.net/npm/x_ite@12.1.9/dist/x_ite.min.js"></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', function () {
+      try {
+        const scene = document.getElementById('molscript-scene-data');
+        const canvas = document.getElementById('molscript-scene');
+        const xml = scene.value.trimStart();
+        console.log('MolScriptSVG WebGL: parsing XML scene', xml.length);
+        const doc = new DOMParser().parseFromString(xml, 'application/xml');
+        const parseError = doc.querySelector('parsererror');
+        if (parseError) {
+          throw new Error(parseError.textContent || 'X3D XML parse error');
+        }
+        canvas.appendChild(document.importNode(doc.documentElement, true));
+        console.log('MolScriptSVG WebGL: scene attached');
+      } catch (error) {
+        console.error('MolScriptSVG WebGL load failed:', error);
+      }
+    });
+  </script>
+  <style>
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      background: #ffffff;
+    }
+    x3d-canvas {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+    }
+    #molscript-scene-data {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <textarea id="molscript-scene-data">&lt;?xml version="1.0" encoding="UTF-8"?>
+&lt;X3D profile="Immersive" version="3.3" xmlns:xsd="http://www.w3.org/2001/XMLSchema-instance" xsd:noNamespaceSchemaLocation="http://www.web3d.org/specifications/x3d-3.3.xsd">
+  &lt;Scene>
+  &lt;WorldInfo info="&amp;quot;Program: MolScriptSVG 2.3, Copyright (C) 1997-1998 Per J. Kraulis&amp;quot; &amp;quot;Author: jwm&amp;quot;"/>
+  &lt;ProtoDeclare name="Ball">
+    &lt;ProtoInterface>
+      &lt;field accessType="inputOutput" type="SFVec3f" name="p" value="0 0 0"/>
+      &lt;field accessType="initializeOnly" type="SFFloat" name="rad" value="1.5"/>
+      &lt;field accessType="initializeOnly" type="SFColor" name="dc" value="1 1 1"/>
+      &lt;field accessType="initializeOnly" type="SFColor" name="ec" value="0 0 0"/>
+      &lt;field accessType="initializeOnly" type="SFColor" name="sc" value="0.2 0.2 0.2"/>
+      &lt;field accessType="initializeOnly" type="SFFloat" name="sh" value="0"/>
+      &lt;field accessType="initializeOnly" type="SFFloat" name="tr" value="0"/>
+    &lt;/ProtoInterface>
+    &lt;ProtoBody>
+      &lt;Transform>
+        &lt;Shape>
+          &lt;Appearance>
+            &lt;Material>
+              &lt;IS>
+                &lt;connect nodeField="diffuseColor" protoField="dc"/>
+                &lt;connect nodeField="emissiveColor" protoField="ec"/>
+                &lt;connect nodeField="specularColor" protoField="sc"/>
+                &lt;connect nodeField="shininess" protoField="sh"/>
+                &lt;connect nodeField="transparency" protoField="tr"/>
+              &lt;/IS>
+            &lt;/Material>
+          &lt;/Appearance>
+          &lt;Sphere>
+            &lt;IS>
+              &lt;connect nodeField="radius" protoField="rad"/>
+            &lt;/IS>
+          &lt;/Sphere>
+        &lt;/Shape>
+        &lt;IS>
+          &lt;connect nodeField="translation" protoField="p"/>
+        &lt;/IS>
+      &lt;/Transform>
+    &lt;/ProtoBody>
+  &lt;/ProtoDeclare>
+  &lt;ProtoDeclare name="Cyl">
+    &lt;ProtoInterface>
+      &lt;field accessType="initializeOnly" type="SFBool" name="tc" value="TRUE"/>
+      &lt;field accessType="initializeOnly" type="SFBool" name="bc" value="TRUE"/>
+      &lt;field accessType="inputOutput" type="SFVec3f" name="p" value="0 0 0"/>
+      &lt;field accessType="inputOutput" type="SFRotation" name="r" value="0 0 1 0"/>
+      &lt;field accessType="inputOutput" type="SFVec3f" name="s" value="1 1 1"/>
+      &lt;field accessType="initializeOnly" type="SFColor" name="dc" value="1 1 1"/>
+      &lt;field accessType="initializeOnly" type="SFColor" name="ec" value="0 0 0"/>
+      &lt;field accessType="initializeOnly" type="SFColor" name="sc" value="0.2 0.2 0.2"/>
+      &lt;field accessType="initializeOnly" type="SFFloat" name="sh" value="0"/>
+      &lt;field accessType="initializeOnly" type="SFFloat" name="tr" value="0"/>
+    &lt;/ProtoInterface>
+    &lt;ProtoBody>
+      &lt;Transform>
+        &lt;Shape>
+          &lt;Appearance>
+            &lt;Material>
+              &lt;IS>
+                &lt;connect nodeField="diffuseColor" protoField="dc"/>
+                &lt;connect nodeField="emissiveColor" protoField="ec"/>
+                &lt;connect nodeField="specularColor" protoField="sc"/>
+                &lt;connect nodeField="shininess" protoField="sh"/>
+                &lt;connect nodeField="transparency" protoField="tr"/>
+              &lt;/IS>
+            &lt;/Material>
+          &lt;/Appearance>
+          &lt;Cylinder>
+            &lt;IS>
+              &lt;connect nodeField="top" protoField="tc"/>
+              &lt;connect nodeField="bottom" protoField="bc"/>
+            &lt;/IS>
+          &lt;/Cylinder>
+        &lt;/Shape>
+        &lt;IS>
+          &lt;connect nodeField="translation" protoField="p"/>
+          &lt;connect nodeField="rotation" protoField="r"/>
+          &lt;connect nodeField="scale" protoField="s"/>
+        &lt;/IS>
+      &lt;/Transform>
+    &lt;/ProtoBody>
+  &lt;/ProtoDeclare>
+  &lt;ProtoDeclare name="Stick">
+    &lt;ProtoInterface>
+      &lt;field accessType="inputOutput" type="SFVec3f" name="p" value="0 0 0"/>
+      &lt;field accessType="inputOutput" type="SFRotation" name="r" value="0 0 1 0"/>
+      &lt;field accessType="inputOutput" type="SFVec3f" name="s" value="1 1 1"/>
+      &lt;field accessType="initializeOnly" type="SFColor" name="dc" value="1 1 1"/>
+      &lt;field accessType="initializeOnly" type="SFColor" name="ec" value="0 0 0"/>
+      &lt;field accessType="initializeOnly" type="SFColor" name="sc" value="0.2 0.2 0.2"/>
+      &lt;field accessType="initializeOnly" type="SFFloat" name="sh" value="0"/>
+      &lt;field accessType="initializeOnly" type="SFFloat" name="tr" value="0"/>
+    &lt;/ProtoInterface>
+    &lt;ProtoBody>
+      &lt;Transform>
+        &lt;Shape>
+          &lt;Appearance>
+            &lt;Material>
+              &lt;IS>
+                &lt;connect nodeField="diffuseColor" protoField="dc"/>
+                &lt;connect nodeField="emissiveColor" protoField="ec"/>
+                &lt;connect nodeField="specularColor" protoField="sc"/>
+                &lt;connect nodeField="shininess" protoField="sh"/>
+                &lt;connect nodeField="transparency" protoField="tr"/>
+              &lt;/IS>
+            &lt;/Material>
+          &lt;/Appearance>
+          &lt;Extrusion spine="0 -1 0 0 1 0" crossSection="1 0 0.707107 -0.707107 -1.83697e-16 -1 -0.707107 -0.707107 -1 1.22465e-16 -0.707107 0.707107 6.12323e-17 1 0.707107 0.707107 1 0" beginCap="FALSE" endCap="FALSE" creaseAngle="1.7"/>
+        &lt;/Shape>
+        &lt;IS>
+          &lt;connect nodeField="translation" protoField="p"/>
+          &lt;connect nodeField="rotation" protoField="r"/>
+          &lt;connect nodeField="scale" protoField="s"/>
+        &lt;/IS>
+      &lt;/Transform>
+    &lt;/ProtoBody>
+  &lt;/ProtoDeclare>
+  &lt;ProtoDeclare name="Label">
+    &lt;ProtoInterface>
+      &lt;field accessType="initializeOnly" type="SFVec3f" name="p" value="0 0 0"/>
+      &lt;field accessType="initializeOnly" type="SFFloat" name="sz" value="1"/>
+      &lt;field accessType="initializeOnly" type="MFString" name="c" value=""/>
+      &lt;field accessType="initializeOnly" type="MFString" name="family" value="&amp;quot;SERIF&amp;quot;"/>
+      &lt;field accessType="initializeOnly" type="SFVec3f" name="o" value="0 0 0"/>
+      &lt;field accessType="initializeOnly" type="SFColor" name="dc" value="1 1 1"/>
+      &lt;field accessType="initializeOnly" type="SFColor" name="ec" value="0 0 0"/>
+      &lt;field accessType="initializeOnly" type="SFColor" name="sc" value="0.2 0.2 0.2"/>
+      &lt;field accessType="initializeOnly" type="SFFloat" name="sh" value="0"/>
+      &lt;field accessType="initializeOnly" type="SFFloat" name="tr" value="0"/>
+    &lt;/ProtoInterface>
+    &lt;ProtoBody>
+      &lt;Transform>
+        &lt;Billboard axisOfRotation="0 0 0">
+          &lt;Transform>
+            &lt;Shape>
+              &lt;Appearance>
+                &lt;Material>
+                  &lt;IS>
+                    &lt;connect nodeField="diffuseColor" protoField="dc"/>
+                    &lt;connect nodeField="emissiveColor" protoField="ec"/>
+                    &lt;connect nodeField="specularColor" protoField="sc"/>
+                    &lt;connect nodeField="shininess" protoField="sh"/>
+                    &lt;connect nodeField="transparency" protoField="tr"/>
+                  &lt;/IS>
+                &lt;/Material>
+              &lt;/Appearance>
+              &lt;Text>
+                &lt;FontStyle>
+                  &lt;IS>
+                    &lt;connect nodeField="family" protoField="family"/>
+                    &lt;connect nodeField="size" protoField="sz"/>
+                  &lt;/IS>
+                &lt;/FontStyle>
+                &lt;IS>
+                  &lt;connect nodeField="string" protoField="c"/>
+                &lt;/IS>
+              &lt;/Text>
+            &lt;/Shape>
+            &lt;IS>
+              &lt;connect nodeField="translation" protoField="o"/>
+            &lt;/IS>
+          &lt;/Transform>
+        &lt;/Billboard>
+        &lt;IS>
+          &lt;connect nodeField="translation" protoField="p"/>
+        &lt;/IS>
+      &lt;/Transform>
+    &lt;/ProtoBody>
+  &lt;/ProtoDeclare>
+  &lt;Collision collide="FALSE" bboxCenter="0 0 0" bboxSize="10 14 2">
+    &lt;ProtoInstance name="Label">
+      &lt;fieldValue name="p" value="0.00 6.00 0.00"/>
+      &lt;fieldValue name="c" value="&amp;quot;MolScriptSVG: fonts and units&amp;quot;"/>
+      &lt;fieldValue name="family" value="&amp;quot;TYPEWRITER&amp;quot;"/>
+      &lt;fieldValue name="dc" value="0 0 0"/>
+      &lt;fieldValue name="sc" value="0 0 0"/>
+      &lt;fieldValue name="sh" value="0.2"/>
+      &lt;fieldValue name="sz" value="1"/>
+    &lt;/ProtoInstance>
+    &lt;ProtoInstance name="Label">
+      &lt;fieldValue name="p" value="0.00 2.00 0.00"/>
+      &lt;fieldValue name="c" value="&amp;quot;Carbon Oxygen Nitrogen&amp;quot;"/>
+      &lt;fieldValue name="family" value="&amp;quot;TYPEWRITER&amp;quot;"/>
+      &lt;fieldValue name="dc" value="0 0 0"/>
+      &lt;fieldValue name="sc" value="0 0 0"/>
+      &lt;fieldValue name="sh" value="0.2"/>
+      &lt;fieldValue name="sz" value="1"/>
+    &lt;/ProtoInstance>
+    &lt;ProtoInstance name="Label">
+      &lt;fieldValue name="p" value="0.00 -2.00 0.00"/>
+      &lt;fieldValue name="c" value="&amp;quot;WiMW abcdefg 0123456789&amp;quot;"/>
+      &lt;fieldValue name="family" value="&amp;quot;TYPEWRITER&amp;quot;"/>
+      &lt;fieldValue name="dc" value="0 0 0"/>
+      &lt;fieldValue name="sc" value="0 0 0"/>
+      &lt;fieldValue name="sh" value="0.2"/>
+      &lt;fieldValue name="sz" value="1"/>
+    &lt;/ProtoInstance>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedLineSet coordIndex="0 1">
+        &lt;Coordinate point="-4.00 -6.00 0.00 -3.70 -6.00 0.00"/>
+      &lt;/IndexedLineSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedLineSet coordIndex="0 1">
+        &lt;Coordinate point="-3.41 -6.00 0.00 -3.11 -6.00 0.00"/>
+      &lt;/IndexedLineSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedLineSet coordIndex="0 1">
+        &lt;Coordinate point="-2.81 -6.00 0.00 -2.52 -6.00 0.00"/>
+      &lt;/IndexedLineSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedLineSet coordIndex="0 1">
+        &lt;Coordinate point="-2.22 -6.00 0.00 -1.93 -6.00 0.00"/>
+      &lt;/IndexedLineSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedLineSet coordIndex="0 1">
+        &lt;Coordinate point="-1.63 -6.00 0.00 -1.33 -6.00 0.00"/>
+      &lt;/IndexedLineSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedLineSet coordIndex="0 1">
+        &lt;Coordinate point="-1.04 -6.00 0.00 -0.74 -6.00 0.00"/>
+      &lt;/IndexedLineSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedLineSet coordIndex="0 1">
+        &lt;Coordinate point="-0.44 -6.00 0.00 -0.15 -6.00 0.00"/>
+      &lt;/IndexedLineSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedLineSet coordIndex="0 1">
+        &lt;Coordinate point="0.15 -6.00 0.00 0.44 -6.00 0.00"/>
+      &lt;/IndexedLineSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedLineSet coordIndex="0 1">
+        &lt;Coordinate point="0.74 -6.00 0.00 1.04 -6.00 0.00"/>
+      &lt;/IndexedLineSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedLineSet coordIndex="0 1">
+        &lt;Coordinate point="1.33 -6.00 0.00 1.63 -6.00 0.00"/>
+      &lt;/IndexedLineSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedLineSet coordIndex="0 1">
+        &lt;Coordinate point="1.93 -6.00 0.00 2.22 -6.00 0.00"/>
+      &lt;/IndexedLineSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedLineSet coordIndex="0 1">
+        &lt;Coordinate point="2.52 -6.00 0.00 2.81 -6.00 0.00"/>
+      &lt;/IndexedLineSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedLineSet coordIndex="0 1">
+        &lt;Coordinate point="3.11 -6.00 0.00 3.41 -6.00 0.00"/>
+      &lt;/IndexedLineSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedLineSet coordIndex="0 1">
+        &lt;Coordinate point="3.70 -6.00 0.00 4.00 -6.00 0.00"/>
+      &lt;/IndexedLineSet>
+    &lt;/Shape>
+    &lt;ProtoInstance name="Label">
+      &lt;fieldValue name="p" value="0.00 -6.00 0.00"/>
+      &lt;fieldValue name="c" value="&amp;quot;8.00 Å&amp;quot;"/>
+      &lt;fieldValue name="family" value="&amp;quot;TYPEWRITER&amp;quot;"/>
+      &lt;fieldValue name="dc" value="0 0 0"/>
+      &lt;fieldValue name="sc" value="0 0 0"/>
+      &lt;fieldValue name="sh" value="0.2"/>
+      &lt;fieldValue name="sz" value="1"/>
+    &lt;/ProtoInstance>
+  &lt;/Collision>
+  &lt;NavigationInfo speed="4" type="&amp;quot;EXAMINE&amp;quot; &amp;quot;FLY&amp;quot;"/>
+  &lt;Background skyColor="1 1 1"/>
+  &lt;Viewpoint position="0.00 0.00 16.80" description="overall default"/>
+  &lt;/Scene>
+&lt;/X3D>
+</textarea>
+  <x3d-canvas id="molscript-scene" contentScale="auto" update="auto"></x3d-canvas>
+</body>
+</html>

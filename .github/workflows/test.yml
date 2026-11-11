@@ -41,8 +41,14 @@ jobs:
           esac
       - name: SVG and MolAuto regressions
         run: |
+          python3 scripts/build-html-docs.py --check
           python3 scripts/test-svg.py
           python3 scripts/test-backends-molauto.py
+          python3 scripts/test-scalar-colours.py
+          python3 scripts/test-curves.py
+          python3 scripts/test-annotations.py
+          python3 scripts/test-figure-tools.py
+          python3 scripts/test-fonts.py
       - name: Geometry and image regressions
         run: xvfb-run -a python3 scripts/test-rendering.py
       - name: Example format checks

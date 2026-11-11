@@ -12,6 +12,28 @@
 
 #include "str_utils.h"
 
+unsigned int
+str_utf8_next (const char **text)
+{
+  const unsigned char *s = (const unsigned char *) *text;
+  unsigned int c, minimum;
+  int n, i;
+  if (!*s) return 0;
+  *text += 1;
+  if (*s < 0x80) return *s;
+  if (*s >= 0xc2 && *s <= 0xdf) { n = 2; c = *s & 31; minimum = 0x80; }
+  else if (*s >= 0xe0 && *s <= 0xef) { n = 3; c = *s & 15; minimum = 0x800; }
+  else if (*s >= 0xf0 && *s <= 0xf4) { n = 4; c = *s & 7; minimum = 0x10000; }
+  else return '?';
+  for (i = 1; i < n; i++) {
+    if ((s[i] & 0xc0) != 0x80) return '?';
+    c = (c << 6) | (s[i] & 63);
+  }
+  if (c < minimum || c > 0x10ffff || (c >= 0xd800 && c <= 0xdfff)) return '?';
+  *text += n - 1;
+  return c;
+}
+
 /* public ==========
 #include <boolean.h>
 ========== public */

@@ -1,6 +1,6 @@
 /* col.c
 
-   MolScriptSVG v2.2
+   MolScriptSVG v2.3
 
    Colour routines.
 
@@ -10,6 +10,7 @@
 */
 
 #include <assert.h>
+#include <string.h>
 
 #include "clib/colour.h"
 
@@ -139,7 +140,108 @@ set_colour (const char *name)
 
 /*------------------------------------------------------------*/
 static double hsb_ramp_length;
+static int named_ramp;
+
+int
+ramp_is_discrete (void)
+{
+  return named_ramp == 2;
+}
+
+void
+set_named_ramp (const char *name)
+{
+  if (!strcmp (name, "blue-white-red")) named_ramp = 1;
+  else if (!strcmp (name, "alphafold")) named_ramp = 2;
+  else if (!strcmp (name, "alphafold-gradient")) named_ramp = 3;
+  else { yyerror ("unknown named colour ramp"); return; }
+  ramp_colour (&ramp_from_colour, 0.0);
+  ramp_colour (&ramp_to_colour, 1.0);
+}
 static double hsb_ramp_breakpoint;
+
+typedef struct {
+  int named, hsb;
+  colour from, to;
+  double length, breakpoint, low, high;
+} ramp_snapshot;
+typedef struct {
+  int valid;
+  double value;
+  ramp_snapshot ramp;
+} residue_ramp;
+
+static void
+snapshot_ramp (ramp_snapshot *s)
+{
+  memset (s, 0, sizeof(*s));
+  s->named = named_ramp; s->hsb = current_state->hsbramp;
+  s->from = ramp_from_colour; s->to = ramp_to_colour;
+  s->length = hsb_ramp_length; s->breakpoint = hsb_ramp_breakpoint;
+}
+
+static void
+restore_ramp (ramp_snapshot *s)
+{
+  named_ramp = s->named; current_state->hsbramp = s->hsb;
+  ramp_from_colour = s->from; ramp_to_colour = s->to;
+  hsb_ramp_length = s->length; hsb_ramp_breakpoint = s->breakpoint;
+}
+
+static int
+same_ramp (ramp_snapshot *a, ramp_snapshot *b)
+{
+  return a->named == b->named && a->hsb == b->hsb &&
+    a->low == b->low && a->high == b->high &&
+    a->length == b->length && a->breakpoint == b->breakpoint &&
+    a->from.spec == b->from.spec && a->from.x == b->from.x &&
+    a->from.y == b->from.y && a->from.z == b->from.z &&
+    a->to.spec == b->to.spec && a->to.x == b->to.x &&
+    a->to.y == b->to.y && a->to.z == b->to.z;
+}
+
+void
+clear_residue_ramp (res3d *res)
+{
+  residue_ramp *r = nd_search_data (res->data, "molscript-scalar-ramp");
+  if (r) r->valid = FALSE;
+}
+
+void
+record_residue_ramp (res3d *res, double f, double low, double high)
+{
+  residue_ramp r;
+  named_data *nd = nd_search (res->data, "molscript-scalar-ramp");
+  memset (&r, 0, sizeof(r));
+  r.valid = !ramp_is_discrete();
+  r.value = f < 0 ? 0 : f > 1 ? 1 : f;
+  snapshot_ramp (&r.ramp);
+  r.ramp.low = low; r.ramp.high = high;
+  if (!nd) {
+    nd = nd_create ("molscript-scalar-ramp", TRUE);
+    if (res->data) nd_append (res->data, nd);
+    else res->data = nd;
+  }
+  nd_set_data_clone (nd, &r, sizeof(r));
+}
+
+int
+interpolate_residue_colour (colour *dest, res3d *a, res3d *b, double t)
+{
+  residue_ramp *ra, *rb;
+  ramp_snapshot saved;
+  if (!current_state->colourparts || !current_state->colourinterpolate) return FALSE;
+  if (a->mol != b->mol || a->chain != b->chain || a->next != b) return FALSE;
+  ra = nd_search_data (a->data, "molscript-scalar-ramp");
+  rb = nd_search_data (b->data, "molscript-scalar-ramp");
+  if (!ra || !rb || !ra->valid || !rb->valid ||
+      !same_ramp (&ra->ramp, &rb->ramp)) return FALSE;
+  snapshot_ramp (&saved);
+  restore_ramp (&ra->ramp);
+  ramp_colour (dest, (1-t)*ra->value + t*rb->value);
+  restore_ramp (&saved);
+  return TRUE;
+}
 
 
 /*------------------------------------------------------------*/
@@ -147,6 +249,8 @@ void
 set_colour_ramp (colour *ramp_to)
 {
   assert (ramp_to);
+
+  named_ramp = 0;
 
   ramp_to_colour = *ramp_to;
 
@@ -205,6 +309,27 @@ ramp_colour (colour *dest, double f)
   assert (dest);
   assert (f >= 0.0);
   assert (f <= 1.0);
+
+  if (named_ramp) {
+    static const double af[4][3] = {{238,132,83}, {249,220,77},
+                                    {117,199,244}, {33,82,206}};
+    static const double stops[4] = {0, 0.5, 0.7, 1};
+    double rgb[3], t;
+    int i, k;
+    if (named_ramp == 1) {
+      rgb[0] = f < 0.5 ? 2*f : 1;
+      rgb[1] = f < 0.5 ? 2*f : 2*(1-f);
+      rgb[2] = f < 0.5 ? 1 : 2*(1-f);
+    } else {
+      i = named_ramp == 2 ? (f > 0.9 ? 3 : f > 0.7 ? 2 : f > 0.5 ? 1 : 0)
+                          : (f < 0.5 ? 0 : f < 0.7 ? 1 : 2);
+      t = named_ramp == 2 ? 0 : (f-stops[i])/(stops[i+1]-stops[i]);
+      for (k=0; k<3; k++)
+        rgb[k] = (af[i][k] + (t ? t*(af[i+1][k]-af[i][k]) : 0))/255.0;
+    }
+    colour_set_rgb (dest, rgb[0], rgb[1], rgb[2]);
+    return;
+  }
 
   if (current_state->hsbramp) {
     dest->spec = COLOUR_HSB;

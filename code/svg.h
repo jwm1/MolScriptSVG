@@ -1,6 +1,6 @@
 /* svg.h
 
-   MolScriptSVG v2.2
+   MolScriptSVG v2.3
 
    SVG file.
 */
@@ -11,6 +11,8 @@
 #include "coord.h"
 
 void svg_set (void);
+void svg_begin_command (const char *kind);
+void svg_legend_box (vector3 *low, vector3 *high, colour *c);
 
 void svg_first_plot (void);
 void svg_finish_output (void);

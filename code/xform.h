@@ -1,6 +1,6 @@
 /* xform.h
 
-   MolScriptSVG v2.2
+   MolScriptSVG v2.3
 
    Coordinate transformation.
 
@@ -15,6 +15,11 @@
 #include "clib/mol3d.h"
 
 extern double xform[4][4];
+extern char *view_filename;
+void view_plot_init (void);
+void view_note_read (void);
+void view_note_draw (void);
+void view_export (void);
 
 void xform_init (void);
 void xform_init_stored (void);

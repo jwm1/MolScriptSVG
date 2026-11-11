@@ -1,15 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0.00 0.00 600.00 300.00" width="600.00" height="300.00">
 <title>SVG review: translucent points, borders and triangle surfaces</title>
-<desc>MolScriptSVG 2.2, Copyright (C) 1997-1998 Per J. Kraulis</desc>
+<desc>MolScriptSVG 2.3, Copyright (C) 1997-1998 Per J. Kraulis</desc>
 <g transform="translate(0 300.00) scale(1 -1)">
+<metadata xmlns:ms="urn:molscript:svg">
+<ms:command id="plot-1-command-1" kind="object"></ms:command>
+<ms:command id="plot-1-command-2" kind="object"></ms:command>
+<ms:command id="plot-1-command-3" kind="object"></ms:command>
+<ms:command id="plot-1-command-4" kind="label"></ms:command>
+<ms:command id="plot-1-command-5" kind="label"></ms:command>
+<ms:command id="plot-1-command-6" kind="label"></ms:command>
+</metadata>
 <clipPath id="plot-clip-1"><rect x="0.00" y="0.00" width="600.00" height="300.00"/></clipPath>
 <g clip-path="url(#plot-clip-1)">
 <rect x="0.00" y="0.00" width="600.00" height="300.00" fill="rgb(255,255,255)"/>
+<g id="plot-1-fragment-1" data-command="plot-1-command-1" data-kind="object">
+<title>object</title>
 <circle cx="100.0000" cy="150.0000" r="6.0000" style="stroke:rgb(255,0,0);stroke-width:12;stroke-linejoin:round;stroke-linecap:round;fill:rgb(255,0,0)"/>
+</g>
+<g id="plot-1-fragment-2" data-command="plot-1-command-2" data-kind="object">
+<title>object</title>
 <g opacity="0.5">
 <circle cx="225.0000" cy="150.0000" r="6.0000" style="stroke:rgb(255,0,0);stroke-width:12;stroke-linejoin:round;stroke-linecap:round;fill:rgb(255,0,0)"/>
 </g>
+</g>
+<g id="plot-1-fragment-3" data-command="plot-1-command-3" data-kind="object">
+<title>object</title>
 <g opacity="0.5">
 <polygon points="350.0000,100.0000 450.0000,100.0000 450.0000,200.0000" style="stroke:none;fill:rgb(0,0,255)"/>
 </g>
@@ -17,8 +33,18 @@
 <polygon points="350.0000,100.0000 450.0000,200.0000 350.0000,200.0000" style="stroke:none;fill:rgb(0,0,255)"/>
 </g>
 </g>
+</g>
+<g id="plot-1-fragment-4" data-command="plot-1-command-4" data-kind="label">
+<title>label</title>
 <text transform="translate(100.00 75.00) scale(1 -1)" font-size="12.00" font-family="Times-Roman" text-anchor="middle" dominant-baseline="middle" fill="rgb(0,0,0)">Opaque</text>
+</g>
+<g id="plot-1-fragment-5" data-command="plot-1-command-5" data-kind="label">
+<title>label</title>
 <text transform="translate(225.00 75.00) scale(1 -1)" font-size="12.00" font-family="Times-Roman" text-anchor="middle" dominant-baseline="middle" fill="rgb(0,0,0)">Half transparent</text>
+</g>
+<g id="plot-1-fragment-6" data-command="plot-1-command-6" data-kind="label">
+<title>label</title>
 <text transform="translate(400.00 75.00) scale(1 -1)" font-size="12.00" font-family="Times-Roman" text-anchor="middle" dominant-baseline="middle" fill="rgb(0,0,0)">Translucent mesh</text>
+</g>
 </g>
 </svg>

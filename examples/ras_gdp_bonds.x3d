@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <X3D profile="Immersive" version="3.3" xmlns:xsd="http://www.w3.org/2001/XMLSchema-instance" xsd:noNamespaceSchemaLocation="http://www.web3d.org/specifications/x3d-3.3.xsd">
   <Scene>
-  <WorldInfo title="GDP bonds" info="&quot;Program: MolScriptSVG 2.2, Copyright (C) 1997-1998 Per J. Kraulis&quot; &quot;Author: jwm&quot;"/>
+  <WorldInfo title="GDP bonds" info="&quot;Program: MolScriptSVG 2.3, Copyright (C) 1997-1998 Per J. Kraulis&quot; &quot;Author: jwm&quot;"/>
   <ProtoDeclare name="Ball">
     <ProtoInterface>
       <field accessType="inputOutput" type="SFVec3f" name="p" value="0 0 0"/>
@@ -40,6 +40,8 @@
   </ProtoDeclare>
   <ProtoDeclare name="Cyl">
     <ProtoInterface>
+      <field accessType="initializeOnly" type="SFBool" name="tc" value="TRUE"/>
+      <field accessType="initializeOnly" type="SFBool" name="bc" value="TRUE"/>
       <field accessType="inputOutput" type="SFVec3f" name="p" value="0 0 0"/>
       <field accessType="inputOutput" type="SFRotation" name="r" value="0 0 1 0"/>
       <field accessType="inputOutput" type="SFVec3f" name="s" value="1 1 1"/>
@@ -63,7 +65,12 @@
               </IS>
             </Material>
           </Appearance>
-          <Cylinder/>
+          <Cylinder>
+            <IS>
+              <connect nodeField="top" protoField="tc"/>
+              <connect nodeField="bottom" protoField="bc"/>
+            </IS>
+          </Cylinder>
         </Shape>
         <IS>
           <connect nodeField="translation" protoField="p"/>
@@ -113,6 +120,7 @@
       <field accessType="initializeOnly" type="SFVec3f" name="p" value="0 0 0"/>
       <field accessType="initializeOnly" type="SFFloat" name="sz" value="1"/>
       <field accessType="initializeOnly" type="MFString" name="c" value=""/>
+      <field accessType="initializeOnly" type="MFString" name="family" value="&quot;SERIF&quot;"/>
       <field accessType="initializeOnly" type="SFVec3f" name="o" value="0 0 0"/>
       <field accessType="initializeOnly" type="SFColor" name="dc" value="1 1 1"/>
       <field accessType="initializeOnly" type="SFColor" name="ec" value="0 0 0"/>
@@ -139,6 +147,7 @@
               <Text>
                 <FontStyle>
                   <IS>
+                    <connect nodeField="family" protoField="family"/>
                     <connect nodeField="size" protoField="sz"/>
                   </IS>
                 </FontStyle>

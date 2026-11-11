@@ -358,6 +358,7 @@ is_nucleic_acid_type (char *c3)
 
   while (isspace (*c3)) if (*c3++ == '\0') return FALSE;
   if (*c3 == '+') c3++;		/* modified base according to PDB convention */
+  if (*c3 == 'D' && c3[1]) c3++; /* Modern PDB DNA names: DA, DC, DG, DT. */
 
   switch (*c3) {
   case 'A':

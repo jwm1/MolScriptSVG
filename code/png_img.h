@@ -1,6 +1,6 @@
 /* png_img.h
 
-   MolScriptSVG v2.2
+   MolScriptSVG v2.3
 
    PNG image file.
 

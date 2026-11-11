@@ -1,6 +1,6 @@
 /* state.h
 
-   MolScriptSVG v2.2
+   MolScriptSVG v2.3
 
    Graphics state.
 
@@ -25,6 +25,8 @@ struct s_state {
   double  bondcross;
   double  coilradius;
   boolean colourparts;
+  boolean colourinterpolate;
+  double curvetolerance;
   double  cylinderradius;
   double  depthcue;
   colour  emissivecolour;
@@ -35,6 +37,7 @@ struct s_state {
   double  labelbackground;
   boolean labelcentre;
   boolean labelclip;
+  char labelfont[128];
   int     *labelmask;
   int     labelmasklength;
   vector3 labeloffset;
@@ -68,6 +71,10 @@ struct s_state {
 };
 
 extern state *current_state;
+extern char default_labelfont[128];
+const char *label_font_error (const char *name);
+const char *label_font_name (const state *st, int mode);
+void set_labelfont (const char *name);
 
 void state_init (void);
 void new_state (void);
@@ -81,6 +88,7 @@ void set_bonddistance (void);
 void set_bondcross (void);
 void set_coilradius (void);
 void set_colourparts (boolean on);
+void set_curvetolerance (void);
 void set_colourramphsb (boolean hsb);
 void set_cylinderradius (void);
 void set_depthcue (void);

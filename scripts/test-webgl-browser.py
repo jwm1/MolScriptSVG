@@ -3,6 +3,7 @@
 
 Offline tests exercise the real DOMParser and loader error handler without X_ITE.
 Set MOLSCRIPT_TEST_WEBGL_LIVE=1 to test the CDN runtime and WebGL rendering too.
+MOLSCRIPT_TEST_WEBGL_FONT selects a font family for the generated scene.
 CHROME selects the browser. Browser launch failures are explicit skips.
 """
 import os
@@ -24,7 +25,8 @@ class BrowserTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="molscript-browser-") as tmp:
             tmp = Path(tmp)
             page = tmp / "scene.html"
-            proc = subprocess.run([BINARY, "-webgl", "-in", "ras_std.in", "-out", str(page)],
+            proc = subprocess.run([BINARY, "-webgl", "-font", os.environ.get("MOLSCRIPT_TEST_WEBGL_FONT", "default"),
+                                   "-in", os.environ.get("MOLSCRIPT_TEST_WEBGL_INPUT", "ras_std.in"), "-out", str(page)],
                                   cwd=ROOT / "examples", capture_output=True, text=True, timeout=30)
             self.assertEqual(proc.returncode, 0, proc.stderr)
             markup = page.read_text()

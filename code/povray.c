@@ -1,6 +1,6 @@
 /* povray.c
 
-   MolScriptSVG v2.2
+   MolScriptSVG v2.3
 
    POV-Ray scene file output.
 */
@@ -480,15 +480,36 @@ pov_comment (char *str)
 void
 pov_coil (void)
 {
-  int slot;
-  coil_segment *cs1, *cs2;
+  int first,last,i,end;
+  vector3 p,normal;
   colour *col;
-
-  for (slot = 1; slot < coil_segment_count; slot++) {
-    cs1 = coil_segments + slot - 1;
-    cs2 = coil_segments + slot;
-    col = current_state->colourparts ? &(cs1->c) : &(current_state->planecolour);
-    pov_write_cylinder (&(cs1->p), &(cs2->p), current_state->coilradius, col);
+  for(first=0;first<coil_segment_count-1;first=last) {
+    col=current_state->colourparts ? &coil_segments[first].c : &current_state->planecolour;
+    last=first+1;
+    /* Limit clipping to one local spline span: a plane on a whole folded
+       colour run could incorrectly remove a distant part of the loop. */
+    fprintf(outfile,"sphere_sweep { cubic_spline %d,\n",last-first+3);
+    for(i=first-1;i<=last+1;i++) {
+      if(i<0) { v3_scaled(&p,2,&coil_segments[0].p); v3_subtract(&p,&coil_segments[1].p); }
+      else if(i>=coil_segment_count) { v3_scaled(&p,2,&coil_segments[last].p); v3_subtract(&p,&coil_segments[last-1].p); }
+      else p=coil_segments[i].p;
+      pov_v3(&p); fprintf(outfile,", %.6f%s\n",current_state->coilradius,i==last+1?"":",");
+      pov_include_point_radius(&p,current_state->coilradius);
+    }
+    /* Matching tangent-plane cuts join spans without overlapping colour caps. */
+    if(first>0 || last<coil_segment_count-1) {
+      fputs("clipped_by {\n",outfile);
+      for(end=0;end<2;end++) {
+        i=end?last:first;
+        if(i==0 || i==coil_segment_count-1) continue;
+        v3_difference(&normal,&coil_segments[i+1].p,&coil_segments[i-1].p);
+        v3_normalize(&normal); if(!end) v3_scale(&normal,-1);
+        fputs("plane { ",outfile); pov_v3(&normal);
+        fprintf(outfile,", %.8g }\n",v3_dot_product(&normal,&coil_segments[i].p));
+      }
+      fputs("}\n",outfile);
+    }
+    pov_write_texture(col); fputs("}\n",outfile);
   }
 }
 
@@ -497,6 +518,22 @@ pov_coil (void)
 void
 pov_cylinder (vector3 *v1, vector3 *v2)
 {
+  if (!cylinder_start_cap || !cylinder_end_cap) {
+    vector3 axis;
+    pov_include_point_radius(v1,current_state->cylinderradius);
+    pov_include_point_radius(v2,current_state->cylinderradius);
+    fputs("cylinder { ",outfile); pov_v3(v1); fputs(", ",outfile); pov_v3(v2);
+    fprintf(outfile,", %.6f open ",current_state->cylinderradius);
+    pov_write_texture(&current_state->planecolour); fputs("}\n",outfile);
+    v3_difference(&axis,v2,v1); v3_normalize(&axis);
+    if (cylinder_start_cap || cylinder_end_cap) {
+      fputs("disc { ",outfile); pov_v3(cylinder_start_cap ? v1 : v2);
+      fputs(", ",outfile); pov_v3(&axis);
+      fprintf(outfile,", %.6f ",current_state->cylinderradius);
+      pov_write_texture(&current_state->planecolour); fputs("}\n",outfile);
+    }
+    return;
+  }
   pov_write_cylinder (v1, v2, current_state->cylinderradius,
                       &(current_state->planecolour));
 }

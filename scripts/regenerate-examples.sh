@@ -26,6 +26,7 @@ for input in *.in; do
 done
 
 python3 "$ROOT/scripts/regenerate-svg-examples.py" --rasterize-only
+python3 "$ROOT/scripts/generate-font-examples.py"
 
 if command -v povray >/dev/null 2>&1; then
   echo "==> rendering POV-Ray outputs"

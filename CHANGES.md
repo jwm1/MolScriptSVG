@@ -1,6 +1,61 @@
 MolscriptSVG Changes
 ====================
 
+MolScriptSVG 2.3 (unreleased)
+----------------------------
+
+* Add -font and set labelfont for SVG, PostScript, MetaPost, VRML and X3D/WebGL,
+  with portable families and native font names. Preserve per-label state,
+  push/pop, unit symbols and existing defaults; document FreeType image fonts.
+* Offer proportional and monospace Raster3D stroke fonts in every build.
+  Bundle permissively licensed freeglut font tables instead of interpreting
+  incompatible private GLUT structures, fixing missing Raster3D letters.
+* Add font-family gallery previews, external-reader and font-state tests.
+* Use proper Å and Å² symbols in distance labels and B-factor legend titles.
+  Add UTF-8 decoding for bitmap/FreeType and stroke labels, Latin-1 PostScript
+  fonts, and TeX-independent MetaPost ring/superscript composition. Avoid signed
+  byte indexing in Raster3D labels.
+* Preserve exact Hermite controls in SVG/PS/MetaPost thin backbone Beziers,
+  including colour boundaries and adaptively sampled intervals. Use an
+  unsmoothed turn with C-alpha markers in the thin-backbone example.
+* Accept smoothsteps 0 to disable coordinate smoothing explicitly; retain the
+  default of two. Document interpolation versus smoothing and unit-font limits.
+* Provide HTML companions for the Markdown documentation, with local HTML-only
+  documentation navigation, a regeneration script and link checks.
+* Refresh external manual links, use local example files instead of remote
+  GitHub raw URLs, and update GIF/libgd documentation to reflect expiry of the
+  historical GIF/LZW patents. Preserve original library notices as history.
+
+* Add distance/angle annotations, explicit unit scaling and labelled connectors.
+* Add optional per-interval adaptive centreline sampling with curvetolerance.
+* Add scalar-ramp interpolation along cartoons without blending categorical
+  palettes; expose sampling/interpolation controls through MolAuto.
+* Add vertical legends, explicit ticks/captions and categorical keys.
+* Add -viewout export as editable header/transform macros and MolAuto -view reuse;
+  reject ambiguous mixed coordinate frames and preserve existing view files.
+* Support quoted include paths and fix res-atom lexer-stack cleanup and numeric
+  vectors following position selections. Add figure-tool tests and examples.
+
+* Add portable scalar legends with explicit position, dimensions, range and
+  ramp, plus MolAuto -legend generation using the selected scalar bounds.
+* Add -check diagnostics without image output or a display; report empty
+  selections, missing backbone atoms, short fragments and clipping.
+* Add semantic SVG command metadata and depth-preserving fragment groups;
+  -svgplain omits them. Add regression tests and three legend examples.
+
+* Use native coloured cylinders in X3D/WebGL, VRML and POV-Ray, with only
+  terminal caps; use radial cylinder normals in other 3D outputs.
+* Add circular, smoothly shaded coil tubes and POV-Ray cubic sphere sweeps.
+* Emit depth-subdivided Bezier paths for thin coils/turns in SVG, PS and MetaPost.
+
+* Add MolAuto B-factor, exact AlphaFold-style and continuous confidence colours.
+* Add reusable native named ramps and colour ligand atoms by their own values.
+* Support residue-coloured cylinder meshes with terminal caps only.
+* Increase VRML/X3D colour precision to preserve palette values.
+* Fix yacc action terminators for regeneration with modern Bison.
+* Recognize modern PDB DNA residue names such as DA and DT.
+* Add scalar-colour tests, synthetic-confidence examples and documentation.
+
 MolScriptSVG 2.2
 ----------------
 

@@ -1,6 +1,6 @@
 /* global.h
 
-   MolScriptSVG v2.2
+   MolScriptSVG v2.3
 
    Global stuff.
 
@@ -50,6 +50,9 @@ extern FILE *outfile;
 extern boolean message_mode;
 extern boolean exit_on_error;
 extern boolean pretty_format;
+extern boolean check_mode;
+extern boolean svg_groups;
+extern int check_warnings;
 extern int output_width;
 extern int output_height;
 

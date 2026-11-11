@@ -1,0 +1,1626 @@
+#VRML V2.0 utf8
+WorldInfo {
+title "c-H-ras p21 protein (1-166), complex with GDP and Mg"
+info [
+"Program: MolScriptSVG 2.3, Copyright (C) 1997-1998 Per J. Kraulis"
+"Author: jwm"
+]
+}
+PROTO Ball [
+exposedField SFVec3f p 0 0 0
+field SFFloat rad 1.5
+field SFColor dc 1 1 1
+field SFColor ec 0 0 0
+field SFColor sc 0.2 0.2 0.2
+field SFFloat sh 0
+field SFFloat tr 0
+]
+{
+Transform {
+translation IS p
+children [
+Shape {
+appearance Appearance {
+material Material {
+diffuseColor IS dc
+emissiveColor IS ec
+specularColor IS sc
+shininess IS sh
+transparency IS tr
+}
+}
+geometry Sphere {
+radius IS rad
+}
+}
+]
+}
+}
+PROTO Cyl [
+field SFBool tc TRUE
+field SFBool bc TRUE
+exposedField SFVec3f p 0 0 0
+exposedField SFRotation r 0 0 1 0
+exposedField SFVec3f s 1 1 1
+field SFColor dc 1 1 1
+field SFColor ec 0 0 0
+field SFColor sc 0.2 0.2 0.2
+field SFFloat sh 0
+field SFFloat tr 0
+]
+{
+Transform {
+translation IS p
+rotation IS r
+scale IS s
+children [
+Shape {
+appearance Appearance {
+material Material {
+diffuseColor IS dc
+emissiveColor IS ec
+specularColor IS sc
+shininess IS sh
+transparency IS tr
+}
+}
+geometry Cylinder {
+top IS tc
+bottom IS bc
+}
+}
+]
+}
+}
+PROTO Stick [
+exposedField SFVec3f p 0 0 0
+exposedField SFRotation r 0 0 1 0
+exposedField SFVec3f s 1 1 1
+field SFColor dc 1 1 1
+field SFColor ec 0 0 0
+field SFColor sc 0.2 0.2 0.2
+field SFFloat sh 0
+field SFFloat tr 0
+]
+{
+Transform {
+translation IS p
+rotation IS r
+scale IS s
+children [
+Shape {
+appearance Appearance {
+material Material {
+diffuseColor IS dc
+emissiveColor IS ec
+specularColor IS sc
+shininess IS sh
+transparency IS tr
+}
+}
+geometry Extrusion {
+spine [0 -1 0, 0 1 0]
+crossSection [
+1 0 0.707107 -0.707107 -1.83697e-16 -1 -0.707107 -0.707107 -1 1.22465e-16 -0.707107 0.707107 6.12323e-17 1 0.707107 0.707107 1 0
+]
+beginCap FALSE
+endCap FALSE
+creaseAngle 1.7
+}
+}
+]
+}
+}
+PROTO Label [
+field SFVec3f p 0 0 0
+field SFFloat sz 1
+field MFString c []
+field MFString family ["SERIF"]
+field SFVec3f o 0 0 0
+field SFColor dc 1 1 1
+field SFColor ec 0 0 0
+field SFColor sc 0.2 0.2 0.2
+field SFFloat sh 0
+field SFFloat tr 0
+]
+{
+Transform {
+translation IS p
+children [
+Billboard {
+axisOfRotation 0 0 0
+children [
+Transform {
+translation IS o
+children [
+Shape {
+appearance Appearance {
+material Material {
+diffuseColor IS dc
+emissiveColor IS ec
+specularColor IS sc
+shininess IS sh
+transparency IS tr
+}
+}
+geometry Text {
+string IS c
+fontStyle FontStyle {
+family IS family
+size IS sz
+}
+}
+}
+]
+}
+]
+}
+]
+}
+}
+Collision {
+collide FALSE
+children [
+Ball {
+p -3.45 -1.93 -1.27 rad 0.45 dc 0.854902 0.647059 0.12549 sc 0 0 0 sh 0.2
+}
+Ball {
+p -4.45 -1.25 -2.13 rad 0.338 dc 1 0 0 sc 0 0 0 sh 0.2
+}
+Ball {
+p -2.27 -2.45 -2.00 rad 0.338 dc 1 0 0 sc 0 0 0 sh 0.2
+}
+Ball {
+p -4.03 -2.88 -0.29 rad 0.338 dc 1 0 0 sc 0 0 0 sh 0.2
+}
+Ball {
+p -1.89 0.37 -1.01 rad 0.45 dc 0.854902 0.647059 0.12549 sc 0 0 0 sh 0.2
+}
+Ball {
+p -2.62 1.65 -1.03 rad 0.338 dc 1 0 0 sc 0 0 0 sh 0.2
+}
+Ball {
+p -1.33 -0.18 -2.27 rad 0.338 dc 1 0 0 sc 0 0 0 sh 0.2
+}
+Ball {
+p -2.85 -0.75 -0.36 rad 0.338 dc 1 0 0 sc 0 0 0 sh 0.2
+}
+Ball {
+p -0.70 0.48 0.07 rad 0.338 dc 1 0 0 sc 0 0 0 sh 0.2
+}
+Ball {
+p -0.94 0.18 1.44 rad 0.425 dc 0 0 0 sc 0 0 0 sh 0.2
+}
+Ball {
+p 0.25 0.57 2.32 rad 0.425 dc 0 0 0 sc 0 0 0 sh 0.2
+}
+Ball {
+p 1.36 -0.31 2.11 rad 0.338 dc 1 0 0 sc 0 0 0 sh 0.2
+}
+Ball {
+p 0.70 1.99 2.01 rad 0.425 dc 0 0 0 sc 0 0 0 sh 0.2
+}
+Ball {
+p 0.51 2.85 3.14 rad 0.338 dc 1 0 0 sc 0 0 0 sh 0.2
+}
+Ball {
+p 2.16 1.90 1.65 rad 0.425 dc 0 0 0 sc 0 0 0 sh 0.2
+}
+Ball {
+p 2.96 2.70 2.54 rad 0.338 dc 1 0 0 sc 0 0 0 sh 0.2
+}
+Ball {
+p 2.54 0.43 1.76 rad 0.425 dc 0 0 0 sc 0 0 0 sh 0.2
+}
+Ball {
+p 3.11 -0.05 0.48 rad 0.425 dc 0 0 1 sc 0 0 0 sh 0.2
+}
+Ball {
+p 2.49 -0.57 -0.60 rad 0.425 dc 0 0 0 sc 0 0 0 sh 0.2
+}
+Ball {
+p 3.18 -0.93 -1.62 rad 0.425 dc 0 0 1 sc 0 0 0 sh 0.2
+}
+Ball {
+p 4.48 -0.61 -1.17 rad 0.425 dc 0 0 0 sc 0 0 0 sh 0.2
+}
+Ball {
+p 5.73 -0.76 -1.83 rad 0.425 dc 0 0 0 sc 0 0 0 sh 0.2
+}
+Ball {
+p 5.95 -1.21 -2.95 rad 0.338 dc 1 0 0 sc 0 0 0 sh 0.2
+}
+Ball {
+p 6.78 -0.31 -1.04 rad 0.425 dc 0 0 1 sc 0 0 0 sh 0.2
+}
+Ball {
+p 6.65 0.21 0.23 rad 0.425 dc 0 0 0 sc 0 0 0 sh 0.2
+}
+Ball {
+p 7.78 0.58 0.83 rad 0.425 dc 0 0 1 sc 0 0 0 sh 0.2
+}
+Ball {
+p 5.48 0.36 0.86 rad 0.425 dc 0 0 1 sc 0 0 0 sh 0.2
+}
+Ball {
+p 4.44 -0.07 0.11 rad 0.425 dc 0 0 0 sc 0 0 0 sh 0.2
+}
+Stick {
+p -3.70037 -1.76243 -1.48265 r 0.651357 0 -0.758771 2.04768 s 0.2 0.371552 0.2 dc 0.854902 0.647059 0.12549 sc 0 0 0 sh 0.2
+}
+Stick {
+p -4.19931 -1.42269 -1.91096 r 0.651357 0 -0.758771 2.04768 s 0.2 0.371552 0.2 dc 1 0 0 sc 0 0 0 sh 0.2
+}
+Stick {
+p -3.15677 -2.06215 -1.4506 r 0.526394 -0 0.850241 1.21171 s 0.2 0.370984 0.2 dc 0.854902 0.647059 0.12549 sc 0 0 0 sh 0.2
+}
+Stick {
+p -2.56851 -2.32185 -1.8148 r 0.526394 -0 0.850241 1.21171 s 0.2 0.370984 0.2 dc 1 0 0 sc 0 0 0 sh 0.2
+}
+Stick {
+p -3.59579 -2.16924 -1.02386 r -0.860411 0 -0.5096 0.876044 s 0.2 0.371593 0.2 dc 0.854902 0.647059 0.12549 sc 0 0 0 sh 0.2
+}
+Stick {
+p -3.88557 -2.64313 -0.53459 r -0.860411 0 -0.5096 0.876044 s 0.2 0.371593 0.2 dc 1 0 0 sc 0 0 0 sh 0.2
+}
+Stick {
+p -3.30094 -1.63608 -1.04046 r -0.835529 0 0.549446 2.39709 s 0.2 0.404392 0.2 dc 0.854902 0.647059 0.12549 sc 0 0 0 sh 0.2
+}
+Stick {
+p -3.00102 -1.04365 -0.584384 r -0.835529 0 0.549446 2.39709 s 0.2 0.404392 0.2 dc 1 0 0 sc 0 0 0 sh 0.2
+}
+Stick {
+p -2.07377 0.687997 -1.01607 r 0.0273533 0 -0.999626 2.62538 s 0.2 0.371589 0.2 dc 0.854902 0.647059 0.12549 sc 0 0 0 sh 0.2
+}
+Stick {
+p -2.439 1.33176 -1.02607 r 0.0273533 0 -0.999626 2.62538 s 0.2 0.371589 0.2 dc 1 0 0 sc 0 0 0 sh 0.2
+}
+Stick {
+p -1.7518 0.228536 -1.32495 r 0.91396 -0 0.405803 1.18975 s 0.2 0.371429 0.2 dc 0.854902 0.647059 0.12549 sc 0 0 0 sh 0.2
+}
+Stick {
+p -1.47308 -0.0466239 -1.95268 r 0.91396 -0 0.405803 1.18975 s 0.2 0.371429 0.2 dc 1 0 0 sc 0 0 0 sh 0.2
+}
+Stick {
+p -2.13113 0.0877291 -0.847395 r -0.563484 0 -0.826127 0.80666 s 0.2 0.403953 0.2 dc 0.854902 0.647059 0.12549 sc 0 0 0 sh 0.2
+}
+Stick {
+p -2.61109 -0.469046 -0.520028 r -0.563484 0 -0.826127 0.80666 s 0.2 0.403953 0.2 dc 1 0 0 sc 0 0 0 sh 0.2
+}
+Stick {
+p -1.59318 0.394604 -0.741898 r -0.670347 0 0.742048 1.64162 s 0.2 0.404173 0.2 dc 0.854902 0.647059 0.12549 sc 0 0 0 sh 0.2
+}
+Stick {
+p -0.997239 0.45158 -0.203537 r -0.670347 0 0.742048 1.64162 s 0.2 0.404173 0.2 dc 1 0 0 sc 0 0 0 sh 0.2
+}
+Stick {
+p -0.758468 0.404554 0.409882 r -0.985532 0 -0.169487 1.35788 s 0.2 0.358791 0.2 dc 1 0 0 sc 0 0 0 sh 0.2
+}
+Stick {
+p -0.876869 0.253526 1.09836 r -0.985532 0 -0.169487 1.35788 s 0.2 0.358791 0.2 dc 0 0 0 sc 0 0 0 sh 0.2
+}
+Stick {
+p -0.344146 0.376492 1.88224 r -0.596265 0 0.802788 1.83375 s 0.2 0.766637 0.2 dc 0 0 0 sc 0 0 0 sh 0.2
+}
+Stick {
+p 0.526351 0.352706 2.2685 r 0.18824 -0 0.982123 0.906128 s 0.2 0.361796 0.2 dc 0 0 0 sc 0 0 0 sh 0.2
+}
+Stick {
+p 1.0835 -0.0918265 2.16171 r 0.18824 -0 0.982123 0.906128 s 0.2 0.361796 0.2 dc 1 0 0 sc 0 0 0 sh 0.2
+}
+Stick {
+p 0.475112 1.28387 2.16625 r 0.564936 -0 0.825135 2.77091 s 0.2 0.763592 0.2 dc 0 0 0 sc 0 0 0 sh 0.2
+}
+Stick {
+p 1.65753 -0.127236 2.0204 r 0.285206 -0 0.958466 2.11573 s 0.2 0.361919 0.2 dc 1 0 0 sc 0 0 0 sh 0.2
+}
+Stick {
+p 2.24846 0.246476 1.84456 r 0.285206 -0 0.958466 2.11573 s 0.2 0.361919 0.2 dc 0 0 0 sc 0 0 0 sh 0.2
+}
+Stick {
+p 0.653948 2.20713 2.29317 r -0.985589 0 -0.169159 2.21283 s 0.2 0.359416 0.2 dc 0 0 0 sc 0 0 0 sh 0.2
+}
+Stick {
+p 0.556951 2.63587 2.85831 r -0.985589 0 -0.169159 2.21283 s 0.2 0.359416 0.2 dc 1 0 0 sc 0 0 0 sh 0.2
+}
+Stick {
+p 1.43368 1.94757 1.8318 r 0.237518 -0 0.971383 1.51084 s 0.2 0.757148 0.2 dc 0 0 0 sc 0 0 0 sh 0.2
+}
+Stick {
+p 2.36304 2.10111 1.87486 r -0.74587 0 0.666091 2.1598 s 0.2 0.359157 0.2 dc 0 0 0 sc 0 0 0 sh 0.2
+}
+Stick {
+p 2.7593 2.49857 2.31858 r -0.74587 0 0.666091 2.1598 s 0.2 0.359157 0.2 dc 1 0 0 sc 0 0 0 sh 0.2
+}
+Stick {
+p 2.35442 1.16786 1.70482 r -0.263763 0 0.964587 0.261348 s 0.2 0.763388 0.2 dc 0 0 0 sc 0 0 0 sh 0.2
+}
+Stick {
+p 2.6848 0.312371 1.43807 r 0.914568 -0 0.404433 1.23656 s 0.2 0.370207 0.2 dc 0 0 0 sc 0 0 0 sh 0.2
+}
+Stick {
+p 2.96655 0.0704469 0.800935 r 0.914568 -0 0.404433 1.23656 s 0.2 0.370207 0.2 dc 0 0 1 sc 0 0 0 sh 0.2
+}
+Stick {
+p 2.95418 -0.181199 0.212643 r 0.869465 0 -0.493995 1.17209 s 0.2 0.337967 0.2 dc 0 0 1 sc 0 0 0 sh 0.2
+}
+Stick {
+p 2.64768 -0.442568 -0.326804 r 0.869465 0 -0.493995 1.17209 s 0.2 0.337967 0.2 dc 0 0 0 sc 0 0 0 sh 0.2
+}
+Stick {
+p 3.4396 -0.0552052 0.389657 r 0.268823 -0 0.96319 1.5572 s 0.2 0.346282 0.2 dc 0 0 1 sc 0 0 0 sh 0.2
+}
+Stick {
+p 4.10395 -0.0645857 0.204239 r 0.268823 -0 0.96319 1.5572 s 0.2 0.346282 0.2 dc 0 0 0 sc 0 0 0 sh 0.2
+}
+Stick {
+p 2.66666 -0.663492 -0.851399 r 0.828576 -0 0.559877 1.28544 s 0.2 0.321849 0.2 dc 0 0 0 sc 0 0 0 sh 0.2
+}
+Stick {
+p 3.0111 -0.843973 -1.36114 r 0.828576 -0 0.559877 1.28544 s 0.2 0.321849 0.2 dc 0 0 1 sc 0 0 0 sh 0.2
+}
+Stick {
+p 3.50626 -0.853379 -1.50551 r -0.323749 0 0.946143 1.80334 s 0.2 0.352168 0.2 dc 0 0 1 sc 0 0 0 sh 0.2
+}
+Stick {
+p 4.15214 -0.69171 -1.28451 r -0.323749 0 0.946143 1.80334 s 0.2 0.352168 0.2 dc 0 0 0 sc 0 0 0 sh 0.2
+}
+Stick {
+p 5.10023 -0.685318 -1.50286 r 0.465554 -0 0.885019 1.4658 s 0.2 0.713124 0.2 dc 0 0 0 sc 0 0 0 sh 0.2
+}
+Stick {
+p 4.4556 -0.340075 -0.531237 r -0.999541 0 -0.03029 1.96937 s 0.2 0.700545 0.2 dc 0 0 0 sc 0 0 0 sh 0.2
+}
+Stick {
+p 5.78107 -0.872721 -2.11204 r 0.980838 -0 0.194824 1.1944 s 0.2 0.308548 0.2 dc 0 0 0 sc 0 0 0 sh 0.2
+}
+Stick {
+p 5.89243 -1.09864 -2.6727 r 0.980838 -0 0.194824 1.1944 s 0.2 0.308548 0.2 dc 1 0 0 sc 0 0 0 sh 0.2
+}
+Stick {
+p 5.98786 -0.64813 -1.63373 r -0.602192 0 0.798351 1.89812 s 0.2 0.348592 0.2 dc 0 0 0 sc 0 0 0 sh 0.2
+}
+Stick {
+p 6.5128 -0.42487 -1.23777 r -0.602192 0 0.798351 1.89812 s 0.2 0.348592 0.2 dc 0 0 1 sc 0 0 0 sh 0.2
+}
+Stick {
+p 6.7435 -0.181651 -0.721949 r -0.99504 0 -0.0994725 1.96157 s 0.2 0.346844 0.2 dc 0 0 1 sc 0 0 0 sh 0.2
+}
+Stick {
+p 6.67995 0.0815257 -0.0862785 r -0.99504 0 -0.0994725 1.96157 s 0.2 0.346844 0.2 dc 0 0 0 sc 0 0 0 sh 0.2
+}
+Stick {
+p 6.93123 0.306038 0.381027 r -0.466965 0 0.884276 1.85334 s 0.2 0.334638 0.2 dc 0 0 0 sc 0 0 0 sh 0.2
+}
+Stick {
+p 7.49732 0.491887 0.679969 r -0.466965 0 0.884276 1.85334 s 0.2 0.334638 0.2 dc 0 0 1 sc 0 0 0 sh 0.2
+}
+Stick {
+p 6.35531 0.249486 0.389086 r -0.473704 0 -0.880684 1.67974 s 0.2 0.335869 0.2 dc 0 0 0 sc 0 0 0 sh 0.2
+}
+Stick {
+p 5.76957 0.322231 0.704145 r -0.473704 0 -0.880684 1.67974 s 0.2 0.335869 0.2 dc 0 0 1 sc 0 0 0 sh 0.2
+}
+Stick {
+p 5.21656 0.251634 0.674138 r 0.584782 0 -0.811191 1.24884 s 0.2 0.339417 0.2 dc 0 0 1 sc 0 0 0 sh 0.2
+}
+Stick {
+p 4.69627 0.0376939 0.299066 r 0.584782 0 -0.811191 1.24884 s 0.2 0.339417 0.2 dc 0 0 0 sc 0 0 0 sh 0.2
+}
+Ball {
+p -6.83 -0.75 -2.55 rad 0.425 dc 0 1 0 sc 0 0 0 sh 0.2
+}
+Ball {
+p -3.65 -1.36 -6.06 rad 0.425 dc 0 0 0 sc 0 0 0 sh 0.2
+}
+Ball {
+p -4.56 -0.53 -5.16 rad 0.425 dc 0 0 0 sc 0 0 0 sh 0.2
+}
+Ball {
+p -5.55 -1.36 -4.59 rad 0.338 dc 1 0 0 sc 0 0 0 sh 0.2
+}
+Stick {
+p -4.1031 -0.943749 -5.6127 r -0.701869 0 -0.712306 2.14995 s 0.2 0.767655 0.2 dc 0 0 0 sc 0 0 0 sh 0.2
+}
+Stick {
+p -4.80756 -0.735128 -5.02069 r -0.498213 0 -0.867054 0.939074 s 0.2 0.356783 0.2 dc 0 0 0 sc 0 0 0 sh 0.2
+}
+Stick {
+p -5.30487 -1.15483 -4.73494 r -0.498213 0 -0.867054 0.939074 s 0.2 0.356783 0.2 dc 1 0 0 sc 0 0 0 sh 0.2
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-4.45 -1.25 -2.13 -4.71 -1.20 -2.17
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-4.98 -1.14 -2.22 -5.24 -1.08 -2.27
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-5.51 -1.03 -2.31 -5.77 -0.97 -2.36
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-6.03 -0.92 -2.41 -6.30 -0.86 -2.45
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-6.56 -0.81 -2.50 -6.83 -0.75 -2.55
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Label {
+p -5.64 -1.00 -2.34 c "2.47 Å" family "SERIF"  o -0.70 -2.00 0.00 dc 0 0 0 sc 0 0 0 sh 0.2 sz 0.6
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-5.55 -1.36 -4.59 -5.70 -1.30 -4.37
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-5.84 -1.23 -4.14 -5.98 -1.16 -3.91
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-6.12 -1.09 -3.68 -6.26 -1.02 -3.46
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-6.40 -0.95 -3.23 -6.54 -0.89 -3.00
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-6.69 -0.82 -2.78 -6.83 -0.75 -2.55
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Label {
+p -6.19 -1.06 -3.57 c "2.49 Å" family "SERIF"  o 0.80 1.80 0.00 dc 0 0 0 sc 0 0 0 sh 0.2 sz 0.6
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-4.45 -1.25 -2.13 -4.71 -1.20 -2.17
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-4.98 -1.14 -2.22 -5.24 -1.08 -2.27
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-5.51 -1.03 -2.31 -5.77 -0.97 -2.36
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-6.03 -0.92 -2.41 -6.30 -0.86 -2.45
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-6.56 -0.81 -2.50 -6.83 -0.75 -2.55
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-6.83 -0.75 -2.55 -6.69 -0.82 -2.78
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-6.54 -0.89 -3.00 -6.40 -0.95 -3.23
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-6.26 -1.02 -3.46 -6.12 -1.09 -3.68
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-5.98 -1.16 -3.91 -5.84 -1.23 -4.14
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-5.70 -1.30 -4.37 -5.55 -1.36 -4.59
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-6.23 -0.88 -2.44 -6.23 -0.88 -2.46
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-6.23 -0.88 -2.46 -6.23 -0.88 -2.49
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-6.23 -0.88 -2.49 -6.23 -0.89 -2.51
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-6.23 -0.89 -2.51 -6.23 -0.89 -2.53
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-6.23 -0.89 -2.53 -6.23 -0.89 -2.55
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-6.23 -0.89 -2.55 -6.23 -0.90 -2.57
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-6.23 -0.90 -2.57 -6.23 -0.90 -2.60
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-6.23 -0.90 -2.60 -6.23 -0.90 -2.62
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-6.23 -0.90 -2.62 -6.24 -0.90 -2.64
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-6.24 -0.90 -2.64 -6.24 -0.91 -2.66
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-6.24 -0.91 -2.66 -6.25 -0.91 -2.68
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-6.25 -0.91 -2.68 -6.25 -0.91 -2.71
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-6.25 -0.91 -2.71 -6.26 -0.91 -2.73
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-6.26 -0.91 -2.73 -6.27 -0.91 -2.75
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-6.27 -0.91 -2.75 -6.27 -0.91 -2.77
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-6.27 -0.91 -2.77 -6.28 -0.92 -2.79
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-6.28 -0.92 -2.79 -6.29 -0.92 -2.81
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-6.29 -0.92 -2.81 -6.30 -0.92 -2.83
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-6.30 -0.92 -2.83 -6.31 -0.92 -2.85
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-6.31 -0.92 -2.85 -6.33 -0.92 -2.87
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-6.33 -0.92 -2.87 -6.34 -0.92 -2.89
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-6.34 -0.92 -2.89 -6.35 -0.92 -2.90
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-6.35 -0.92 -2.90 -6.36 -0.92 -2.92
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-6.36 -0.92 -2.92 -6.38 -0.92 -2.94
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-6.38 -0.92 -2.94 -6.39 -0.91 -2.96
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-6.39 -0.91 -2.96 -6.41 -0.91 -2.97
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-6.41 -0.91 -2.97 -6.42 -0.91 -2.99
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-6.42 -0.91 -2.99 -6.44 -0.91 -3.00
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-6.44 -0.91 -3.00 -6.46 -0.91 -3.02
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-6.46 -0.91 -3.02 -6.48 -0.91 -3.03
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-6.48 -0.91 -3.03 -6.49 -0.90 -3.04
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-6.49 -0.90 -3.04 -6.51 -0.90 -3.06
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Label {
+p -6.07 -0.98 -2.88 c "66.21 deg" family "SERIF"  o -2.00 0.00 0.00 dc 0 0 0 sc 0 0 0 sh 0.2 sz 0.6
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+7.78 0.58 0.83 7.55 0.76 0.80
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+7.32 0.94 0.76 7.09 1.11 0.73
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+6.86 1.29 0.70 6.62 1.47 0.66
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+6.39 1.64 0.63 6.16 1.82 0.60
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+5.93 2.00 0.56 5.70 2.17 0.53
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+5.47 2.35 0.50 5.24 2.53 0.46
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+5.01 2.70 0.43 4.77 2.88 0.40
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+4.54 3.06 0.36 4.31 3.23 0.33
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+4.08 3.41 0.30 3.85 3.59 0.27
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+3.62 3.76 0.23 3.39 3.94 0.20
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+3.16 4.12 0.17 2.92 4.29 0.13
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+2.69 4.47 0.10 2.46 4.65 0.07
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+2.23 4.82 0.03 2.00 5.00 0.00
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Label {
+p 2.00 5.00 0.00 c "GDP" family "SERIF"  o 0.00 0.50 0.00 dc 0 0 0 sc 0 0 0 sh 0.2 sz 0.6
+}
+]
+bboxCenter 0.069565 1.14121 -1.50423
+bboxSize 18.2716 10.7176 11.9652
+}
+NavigationInfo {
+speed 4
+type [
+"EXAMINE" "FLY"
+]
+}
+Viewpoint {
+position 0.07 1.14 20.42
+description "overall default"
+}

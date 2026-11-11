@@ -1,0 +1,10 @@
+! Render with -font serif, -font sans or -font monospace for comparison.
+plot
+  window 20;
+  background white;
+  set linecolour black, labelsize 20, depthcue 0;
+  label 0 6 0 "MolScriptSVG: fonts and units";
+  label 0 2 0 "Carbon Oxygen Nitrogen";
+  label 0 -2 0 "WiMW abcdefg 0123456789";
+  distance -4 -6 0 4 -6 0;
+end_plot

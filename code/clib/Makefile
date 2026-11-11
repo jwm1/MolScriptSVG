@@ -55,7 +55,8 @@ OBJ = args.o str_utils.o dynstring.o err.o indent.o \
 clib.a: $(OBJ)
 	ar -cru clib.a $(OBJ)
 
-ogl_bitmap_character.o: ogl_bitmap_character.h $(FONT_CONFIG)
+ogl_bitmap_character.o: ogl_bitmap_character.h str_utils.h $(FONT_CONFIG)
+str_utils.o: str_utils.h
 
 clean:
 	rm -f clib.a *.o

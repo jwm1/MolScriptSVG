@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MolScriptSVG: SVG REVIEW</title>
+<link rel="stylesheet" href="docs/style.css">
+<link rel="stylesheet" href="docs/documentation.css">
+</head>
+<body>
+<!-- Generated from SVG_REVIEW.md by scripts/build-html-docs.py. -->
+<nav><a href="docs/index.html">Manual</a> | <a href="README.html">README</a> |
+<a href="examples/index.html">Examples</a> | <a href="CHANGES.html">Changelog</a></nav>
+<main>
+<h1 id="molscriptsvg-review">MolScriptSVG review</h1>
+<p>Review date: 23 October 2026. Scope: SVG, other output backends, shared parsing,
+and MolAuto. Changes were developed in <code>molscriptSVG_3</code> and are included in
+the <code>MolScriptSVG_2.2</code> release tree. The original <code>MolscriptSVG</code> directory
+was not edited.
+The source baseline was commit <code>17f57d89f2289f5552556cc91aac5825a1fdc1ca</code>
+plus the existing uncommitted SVG transparency changes, which were retained.</p>
+<h2 id="fixes">Fixes</h2>
+<table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Problem</th>
+<th>Change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SVG, PS, MetaPost</td>
+<td>Coloured point objects advanced by one triplet instead of a position/colour pair, causing invalid colours and out-of-bounds reads.</td>
+<td>Advance by two triplets.</td>
+</tr>
+<tr>
+<td>SVG and PS labels</td>
+<td>Short masks were read beyond their allocation. PS also copied an incorrectly sized mask into an unused temporary buffer.</td>
+<td>Bound mask lookups and remove the PS temporary copy.</td>
+</tr>
+<tr>
+<td>SVG transparency</td>
+<td>Fill and stroke opacity were applied separately. Overlap made a half-transparent red point about 75% opaque at its border. Highlights had the same issue.</td>
+<td>Apply opacity once to a group containing the primitive and its decorations.</td>
+</tr>
+<tr>
+<td>SVG surfaces</td>
+<td>Same-colour seam-sealing strokes darkened translucent facet edges.</td>
+<td>Keep sealing strokes for opaque facets only.</td>
+</tr>
+<tr>
+<td>SVG transparency</td>
+<td>Very small transparency values were discarded; fully invisible primitives remained in output.</td>
+<td>Preserve small values and omit invisible geometry/labels.</td>
+</tr>
+<tr>
+<td>SVG clipping</td>
+<td><code>labelclip off</code> labels were still inside the plot clip group.</td>
+<td>Emit those labels after closing the clip group.</td>
+</tr>
+<tr>
+<td>SVG and PS bounds</td>
+<td>A negative x origin doubled as an uninitialized bounding-box sentinel.</td>
+<td>Track initialization separately; retain negative/multiple plot bounds.</td>
+</tr>
+<tr>
+<td>SVG, PS, MetaPost areas</td>
+<td>Zero-size areas reached division by zero.</td>
+<td>Reject non-finite coordinates and nonpositive dimensions before projection setup.</td>
+</tr>
+<tr>
+<td>MetaPost matrix</td>
+<td>The printed row-vector matrix contradicted the documented column-vector equation.</td>
+<td>Transpose the printed matrix and identify its input as already-transformed view coordinates.</td>
+</tr>
+<tr>
+<td>VRML and X3D</td>
+<td>Coloured-point objects closed one node too many, causing an indentation assertion.</td>
+<td>Balance node closures and count points rather than triplets.</td>
+</tr>
+<tr>
+<td>X3D labels</td>
+<td>Escaped quotes terminated tokens prematurely and broke XML conversion.</td>
+<td>Preserve escaped characters while scanning strings.</td>
+</tr>
+<tr>
+<td>PNG</td>
+<td>Final writes could longjmp into a returned initialization function.</td>
+<td>Install a fresh error handler around row/end writes and free resources on failure.</td>
+</tr>
+<tr>
+<td>OpenGL images</td>
+<td>The GLUT fallback skipped <code>glutInit</code>; pixel pack alignment was implicit.</td>
+<td>Initialize GLUT on fallback and set pack alignment to one byte.</td>
+</tr>
+<tr>
+<td>Shared regex</td>
+<td>Legacy V8 regex functions exported POSIX names with incompatible signatures.</td>
+<td>Prefix symbols to prevent shared-library interposition.</td>
+</tr>
+<tr>
+<td>SGI</td>
+<td>Headers used native byte order; RLE tables assumed 32-bit <code>long</code>. Files were unreadable on this host.</td>
+<td>Serialize fixed-width big-endian integers and initialize header padding.</td>
+</tr>
+<tr>
+<td>Lexer</td>
+<td>Reading EOF again after consuming the final token dereferenced a freed input source.</td>
+<td>Make repeated EOF reads safe, including input without a final newline.</td>
+</tr>
+<tr>
+<td>MolAuto options</td>
+<td>NaN, infinity, overflow, zero/negative windows, surplus filenames and trailing unknown/repeated options were accepted.</td>
+<td>Validate values and require all arguments to be consumed.</td>
+</tr>
+<tr>
+<td>MolAuto structure</td>
+<td>Short final helices/strands escaped cleanup; the first residue could be counted twice.</td>
+<td>Count each residue once and process the final segment.</td>
+</tr>
+<tr>
+<td>MolAuto titles</td>
+<td>Empty COMPND/MOLECULE text triggered a string assertion.</td>
+<td>Omit empty titles; also guard against an empty residue list.</td>
+</tr>
+<tr>
+<td>Headless labels</td>
+<td>GLUT fonts required an X11 display even on EGL.</td>
+<td>Bundle bitmap glyphs and add optional FreeType rasterization without GLUT font calls.</td>
+</tr>
+<tr>
+<td>Degenerate geometry</td>
+<td>Straight backbones and axis-aligned primitives produced zero normals; malformed coordinates caused assertions.</td>
+<td>Choose deterministic perpendiculars where defined; reject coincident, non-finite or undefined geometry with diagnostics.</td>
+</tr>
+<tr>
+<td>Planar OpenGL scenes</td>
+<td>Zero scene depth produced an invalid slab.</td>
+<td>Supply a minimum default slab depth.</td>
+</tr>
+<tr>
+<td>EGL accumulation</td>
+<td>Contexts without accumulation buffers failed with <code>-accum</code>.</td>
+<td>Accumulate RGB samples in software when necessary.</td>
+</tr>
+<tr>
+<td>WebGL loading</td>
+<td>Nested XML parser errors went unnoticed; the Interchange profile did not include Text.</td>
+<td>Detect parsererror descendants and declare Immersive in both X3D encodings.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="verification">Verification</h2>
+<ul>
+<li>Full build with OpenGL/EGL, PNG, JPEG and GIF support succeeded.</li>
+<li><code>scripts/test-svg.py</code>: 13 tests passed, including an actual CairoSVG/Pillow pixel check.</li>
+<li><code>scripts/test-backends-molauto.py</code>: 13 tests passed, with additional subcases for presets, invalid inputs and output modes.</li>
+<li>Both suites and the applicable headless/geometry tests passed with AddressSanitizer and UndefinedBehaviorSanitizer on a full OpenGL/FreeType build. Leak detection was disabled for legacy process-lifetime allocations; X11 tests were skipped in the sanitizer environment.</li>
+<li><code>scripts/test-rendering.py</code>: all 15 passed on the host EGL/GLX paths after installing <code>xdotool</code>. Tests cover bitmap/FreeType labels in four image formats, font errors, geometry, accumulation, forced GLUT fallback, interactive startup and verified resize/Escape exit. The keyboard test releases Escape separately because key-down closes the target window.</li>
+<li><code>scripts/test-webgl-browser.py</code>: all three passed in Chrome, including the opt-in live X_ITE render check and malformed XML error handling.</li>
+<li>All 20 example inputs generated successfully in nine formats: PS, MetaPost, SVG, VRML, XML X3D, Classic X3D, WebGL HTML, POV-Ray and Raster3D. SVG/XML and embedded WebGL XML were parsed.</li>
+<li>Ghostscript and MetaPost processed <code>ras_std</code>; view3dscene accepted its XML X3D; POV-Ray rendered its scene.</li>
+<li>With <code>DISPLAY</code> unset, PNG, JPEG, GIF and SGI exports of <code>ras_std</code> decoded through Pillow at the requested odd dimensions, 201 x 199.</li>
+<li>A PNG write to <code>/dev/full</code> exited with a write-error diagnostic rather than jumping into an expired stack frame.</li>
+<li>All 20 SVG/PNG example pairs and X3D/XML, Classic X3D and WebGL assets were regenerated in this directory. Bitmap and FreeType labelled PNG comparisons were added. Other checked formats were generated in temporary test directories.</li>
+</ul>
+<p>The regeneration helper stages each SVG/PNG pair and checks both before
+replacing old previews. CairoSVG is preferred, with Inkscape as a fallback.
+It no longer deletes a valid preview before attempting rasterization.</p>
+<h2 id="remaining-issues">Remaining issues</h2>
+<ol>
+<li>OpenGL labels use monochrome glyphs and legacy size selection. Bundled
+   glyphs cover printable ASCII; FreeType strings remain byte-oriented, not
+   full UTF-8 or shaped text. See RENDERING_TESTS.md for details.</li>
+<li>SVG transparency is per primitive with painter-style depth sorting. It does
+   not implement order-independent transparency for intersecting surfaces.
+   Adjacent translucent triangles can still show antialiasing seams, visible
+   in <code>examples/svg_transparency_svg.png</code>. The fix removes dark overlapping
+   sealing strokes, not every rasterizer's shared-edge artifact.</li>
+<li>The X3D converter remains a purpose-built, line-oriented converter for
+   internally generated scene data. The quoted-label and coloured-point fixes
+   are not evidence that it handles arbitrary Classic X3D syntax.</li>
+<li>Interactive startup, GLX fallback, accumulation and browser loading/rendering
+   now have exercised tests, including resize/Escape automation with <code>xdotool</code>.
+   Mouse interaction and browser navigation remain untested.</li>
+<li>This review is not an exhaustive memory-safety audit. Straight and nearly
+   straight synthetic backbones now render; coincident or reversing paths
+   with undefined tangents fail cleanly. Arbitrary malformed geometry still
+   needs broader fuzz testing. No new Python-map or mmCIF features were added.</li>
+</ol>
+<h2 id="reproduce">Reproduce</h2>
+<p>From this directory:</p>
+<pre><code class="language-bash">make -C code -j4
+python3 scripts/test-svg.py
+python3 scripts/test-backends-molauto.py
+python3 scripts/test-rendering.py
+python3 scripts/test-webgl-browser.py
+python3 scripts/test-output-formats.py --images
+python3 scripts/regenerate-svg-examples.py
+</code></pre>
+<p>The two regression suites accept <code>MOLSCRIPT</code> and, for MolAuto tests, <code>MOLAUTO</code>
+environment variables to select a separate instrumented build. The format
+check requires Pillow with <code>--images</code>, reports missing external renderers as
+skipped, and does not overwrite example assets.
+See <a href="RENDERING_TESTS.html">RENDERING_TESTS.md</a> for optional FreeType, X11 and
+network-dependent browser checks.</p>
+</main>
+</body>
+</html>

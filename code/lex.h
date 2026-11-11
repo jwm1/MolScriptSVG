@@ -1,6 +1,6 @@
 /* lex.h
 
-   MolScriptSVG v2.2
+   MolScriptSVG v2.3
 
    Input lexer.
 
@@ -19,6 +19,7 @@ extern char yytext[];
 extern int yylen;
 
 void lex_init (void);
+void lex_numbers (void);
 void lex_info (void);
 void lex_cleanup (void);
 void lex_set_input_file (const char *filename);

@@ -1,6 +1,6 @@
 /* graphics.h
 
-   MolScriptSVG v2.2
+   MolScriptSVG v2.3
 
    Graphics: construct the geometries and call the output procedures.
 
@@ -62,6 +62,7 @@ extern void (*output_comment) (char *str);
 
 extern void (*output_coil) (void);
 extern void (*output_cylinder) (vector3 *v1, vector3 *v2);
+extern boolean cylinder_start_cap, cylinder_end_cap;
 extern void (*output_helix) (void);
 extern void (*output_label) (vector3 *p, char *label, colour *c);
 extern void (*output_line) (boolean polylines);
@@ -77,6 +78,9 @@ extern void (*output_finish_object) (void);
 extern void (*output_pickable) (at3d *atom);
 
 void graphics_plot_init (void);
+void drawing_begin (const char *kind);
+void check_plot (void);
+void legend (char *title);
 void set_area_values (double xlo, double ylo, double xhi, double yhi);
 void set_window (void);
 void set_slab (void);

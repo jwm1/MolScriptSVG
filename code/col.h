@@ -1,6 +1,6 @@
 /* col.h
 
-   MolScriptSVG v2.2
+   MolScriptSVG v2.3
 
    Colour routine definitions.
 
@@ -13,6 +13,7 @@
 #define COL_H 1
 
 #include "clib/colour.h"
+#include "clib/mol3d.h"
 
 extern colour given_colour;
 extern colour white_colour, black_colour, grey_colour, grey02_colour,
@@ -28,6 +29,11 @@ void set_colour (const char *name);
 
 void set_colour_ramp (colour *ramp_to);
 void set_rainbow_ramp (void);
+void set_named_ramp (const char *name);
 void ramp_colour (colour *dest, double f);
+int ramp_is_discrete (void);
+void record_residue_ramp (res3d *res, double f, double low, double high);
+void clear_residue_ramp (res3d *res);
+int interpolate_residue_colour (colour *dest, res3d *a, res3d *b, double t);
 
 #endif

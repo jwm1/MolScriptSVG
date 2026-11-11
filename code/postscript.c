@@ -1,6 +1,6 @@
 /* postscript.c
 
-   MolScriptSVG v2.2
+   MolScriptSVG v2.3
 
    PostScript
 
@@ -37,6 +37,8 @@ typedef struct {
 typedef struct {
   vector3 v1;
   vector3 v2;
+  vector3 c1, c2;
+  boolean curved;
   colour *c;
 } line_db_entry;
 
@@ -122,6 +124,39 @@ static int point_output_count;
 static int sphere_output_count;
 static int plane_output_count;
 static int label_output_count;
+
+typedef struct ps_font_entry {
+  char name[128];
+  int id;
+  int defined;
+  struct ps_font_entry *next;
+} ps_font_entry;
+static ps_font_entry *ps_fonts;
+
+static void
+output_label_font (state *st)
+{
+  const char *name = label_font_name (st, POSTSCRIPT_MODE);
+  ps_font_entry *font;
+  for (font = ps_fonts; font; font = font->next)
+    if (!strcmp(font->name, name)) break;
+  if (!font) {
+    font = malloc(sizeof(*font));
+    strcpy(font->name, name);
+    font->id = ps_fonts ? ps_fonts->id + 1 : 0;
+    font->defined = FALSE;
+    font->next = ps_fonts;
+    ps_fonts = font;
+  }
+  if (!font->defined) {
+    fprintf(outfile, "%%%%IncludeResource: font %s\n", name);
+    fprintf(outfile, "/MSFont%d /%s findfont dup length dict begin\n", font->id, name);
+    PRINT("  { 1 index /FID ne { def } { pop pop } ifelse } forall\n");
+    PRINT("  /Encoding ISOLatin1Encoding def currentdict end definefont pop\n");
+    font->defined = TRUE;
+  }
+  fprintf(outfile, "/FR { /MSFont%d findfont } bind def\n", font->id);
+}
 static int stick_output_count;
 
 
@@ -229,7 +264,9 @@ output_string (char *str, int len)
     case '\\':
       fputc ('\\', outfile);	/* fall-through */
     default:
-      fputc (str[slot], outfile);
+      if ((unsigned char) str[slot] >= 128)
+        fprintf (outfile, "\\%03o", (unsigned char) str[slot]);
+      else fputc (str[slot], outfile);
       break;
     }
   }
@@ -354,6 +391,7 @@ db_line (vector3 *v1, vector3 *v2, colour *c)
     le = line_array + line_count;
     le->v1 = *v1;
     le->v2 = *v2;
+    le->curved = FALSE;
     if (c) {
       le->c = colour_clone (c);
     } else {
@@ -366,6 +404,28 @@ db_line (vector3 *v1, vector3 *v2, colour *c)
 
 
 /*------------------------------------------------------------*/
+/* De Casteljau splitting retains the existing depth-sort segment granularity. */
+static void
+db_curve (vector3 p[4], colour *c, int level)
+{
+  double length=v3_distance(p,p+1)+v3_distance(p+1,p+2)+v3_distance(p+2,p+3);
+  int old;
+  if (length > current_state->segmentsize && level<20) {
+    vector3 a[4],b[4],mid;
+    a[0]=p[0]; b[3]=p[3];
+    v3_middle(a+1,p,p+1); v3_middle(&mid,p+1,p+2); v3_middle(b+2,p+2,p+3);
+    v3_middle(a+2,a+1,&mid); v3_middle(b+1,&mid,b+2);
+    v3_middle(a+3,a+2,b+1); b[0]=a[3];
+    db_curve(a,c,level+1); db_curve(b,c,level+1);
+    return;
+  }
+  old=line_count; db_line(p,p+3,c);
+  if (line_count==old+1) {
+    line_array[old].curved=TRUE;
+    line_array[old].c1=p[1]; line_array[old].c2=p[2];
+  }
+}
+
 static void
 db_point (vector3 *v, colour *c)
 {
@@ -602,6 +662,10 @@ db_transform (double matrix[4][4], double scale)
   for (slot = 0; slot < line_count; slot++, le++) {
     matrix3_transform (&(le->v1), matrix);
     matrix3_transform (&(le->v2), matrix);
+    if (le->curved) {
+      matrix3_transform (&le->c1, matrix);
+      matrix3_transform (&le->c2, matrix);
+    }
   }
 
   pte = point_array;
@@ -742,6 +806,7 @@ db_label_output (depth_db_entry *de)
   lae = label_array + de->slot;
   len = strlen (lae->str);
 
+  output_label_font (de->st);
   output_linecolour (&(lae->col));
 
   fprintf (outfile, "%.2f %.2f M", lae->pos.x, lae->pos.y);
@@ -818,6 +883,11 @@ db_output (void)
       }
       output_linewidth (depthcue (de->depth, de->st) * de->st->linewidth);
       output_linedash (de->st->linedash);
+      if (le->curved) {
+        fprintf(outfile,"newpath %.4f %.4f moveto %.4f %.4f %.4f %.4f %.4f %.4f curveto stroke\n",
+          le->v1.x,le->v1.y,le->c1.x,le->c1.y,le->c2.x,le->c2.y,le->v2.x,le->v2.y);
+        line_output_count++; break;
+      }
       fprintf (outfile, "%.2f %.2f %.2f %.2f L\n",
 		       le->v1.x, le->v1.y, le->v2.x, le->v2.y);
       line_output_count++;
@@ -1006,7 +1076,7 @@ ps_first_plot (void)
   if (title) fprintf (outfile, "%%%%Title: %s\n", title);
   fprintf (outfile, "%%%%Creator: %s, %s\n", program_str, copyright_str);
   if (user_str[0] != '\0') fprintf (outfile, "%%%%For: %s\n", user_str);
-  PRINT ("%%DocumentNeededResources: font Times-Roman Symbol\n");
+  PRINT ("%%DocumentNeededResources: (atend)\n");
   PRINT ("%%Pages: 1\n");
   PRINT ("%%EndComments\n");
   PRINT ("%%BeginProlog\n");
@@ -1048,7 +1118,10 @@ ps_first_plot (void)
   PRINT ("/P123 { 8 copy P moveto lineto lineto lineto stroke } bind def\n");
   PRINT ("/P134 { 8 copy P 4 2 roll moveto lineto 4 2 roll lineto lineto stroke } bind def\n");
   PRINT ("/P1234 { 8 copy P moveto lineto lineto lineto closepath stroke } bind def\n");
-  PRINT ("/FR { /Times-Roman findfont } bind def\n");
+  PRINT ("/Times-Latin1 /Times-Roman findfont dup length dict begin\n");
+  PRINT ("  { 1 index /FID ne { def } { pop pop } ifelse } forall\n");
+  PRINT ("  /Encoding ISOLatin1Encoding def currentdict end definefont pop\n");
+  PRINT ("/FR { /Times-Latin1 findfont } bind def\n");
   PRINT ("/FG { /Symbol findfont } bind def\n");
   PRINT ("/PR { scalefont setfont show } bind def\n");
   PRINT ("/C {\n");
@@ -1083,10 +1156,18 @@ void
 ps_finish_output (void)
 {
   int i0, i1, i2, i3;
+  ps_font_entry *font;
 
   PRINT ("end\n");
   PRINT ("showpage\n");
   PRINT ("%%Trailer\n");
+  PRINT ("%%DocumentNeededResources: font Times-Roman Symbol\n");
+  while ((font = ps_fonts) != NULL) {
+    if (strcmp(font->name, "Times-Roman"))
+      fprintf(outfile, "%%%%+ font %s\n", font->name);
+    ps_fonts = font->next;
+    free(font);
+  }
   if (!bounding_box_valid) {
     i0 = floor (default_area[0]);
     i1 = floor (default_area[1]);
@@ -1107,6 +1188,10 @@ ps_finish_output (void)
 void
 ps_start_plot (void)
 {
+  ps_font_entry *font;
+  /* Plot restore removes re-encoded fonts, but retain the document resource list. */
+  for (font = ps_fonts; font; font = font->next) font->defined = FALSE;
+
   set_area_values (default_area[0], default_area[1],
 		   default_area[2], default_area[3]);
 
@@ -1467,6 +1552,9 @@ void
 ps_label (vector3 *p, char *label, colour *c)
 {
   label_db_entry *lae;
+  const char *text = label;
+  char *dest;
+  unsigned int cp;
 
   assert (p);
   assert (label);
@@ -1481,6 +1569,13 @@ ps_label (vector3 *p, char *label, colour *c)
 
   v3_sum (&(lae->pos), p, &(current_state->labeloffset));
   lae->str = str_clone (label);
+  dest = lae->str;
+  while (*text) {
+    cp = str_utf8_next (&text);
+    if (cp == 0x212b) cp = 0xc5;
+    *dest++ = cp <= 255 ? cp : '?';
+  }
+  *dest = '\0';
   if (c) {
     lae->col = *c;
   } else {
@@ -1503,6 +1598,15 @@ ps_line (boolean polylines)
   int slot;
 
   if (line_segment_count < 2) return;
+  if (polylines && line_segments_curved) {
+    vector3 p[4];
+    for (slot=1;slot<line_segment_count;slot++) {
+      if (line_segments[slot].new) continue;
+      line_segment_bezier(slot,p);
+      db_curve(p,current_state->colourparts ? &line_segments[slot-1].c : NULL,0);
+    }
+    return;
+  }
 
   if (current_state->colourparts) {
 

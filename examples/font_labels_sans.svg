@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="50.00 100.00 500.00 600.00" width="500.00" height="600.00">
+<desc>MolScriptSVG 2.3, Copyright (C) 1997-1998 Per J. Kraulis</desc>
+<g transform="translate(0 800.00) scale(1 -1)">
+<metadata xmlns:ms="urn:molscript:svg">
+<ms:command id="plot-1-command-1" kind="label"></ms:command>
+<ms:command id="plot-1-command-2" kind="label"></ms:command>
+<ms:command id="plot-1-command-3" kind="label"></ms:command>
+<ms:command id="plot-1-command-4" kind="distance"></ms:command>
+</metadata>
+<clipPath id="plot-clip-1"><rect x="50.00" y="100.00" width="500.00" height="600.00"/></clipPath>
+<g clip-path="url(#plot-clip-1)">
+<rect x="50.00" y="100.00" width="500.00" height="600.00" fill="rgb(255,255,255)"/>
+<g id="plot-1-fragment-1" data-command="plot-1-command-4" data-kind="distance">
+<title>distance</title>
+<line x1="200.0000" y1="250.0000" x2="207.4074" y2="250.0000" style="stroke:rgb(0,0,0);stroke-width:1;stroke-linejoin:round;stroke-linecap:round;fill:none"/>
+<line x1="214.8148" y1="250.0000" x2="222.2222" y2="250.0000" style="stroke:rgb(0,0,0);stroke-width:1;stroke-linejoin:round;stroke-linecap:round;fill:none"/>
+<line x1="229.6296" y1="250.0000" x2="237.0370" y2="250.0000" style="stroke:rgb(0,0,0);stroke-width:1;stroke-linejoin:round;stroke-linecap:round;fill:none"/>
+<line x1="244.4444" y1="250.0000" x2="251.8519" y2="250.0000" style="stroke:rgb(0,0,0);stroke-width:1;stroke-linejoin:round;stroke-linecap:round;fill:none"/>
+<line x1="259.2593" y1="250.0000" x2="266.6667" y2="250.0000" style="stroke:rgb(0,0,0);stroke-width:1;stroke-linejoin:round;stroke-linecap:round;fill:none"/>
+<line x1="274.0741" y1="250.0000" x2="281.4815" y2="250.0000" style="stroke:rgb(0,0,0);stroke-width:1;stroke-linejoin:round;stroke-linecap:round;fill:none"/>
+<line x1="288.8889" y1="250.0000" x2="296.2963" y2="250.0000" style="stroke:rgb(0,0,0);stroke-width:1;stroke-linejoin:round;stroke-linecap:round;fill:none"/>
+<line x1="303.7037" y1="250.0000" x2="311.1111" y2="250.0000" style="stroke:rgb(0,0,0);stroke-width:1;stroke-linejoin:round;stroke-linecap:round;fill:none"/>
+<line x1="318.5185" y1="250.0000" x2="325.9259" y2="250.0000" style="stroke:rgb(0,0,0);stroke-width:1;stroke-linejoin:round;stroke-linecap:round;fill:none"/>
+<line x1="333.3333" y1="250.0000" x2="340.7407" y2="250.0000" style="stroke:rgb(0,0,0);stroke-width:1;stroke-linejoin:round;stroke-linecap:round;fill:none"/>
+<line x1="348.1481" y1="250.0000" x2="355.5556" y2="250.0000" style="stroke:rgb(0,0,0);stroke-width:1;stroke-linejoin:round;stroke-linecap:round;fill:none"/>
+<line x1="362.9630" y1="250.0000" x2="370.3704" y2="250.0000" style="stroke:rgb(0,0,0);stroke-width:1;stroke-linejoin:round;stroke-linecap:round;fill:none"/>
+<line x1="377.7778" y1="250.0000" x2="385.1852" y2="250.0000" style="stroke:rgb(0,0,0);stroke-width:1;stroke-linejoin:round;stroke-linecap:round;fill:none"/>
+<line x1="392.5926" y1="250.0000" x2="400.0000" y2="250.0000" style="stroke:rgb(0,0,0);stroke-width:1;stroke-linejoin:round;stroke-linecap:round;fill:none"/>
+</g>
+</g>
+<g id="plot-1-fragment-2" data-command="plot-1-command-1" data-kind="label">
+<title>label</title>
+<text transform="translate(300.00 550.00) scale(1 -1)" font-size="20.00" font-family="sans-serif" text-anchor="middle" dominant-baseline="middle" fill="rgb(0,0,0)">MolScriptSVG: fonts and units</text>
+</g>
+<g id="plot-1-fragment-3" data-command="plot-1-command-2" data-kind="label">
+<title>label</title>
+<text transform="translate(300.00 450.00) scale(1 -1)" font-size="20.00" font-family="sans-serif" text-anchor="middle" dominant-baseline="middle" fill="rgb(0,0,0)">Carbon Oxygen Nitrogen</text>
+</g>
+<g id="plot-1-fragment-4" data-command="plot-1-command-3" data-kind="label">
+<title>label</title>
+<text transform="translate(300.00 350.00) scale(1 -1)" font-size="20.00" font-family="sans-serif" text-anchor="middle" dominant-baseline="middle" fill="rgb(0,0,0)">WiMW abcdefg 0123456789</text>
+</g>
+<g id="plot-1-fragment-5" data-command="plot-1-command-4" data-kind="distance">
+<title>distance</title>
+<text transform="translate(300.00 250.00) scale(1 -1)" font-size="20.00" font-family="sans-serif" text-anchor="middle" dominant-baseline="middle" fill="rgb(0,0,0)">8.00 Å</text>
+</g>
+</g>
+</svg>

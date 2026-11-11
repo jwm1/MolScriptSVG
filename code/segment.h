@@ -1,6 +1,6 @@
 /* segment.h
 
-   MolScriptSVG v2.2
+   MolScriptSVG v2.3
 
    Segment data structure and routines.
 
@@ -18,10 +18,15 @@ typedef struct {
   vector3 p;
   colour c;
   boolean new;
+  vector3 control1, control2;
+  boolean exact_curve;
 } line_segment;
 
 extern line_segment *line_segments;
 extern int line_segment_count;
+extern boolean line_segments_curved;
+void line_segment_bezier (int slot, vector3 p[4]);
+void line_segment_hermite (line_segment *segment, double t0, double t1);
 
 void line_segment_init (void);
 line_segment *line_segment_next (void);

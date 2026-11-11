@@ -147,6 +147,23 @@ class HeadlessTests(SceneTests):
             with self.subTest(args=args):
                 self.render(self.label(), "-png", args, success=False)
 
+    def test_angstrom_ring_and_utf8_decoding(self):
+        from PIL import ImageChops, Image
+        for font in ("bitmap", "freetype"):
+            args = self.font_args(font)
+            for size in (10, 14, 24):
+                boxes = []
+                for text in ("A", "Å", "Å"):
+                    im = self.image(self.render(self.label(text, size), "-png", args)[0])
+                    boxes.append(ImageChops.difference(im, Image.new("RGB", im.size, "white")).getbbox())
+                self.assertLess(boxes[1][1], boxes[0][1], (font, size, boxes))
+                self.assertEqual(boxes[1], boxes[2])
+                # Decoding must not turn the two-byte Å into two advancing glyphs.
+                self.assertAlmostEqual(boxes[0][2]-boxes[0][0], boxes[1][2]-boxes[1][0], delta=1)
+            regular = self.image(self.render(self.label("2"), "-png", args)[0])
+            raised = self.image(self.render(self.label("²"), "-png", args)[0])
+            self.assertNotEqual(regular.tobytes(), raised.tobytes())
+
     def test_accumulation_preserves_unjittered_labels(self):
         for font in ("bitmap", "freetype"):
             with self.subTest(font=font):

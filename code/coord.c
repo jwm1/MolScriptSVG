@@ -1,6 +1,6 @@
 /* coord.c
 
-   MolScriptSVG v2.2
+   MolScriptSVG v2.3
 
    Coordinate data handling.
 
@@ -20,6 +20,7 @@
 #include "global.h"
 #include "lex.h"
 #include "select.h"
+#include "xform.h"
 
 
 /*============================================================*/
@@ -53,6 +54,8 @@ read_coordinate_file (char *filename)
   int mol_count = 0;
   int res_count= 0;
   int at_count = 0;
+
+  view_note_read();
 
   if (filename) {
 

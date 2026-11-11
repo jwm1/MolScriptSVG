@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MolScriptSVG: FONTS</title>
+<link rel="stylesheet" href="docs/style.css">
+<link rel="stylesheet" href="docs/documentation.css">
+</head>
+<body>
+<!-- Generated from FONTS.md by scripts/build-html-docs.py. -->
+<nav><a href="docs/index.html">Manual</a> | <a href="README.html">README</a> |
+<a href="examples/index.html">Examples</a> | <a href="CHANGES.html">Changelog</a></nav>
+<main>
+<h1 id="output-fonts-23">Output fonts (2.3)</h1>
+<p>Select a font on the command line, or change it for subsequent annotations in
+the script. Existing scripts retain their previous default fonts.</p>
+<pre><code class="language-bash">./molscript -svg -font sans -in examples/ras_gdp.in -out ras_gdp_sans.svg
+</code></pre>
+<pre><code class="language-text">set labelfont &quot;sans&quot;, labelsize 18;
+label 0 0 0 &quot;Distance / Å&quot;;
+push;
+set labelfont &quot;monospace&quot;;
+label 0 -3 0 &quot;CA 42&quot;;
+pop;
+</code></pre>
+<p><code>-font NAME</code> supplies the initial font for each plot. A script's <code>set labelfont</code>
+overrides it; <code>push</code>/<code>pop</code> save and restore the selection. Ordinary labels,
+measurement labels, legends and categorical keys all inherit it. Depth-sorted
+outputs retain the font assigned when each label was drawn. Explicit
+<code>set labelfont "default"</code> restores the original backend default, not the
+command-line override.</p>
+<h2 id="portable-families">Portable families</h2>
+<p>These lowercase presets map to fonts appropriate for each output format:</p>
+<table>
+<thead>
+<tr>
+<th>Selection</th>
+<th>SVG</th>
+<th>PostScript</th>
+<th>MetaPost</th>
+<th>VRML / X3D / WebGL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>default</code></td>
+<td>Times-Roman</td>
+<td>Times-Roman</td>
+<td>cmr10</td>
+<td>SERIF</td>
+</tr>
+<tr>
+<td><code>serif</code></td>
+<td>serif</td>
+<td>Times-Roman</td>
+<td>cmr10</td>
+<td>SERIF</td>
+</tr>
+<tr>
+<td><code>sans</code> or <code>sans-serif</code></td>
+<td>sans-serif</td>
+<td>Helvetica</td>
+<td>cmss10</td>
+<td>SANS</td>
+</tr>
+<tr>
+<td><code>monospace</code></td>
+<td>monospace</td>
+<td>Courier</td>
+<td>cmtt10</td>
+<td>TYPEWRITER</td>
+</tr>
+</tbody>
+</table>
+<p>These select families, not identical font files across machines or formats.
+Use native names or an explicit FreeType font file when a particular face is
+required. Font selection does not change the backend's existing label sizing,
+alignment or rotation rules. In particular, MetaPost still uses its font's
+native size rather than MolScript's <code>labelsize</code>; axis labels use the font
+selected at the end of the plot.</p>
+<h2 id="native-names">Native names</h2>
+<ul>
+<li><strong>SVG:</strong> <code>-font "DejaVu Sans"</code>, for example. The family is written into the
+  SVG, not embedded. The browser or SVG rasterizer must have it available;
+  otherwise its normal font substitution applies. PNG converted from SVG uses
+  this choice, not the OpenGL font options.</li>
+<li><strong>PostScript:</strong> <code>-font Helvetica-Bold</code>, <code>Times-Italic</code>, <code>Courier</code>, or another
+  PostScript font name. Fonts are declared as required resources, not embedded.
+  They must be available to the interpreter. Latin-1 re-encoding retains Å and
+  ². A missing font may be substituted by the interpreter.</li>
+<li><strong>MetaPost:</strong> use a TeX font metric name, such as <code>cmss10</code> or <code>cmtt10</code>. The
+  font metrics and the renderer's corresponding fonts must be installed.
+  Å/² composition follows the selected font and does not require TeX typesetting.</li>
+<li><strong>VRML / X3D / WebGL:</strong> native family names are emitted as a quoted MFString
+  and resolved by the viewer. Availability and substitution are viewer-specific;
+  the portable families are the safest choices. See the
+  <a href="https://www.web3d.org/documents/specifications/19775-1/V3.3/Part01/components/text.html#FontStyle">X3D FontStyle specification</a>.</li>
+</ul>
+<p>Names may contain 1-127 ASCII letters, digits, spaces, hyphens, underscores or
+dots; leading/trailing spaces are rejected. PostScript and MetaPost names must
+not contain spaces. These restrictions prevent names from becoming executable
+output syntax. MolScript checks syntax, not font installation. Legacy Greek
+<code>labelmask</code> runs continue to use Symbol in SVG/PostScript.</p>
+<h2 id="opengl-and-raster-images">OpenGL and raster images</h2>
+<p>PNG, JPEG, GIF, SGI and raster EPS use the OpenGL label renderer. Keep the
+existing <code>-labelfont bitmap</code> default, or select a real font file with FreeType:</p>
+<pre><code class="language-bash">make -C code -j4 USE_FREETYPE=1
+./molscript -png -labelfont freetype \
+  -fontfile /usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf \
+  -in examples/ras_gdp.in -out ras_gdp_serif.png
+</code></pre>
+<p>The same options work with interactive <code>-gl</code>. Choose the actual bold or italic
+font file if that face is wanted. File selection is global for the rendering
+run, not per label. Bitmap mode has one bundled face. Both modes support Å/²;
+FreeType can draw additional Unicode characters present in the chosen font.
+<code>-font</code> and non-default <code>set labelfont</code> selections are rejected in these modes
+instead of pretending to select a system font by family name.</p>
+<h2 id="raster3d-and-pov-ray">Raster3D and POV-Ray</h2>
+<p>Raster3D accepts <code>default</code> or <code>roman</code> for proportional stroke letters and
+<code>monospace</code> for fixed-pitch stroke letters. These are emitted as geometry, so
+the Raster3D renderer needs no fonts installed. Both work in the basic build
+without OpenGL or a display. The font tables are bundled from freeglut 3.4.0
+with their original permissive licence notices. This also fixes the old
+dependence on incompatible private GLUT/freeglut font structures.</p>
+<p>POV-Ray currently exports labels as comments, so it has no rendered-text font
+selection. A non-default font selection is rejected rather than ignored.
+<code>-check</code> validates name syntax but cannot check another backend's font support
+or a viewer's installed fonts.</p>
+<h2 id="examples-and-tests">Examples and tests</h2>
+<p>The <a href="examples/index.html">gallery</a> has serif, sans-serif and monospace previews
+made from <a href="examples/font_labels.in">font_labels.in</a>. Regenerate them and run
+the font tests with:</p>
+<pre><code class="language-bash">python3 scripts/generate-font-examples.py
+python3 scripts/test-fonts.py
+python3 scripts/build-html-docs.py
+</code></pre>
+<p>Generation needs CairoSVG. Tests use installed Ghostscript, MetaPost and
+view3dscene when available; the FreeType image comparison needs DejaVu Sans
+and Serif plus an EGL-capable complete build.</p>
+</main>
+</body>
+</html>

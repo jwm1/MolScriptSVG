@@ -45,6 +45,9 @@ str_clone (const char *str);
 char *
 str_subclone (const char *str, const int first, const int last);
 
+/* Decode one UTF-8 code point, advancing past it. Invalid input becomes '?'. */
+unsigned int str_utf8_next (const char **text);
+
 int
 str_hashcode (const char *str, const int range);
 

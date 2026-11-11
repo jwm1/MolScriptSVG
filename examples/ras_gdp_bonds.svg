@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="50.00 100.00 500.00 600.00" width="500.00" height="600.00">
 <title>GDP bonds</title>
-<desc>MolScriptSVG 2.2, Copyright (C) 1997-1998 Per J. Kraulis</desc>
+<desc>MolScriptSVG 2.3, Copyright (C) 1997-1998 Per J. Kraulis</desc>
 <g transform="translate(0 800.00) scale(1 -1)">
+<metadata xmlns:ms="urn:molscript:svg">
+<ms:command id="plot-1-command-1" kind="bonds">set 1: mol/model=0/chain= /200(GDP)[PB,O1B,O2B,O3B,PA,O1A,O2A,O3A,O5',C5',C4',O4',C3',O3',C2',O2',C1',N9,C8,N7,C5,C6,O6,N1,C2,N2,N3,C4]; </ms:command>
+</metadata>
 <clipPath id="plot-clip-1"><rect x="50.00" y="100.00" width="500.00" height="600.00"/></clipPath>
 <g clip-path="url(#plot-clip-1)">
 <rect x="50.00" y="100.00" width="500.00" height="600.00" fill="rgb(255,255,255)"/>
+<g id="plot-1-fragment-1" data-command="plot-1-command-1" data-kind="bonds">
+<title>bonds</title>
 <line x1="186.3953" y1="387.6071" x2="175.9262" y2="398.1753" style="stroke:rgb(255,0,0);stroke-width:0.595;stroke-linejoin:round;stroke-linecap:round;fill:none"/>
 <line x1="196.8643" y1="377.0390" x2="186.3953" y2="387.6071" style="stroke:rgb(255,0,255);stroke-width:0.785;stroke-linejoin:round;stroke-linecap:round;fill:none"/>
 <line x1="206.4171" y1="356.2040" x2="215.9699" y2="335.3691" style="stroke:rgb(255,0,0);stroke-width:0.831;stroke-linejoin:round;stroke-linecap:round;fill:none"/>
@@ -60,6 +65,7 @@
 <line x1="291.0717" y1="449.2348" x2="310.3492" y2="451.6662" style="stroke:rgb(255,0,0);stroke-width:1.66;stroke-linejoin:round;stroke-linecap:round;fill:none"/>
 <line x1="274.1154" y1="459.2154" x2="291.0717" y2="449.2348" style="stroke:rgb(255,0,0);stroke-width:1.66;stroke-linejoin:round;stroke-linecap:round;fill:none"/>
 <line x1="134.9464" y1="333.3840" x2="124.2889" y2="337.6323" style="stroke:rgb(255,0,0);stroke-width:1.76;stroke-linejoin:round;stroke-linecap:round;fill:none"/>
+</g>
 </g>
 </g>
 </svg>

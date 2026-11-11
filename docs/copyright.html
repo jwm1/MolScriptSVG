@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>MolScriptSVG 2.2: Copyright</title>
+<title>MolScriptSVG 2.3: Copyright</title>
 <link href="style.css" type="text/css" rel="stylesheet"></link>
 </head>
 
@@ -19,6 +19,14 @@ unless otherwise noted. There is no copyright on the example files.
 <hr>
 <h2>Source code written by other people</h2>
 
+<p><strong>Historical notices:</strong> the third-party notices below describe
+the library versions used by the original MolScript distribution. They are
+preserved verbatim, including contemporary patent warnings. The GIF/LZW patents
+behind those warnings have since expired; see the
+<a href="output.html#GIF">updated GIF explanation and sources</a>.
+For a current build, consult the licences supplied with the actual installed
+libraries as well as this historical record.</p>
+
 MolScript uses some software written by other people, either directly
 as integrated parts of the source code, or as calls to external
 libraries. Here follows the copyright statements relating to these
@@ -27,6 +35,7 @@ external codes:
 <li>Source code included in the distribution.
 <ul>
 <li><a href="#jitter.h">jitter.h</a>
+<li><a href="#stroke-fonts">Bundled freeglut stroke fonts</a>
 <li><a href="#glutstroke.h">glutstroke.h</a>
 the distribution. 
 <li><a href="#regex.c">regex.c</a>
@@ -97,11 +106,9 @@ accumulation aliasing option
 <hr>
 <h3><a name="glutstroke.h">glutstroke.h</a></h3>
 
-The glutstroke.h file contains the character data structures for the
-GLUT library, which are needed for the
-<a href="output.html#Raster3D">Raster3D</a> character
-implementation. This source code file is included in the distribution
-for technical reasons.
+The historical glutstroke.h file contains private GLUT character structures.
+The current Raster3D backend no longer uses these structures; it uses the
+bundled stroke tables described below.
 <p>
 <hr width="50%" size=2 noshade>
 <pre>
@@ -113,6 +120,16 @@ for technical reasons.
 </pre>
 <hr width="50%" size=2 noshade>
 
+<hr>
+<h3><a name="stroke-fonts">Bundled freeglut stroke fonts</a></h3>
+<p>Raster3D uses Roman and MonoRoman stroke tables from
+<a href="https://github.com/freeglut/freeglut/tree/v3.4.0/src">freeglut 3.4.0</a>,
+copyright (c) 1999-2000 Pawel W. Olszta. Names and types have been adapted
+to remove dependencies on OpenGL and private library data structures.</p>
+<p>The original permissive licence notices and source checksums are retained in
+<a href="../code/other/stroke_roman.c">stroke_roman.c</a> and
+<a href="../code/other/stroke_mono_roman.c">stroke_mono_roman.c</a>.
+These notices must accompany copies or substantial portions of those tables.</p>
 <hr>
 <h3><a name="regex.c">regex.c</a></h3>
 
@@ -417,8 +434,11 @@ in the file ChangeLog history information documenting your changes.
 <hr>
 <h3><a name="gd 1.3">gd 1.3</a></h3>
 
-The gd 1.3 library is a C library used for the
-<a href="output.html#GIF">GIF image file format</a>.
+The notice below is for the historical gd 1.3 library. Current builds use
+<a href="https://libgd.github.io/">libgd</a> for the
+<a href="output.html#GIF">GIF image file format</a>; consult the
+<a href="https://github.com/libgd/libgd/blob/master/COPYING">current libgd licence</a>.
+The old non-LZW discussion is retained as history, not current installation advice.
 <p>
 <strong>Note</strong> that this library is not included in the
 MolScript distribution: you will have to obtain it yourself from the

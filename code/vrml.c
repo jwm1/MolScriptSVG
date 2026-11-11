@@ -1,6 +1,6 @@
 /* vrml.c
 
-   MolScriptSVG v2.2
+   MolScriptSVG v2.3
 
    VRML V2.0
 
@@ -387,6 +387,8 @@ vrml_first_plot (void)
   vrml_finish_node();
 
   vrml_proto ("Cyl");
+  vrml_s_newline ("field SFBool tc TRUE");
+  vrml_s_newline ("field SFBool bc TRUE");
   vrml_s_newline ("exposedField SFVec3f p 0 0 0");
   vrml_s_newline ("exposedField SFRotation r 0 0 1 0");
   vrml_s_newline ("exposedField SFVec3f s 1 1 1");
@@ -414,7 +416,10 @@ vrml_first_plot (void)
   vrml_finish_node();
   vrml_finish_node();
   indent_newline();
-  indent_string ("geometry Cylinder { }");
+  vrml_node ("geometry Cylinder");
+  vrml_s_newline ("top IS tc");
+  vrml_s_newline ("bottom IS bc");
+  vrml_finish_node();
   vrml_finish_node();
   vrml_finish_list();
   vrml_finish_node();
@@ -475,6 +480,7 @@ vrml_first_plot (void)
   vrml_s_newline ("field SFVec3f p 0 0 0");
   vrml_s_newline ("field SFFloat sz 1");
   vrml_s_newline ("field MFString c []");
+  vrml_s_newline ("field MFString family [\"SERIF\"]");
   vrml_s_newline ("field SFVec3f o 0 0 0");
   vrml_s_newline ("field SFColor dc 1 1 1");
   vrml_s_newline ("field SFColor ec 0 0 0");
@@ -507,6 +513,7 @@ vrml_first_plot (void)
   vrml_node ("geometry Text");
   vrml_s_newline ("string IS c");
   vrml_node ("fontStyle FontStyle");
+  vrml_s_newline ("family IS family");
   indent_string ("size IS sz");
   vrml_finish_node();
   vrml_finish_node();
@@ -1128,6 +1135,8 @@ vrml_cylinder (vector3 *v1, vector3 *v2)
 
   indent_newline();
   vrml_node ("Cyl");
+  if (!cylinder_start_cap) vrml_s_newline ("tc FALSE");
+  if (!cylinder_end_cap) vrml_s_newline ("bc FALSE");
   indent_string ("p ");
   vrml_v3 (&middle);
   output_rot (&rot, angle);
@@ -1284,6 +1293,8 @@ vrml_label (vector3 *p, char *label, colour *c)
   vrml_v3 (p);
   indent_string ("c");
   vrml_s_quoted (label);
+  indent_string ("family");
+  vrml_s_quoted ((char *) label_font_name (current_state, VRML_MODE));
   if (v3_length (&(current_state->labeloffset)) >= 0.001) {
     indent_string (" o ");
     vrml_v3 (&(current_state->labeloffset));

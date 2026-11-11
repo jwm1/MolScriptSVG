@@ -45,15 +45,16 @@ YLIB =
 
 #------------------------------------------------------------
 OBJ = molscript.tab.o global.o lex.o col.o select.o \
-      state.o graphics.o segment.o coord.o xform.o \
-      postscript.o svg.o metapost.o povray.o raster3d.o vrml.o x3d.o regex.o
+      state.o graphics.o figure.o segment.o coord.o xform.o \
+      postscript.o svg.o metapost.o povray.o raster3d.o vrml.o x3d.o regex.o \
+      other/stroke_roman.o other/stroke_mono_roman.o
 
 #------------------------------------------------------------
 all: $(MOLSCRIPT) $(MOLAUTO)
 
 #------------------------------------------------------------
 clean:
-	(rm -f $(MOLSCRIPT) $(MOLAUTO) *.o core *~)
+	(rm -f $(MOLSCRIPT) $(MOLAUTO) *.o other/*.o core *~)
 	(cd clib; make clean)
 
 #------------------------------------------------------------
@@ -77,9 +78,11 @@ select.o: select.c select.h coord.h global.h state.h lex.h
 state.o: state.c state.h col.h global.h select.h
 
 graphics.o: graphics.c graphics.h coord.h state.h global.h lex.h \
-            select.h xform.h segment.h postscript.h svg.h raster3d.h vrml.h x3d.h
+            select.h xform.h segment.h postscript.h svg.h raster3d.h vrml.h x3d.h col.h
 
-segment.o: segment.c segment.h
+segment.o: segment.c segment.h clib/hermite_curve.h
+figure.o: figure.c figure.h graphics.h global.h svg.h col.h state.h
+graphics.o molscript.tab.o: figure.h
 
 coord.o: coord.c coord.h global.h lex.h select.h
 
@@ -88,13 +91,14 @@ xform.o: xform.c xform.h global.h select.h
 postscript.o: postscript.c postscript.h coord.h global.h \
               graphics.h segment.h state.h
 
-svg.o: svg.c svg.h coord.h global.h graphics.h segment.h state.h
+svg.o: svg.c svg.h coord.h global.h graphics.h segment.h state.h select.h clib/dynstring.h
 
 metapost.o: metapost.c metapost.h coord.h global.h graphics.h segment.h state.h
 
 povray.o: povray.c povray.h coord.h global.h graphics.h segment.h state.h
 
 raster3d.o: raster3d.c raster3d.h coord.h global.h graphics.h segment.h state.h
+other/stroke_roman.o other/stroke_mono_roman.o raster3d.o: other/stroke_fonts.h
 
 vrml.o: vrml.c vrml.h col.h coord.h global.h graphics.h segment.h state.h
 

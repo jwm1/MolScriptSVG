@@ -1,9 +1,9 @@
 %!PS-Adobe-3.0
 %%BoundingBox: (atend)
 %%Title: c-H-ras p21 protein (1-166), complex with GDP and Mg
-%%Creator: MolScriptSVG 2.2, Copyright (C) 1997-1998 Per J. Kraulis
+%%Creator: MolScriptSVG 2.3, Copyright (C) 1997-1998 Per J. Kraulis
 %%For: jwm
-%%DocumentNeededResources: font Times-Roman Symbol
+%%DocumentNeededResources: (atend)
 %%Pages: 1
 %%EndComments
 %%BeginProlog
@@ -45,7 +45,10 @@
 /P123 { 8 copy P moveto lineto lineto lineto stroke } bind def
 /P134 { 8 copy P 4 2 roll moveto lineto 4 2 roll lineto lineto stroke } bind def
 /P1234 { 8 copy P moveto lineto lineto lineto closepath stroke } bind def
-/FR { /Times-Roman findfont } bind def
+/Times-Latin1 /Times-Roman findfont dup length dict begin
+  { 1 index /FID ne { def } { pop pop } ifelse } forall
+  /Encoding ISOLatin1Encoding def currentdict end definefont pop
+/FR { /Times-Latin1 findfont } bind def
 /FG { /Symbol findfont } bind def
 /PR { scalefont setfont show } bind def
 /C {
@@ -1724,5 +1727,6 @@ MolScriptPlotSave restore
 end
 showpage
 %%Trailer
+%%DocumentNeededResources: font Times-Roman Symbol
 %%BoundingBox: 50 100 550 700
 %%EOF

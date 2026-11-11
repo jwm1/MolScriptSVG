@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MolScriptSVG: WORK DONE SO FAR</title>
+<link rel="stylesheet" href="docs/style.css">
+<link rel="stylesheet" href="docs/documentation.css">
+</head>
+<body>
+<!-- Generated from WORK_DONE_SO_FAR.md by scripts/build-html-docs.py. -->
+<nav><a href="docs/index.html">Manual</a> | <a href="README.html">README</a> |
+<a href="examples/index.html">Examples</a> | <a href="CHANGES.html">Changelog</a></nav>
+<main>
+<h1 id="molscriptsvg-work-summary">MolScriptSVG Work Summary</h1>
+<h2 id="historical-baseline-215">Historical baseline (2.1.5)</h2>
+<p>This is the earlier work summary. For the 2.2 release, see
+<a href="CHANGES.html">CHANGES.md</a> and <a href="RELEASE_NOTES_2.2.html">RELEASE_NOTES_2.2.md</a>.</p>
+<ul>
+<li>Project renamed from <code>MolScript</code> to <code>MolScriptSVG</code>.</li>
+<li>Executable name kept as <code>molscript</code>.</li>
+<li>Current local baseline: <code>MolScriptSVG 2.1.5</code> tagged as <code>v2.1.5</code>.</li>
+<li>MIT licensing retained, with fork changes attributed to James W. Murray.</li>
+</ul>
+<h2 id="major-backend-work">Major backend work</h2>
+<ul>
+<li>Added direct SVG output with <code>-svg</code>.</li>
+<li>Added MetaPost output with <code>-mp</code> / <code>-metapost</code>.</li>
+<li>Added X3D output:</li>
+<li><code>-x3d</code> for XML X3D</li>
+<li><code>-x3dv</code> for Classic X3D</li>
+<li>Added <code>-webgl</code> output using X_ITE-backed HTML wrappers.</li>
+<li>Restored and modernized OpenGL-backed image output:</li>
+<li><code>-png</code></li>
+<li><code>-jpeg</code></li>
+<li><code>-gif</code></li>
+<li><code>-sgi</code></li>
+<li><code>-eps</code></li>
+<li><code>-epsbw</code></li>
+</ul>
+<h2 id="opengl-and-image-path-modernization">OpenGL and image-path modernization</h2>
+<ul>
+<li>Modernized <code>Makefile.complete</code> for current Linux systems.</li>
+<li>Switched dependency discovery to <code>pkg-config</code>.</li>
+<li>Fixed the old GLX pixmap-based image path.</li>
+<li>Added EGL-first headless image rendering with fallback to GLUT/X11.</li>
+<li>Verified working <code>-gl</code>, <code>-png</code>, <code>-jpeg</code>, and <code>-gif</code> on the local machine.</li>
+</ul>
+<h2 id="metapost-work">MetaPost work</h2>
+<ul>
+<li>Added native MetaPost scene output.</li>
+<li>Added semantic comments for:</li>
+<li>helices</li>
+<li>strands</li>
+<li>coils/turns</li>
+<li>traces</li>
+<li>ball-and-stick</li>
+<li>bonds</li>
+<li>cpk</li>
+<li>Added optional projected axes/ticks overlay via <code>-mpaxes</code>.</li>
+<li>Added image-frame transform matrix comments to generated <code>.mp</code> figures.</li>
+</ul>
+<h2 id="x3d-and-webgl-stabilization">X3D and WebGL stabilization</h2>
+<ul>
+<li>Implemented Classic X3D first, then stabilized native XML X3D generation.</li>
+<li>Iterated on WebGL/X_ITE integration until native scenes loaded and displayed reliably.</li>
+<li>Fixed XML validity issues affecting WebGL scene loading.</li>
+</ul>
+<h2 id="svg-work">SVG work</h2>
+<ul>
+<li>Added native SVG scene generation.</li>
+<li>Improved SVG/PostScript parity.</li>
+<li>Fixed visible seams with higher coordinate precision and seam-hiding strokes.</li>
+<li>Matched default border line colour to PostScript.</li>
+<li>Added PostScript-style sphere highlight support.</li>
+</ul>
+<h2 id="molauto-improvements">MolAuto improvements</h2>
+<ul>
+<li>Added framing/orientation options:</li>
+<li><code>-window</code></li>
+<li><code>-rotate</code></li>
+<li><code>-translate</code></li>
+<li>Added palette/preset options:</li>
+<li><code>-ss_palette</code></li>
+<li><code>-colourblind</code></li>
+<li><code>-publication</code></li>
+</ul>
+<h2 id="examples-and-documentation">Examples and documentation</h2>
+<ul>
+<li>Regenerated and checked in example outputs across the supported backends.</li>
+<li>Added SVG-derived PNGs as <code>*_svg.png</code>.</li>
+<li>Added MetaPost example outputs for all example <code>.in</code> files.</li>
+<li>Added the <code>trace</code> example to the gallery.</li>
+<li>Updated <code>examples/index.html</code> to work from a local checkout.</li>
+<li>Added <code>scripts/regenerate-examples.sh</code>.</li>
+<li>Added <code>UNDOCUMENTED_FEATURES.md</code>.</li>
+<li>Updated README and the documentation HTML pages to use MolScriptSVG branding.</li>
+<li>Added <code>CHANGES.md</code> and <code>.gitignore</code>.</li>
+</ul>
+<h2 id="current-direction">Current direction</h2>
+<p>MolScriptSVG is now a modernized multi-backend MolScript distribution with:</p>
+<ul>
+<li>vector output</li>
+<li>3D scene export</li>
+<li>WebGL viewing</li>
+<li>restored OpenGL/image output on modern Linux</li>
+<li>improved examples and documentation</li>
+</ul>
+<h2 id="likely-next-areas">Likely next areas</h2>
+<ul>
+<li>POV-Ray output backend</li>
+<li>more MetaPost polish</li>
+<li>better label support in 3D backends</li>
+<li>CI smoke tests</li>
+</ul>
+</main>
+</body>
+</html>

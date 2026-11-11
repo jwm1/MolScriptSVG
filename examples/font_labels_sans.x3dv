@@ -1,0 +1,446 @@
+#X3D V3.3 utf8
+PROFILE Immersive
+WorldInfo {
+info [
+"Program: MolScriptSVG 2.3, Copyright (C) 1997-1998 Per J. Kraulis"
+"Author: jwm"
+]
+}
+PROTO Ball [
+inputOutput SFVec3f p 0 0 0
+initializeOnly SFFloat rad 1.5
+initializeOnly SFColor dc 1 1 1
+initializeOnly SFColor ec 0 0 0
+initializeOnly SFColor sc 0.2 0.2 0.2
+initializeOnly SFFloat sh 0
+initializeOnly SFFloat tr 0
+]
+{
+Transform {
+translation IS p
+children [
+Shape {
+appearance Appearance {
+material Material {
+diffuseColor IS dc
+emissiveColor IS ec
+specularColor IS sc
+shininess IS sh
+transparency IS tr
+}
+}
+geometry Sphere {
+radius IS rad
+}
+}
+]
+}
+}
+PROTO Cyl [
+initializeOnly SFBool tc TRUE
+initializeOnly SFBool bc TRUE
+inputOutput SFVec3f p 0 0 0
+inputOutput SFRotation r 0 0 1 0
+inputOutput SFVec3f s 1 1 1
+initializeOnly SFColor dc 1 1 1
+initializeOnly SFColor ec 0 0 0
+initializeOnly SFColor sc 0.2 0.2 0.2
+initializeOnly SFFloat sh 0
+initializeOnly SFFloat tr 0
+]
+{
+Transform {
+translation IS p
+rotation IS r
+scale IS s
+children [
+Shape {
+appearance Appearance {
+material Material {
+diffuseColor IS dc
+emissiveColor IS ec
+specularColor IS sc
+shininess IS sh
+transparency IS tr
+}
+}
+geometry Cylinder {
+top IS tc
+bottom IS bc
+}
+}
+]
+}
+}
+PROTO Stick [
+inputOutput SFVec3f p 0 0 0
+inputOutput SFRotation r 0 0 1 0
+inputOutput SFVec3f s 1 1 1
+initializeOnly SFColor dc 1 1 1
+initializeOnly SFColor ec 0 0 0
+initializeOnly SFColor sc 0.2 0.2 0.2
+initializeOnly SFFloat sh 0
+initializeOnly SFFloat tr 0
+]
+{
+Transform {
+translation IS p
+rotation IS r
+scale IS s
+children [
+Shape {
+appearance Appearance {
+material Material {
+diffuseColor IS dc
+emissiveColor IS ec
+specularColor IS sc
+shininess IS sh
+transparency IS tr
+}
+}
+geometry Extrusion {
+spine [0 -1 0, 0 1 0]
+crossSection [
+1 0 0.707107 -0.707107 -1.83697e-16 -1 -0.707107 -0.707107 -1 1.22465e-16 -0.707107 0.707107 6.12323e-17 1 0.707107 0.707107 1 0
+]
+beginCap FALSE
+endCap FALSE
+creaseAngle 1.7
+}
+}
+]
+}
+}
+PROTO Label [
+initializeOnly SFVec3f p 0 0 0
+initializeOnly SFFloat sz 1
+initializeOnly MFString c []
+initializeOnly MFString family ["SERIF"]
+initializeOnly SFVec3f o 0 0 0
+initializeOnly SFColor dc 1 1 1
+initializeOnly SFColor ec 0 0 0
+initializeOnly SFColor sc 0.2 0.2 0.2
+initializeOnly SFFloat sh 0
+initializeOnly SFFloat tr 0
+]
+{
+Transform {
+translation IS p
+children [
+Billboard {
+axisOfRotation 0 0 0
+children [
+Transform {
+translation IS o
+children [
+Shape {
+appearance Appearance {
+material Material {
+diffuseColor IS dc
+emissiveColor IS ec
+specularColor IS sc
+shininess IS sh
+transparency IS tr
+}
+}
+geometry Text {
+string IS c
+fontStyle FontStyle {
+family IS family
+size IS sz
+}
+}
+}
+]
+}
+]
+}
+]
+}
+}
+Collision {
+collide FALSE
+children [
+Label {
+p 0.00 6.00 0.00 c "MolScriptSVG: fonts and units" family "SANS" dc 0 0 0 sc 0 0 0 sh 0.2 sz 1
+}
+Label {
+p 0.00 2.00 0.00 c "Carbon Oxygen Nitrogen" family "SANS" dc 0 0 0 sc 0 0 0 sh 0.2 sz 1
+}
+Label {
+p 0.00 -2.00 0.00 c "WiMW abcdefg 0123456789" family "SANS" dc 0 0 0 sc 0 0 0 sh 0.2 sz 1
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-4.00 -6.00 0.00 -3.70 -6.00 0.00
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-3.41 -6.00 0.00 -3.11 -6.00 0.00
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-2.81 -6.00 0.00 -2.52 -6.00 0.00
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-2.22 -6.00 0.00 -1.93 -6.00 0.00
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-1.63 -6.00 0.00 -1.33 -6.00 0.00
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-1.04 -6.00 0.00 -0.74 -6.00 0.00
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+-0.44 -6.00 0.00 -0.15 -6.00 0.00
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+0.15 -6.00 0.00 0.44 -6.00 0.00
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+0.74 -6.00 0.00 1.04 -6.00 0.00
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+1.33 -6.00 0.00 1.63 -6.00 0.00
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+1.93 -6.00 0.00 2.22 -6.00 0.00
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+2.52 -6.00 0.00 2.81 -6.00 0.00
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+3.11 -6.00 0.00 3.41 -6.00 0.00
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Shape {
+appearance Appearance {
+material Material {
+ambientIntensity 0.2
+shininess 0.2
+}
+}
+geometry IndexedLineSet {
+coord Coordinate {
+point [
+3.70 -6.00 0.00 4.00 -6.00 0.00
+]
+}
+coordIndex [
+0 1
+]
+}
+}
+Label {
+p 0.00 -6.00 0.00 c "8.00 Å" family "SANS" dc 0 0 0 sc 0 0 0 sh 0.2 sz 1
+}
+]
+bboxCenter 0 0 0
+bboxSize 10 14 2
+}
+NavigationInfo {
+speed 4
+type [
+"EXAMINE" "FLY"
+]
+}
+Background {
+skyColor [
+1 1 1
+]
+}
+Viewpoint {
+position 0.00 0.00 16.80
+description "overall default"
+}

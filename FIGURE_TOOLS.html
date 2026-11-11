@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MolScriptSVG: FIGURE TOOLS</title>
+<link rel="stylesheet" href="docs/style.css">
+<link rel="stylesheet" href="docs/documentation.css">
+</head>
+<body>
+<!-- Generated from FIGURE_TOOLS.md by scripts/build-html-docs.py. -->
+<nav><a href="docs/index.html">Manual</a> | <a href="README.html">README</a> |
+<a href="examples/index.html">Examples</a> | <a href="CHANGES.html">Changelog</a></nav>
+<main>
+<h1 id="figure-tools-23">Figure tools (2.3)</h1>
+<p>These additions keep the MolScript script as the figure specification. All
+positions are explicit. Existing scripts keep fixed sampling and residue-wise
+colours unless the new controls are enabled. No new runtime library is needed.</p>
+<h2 id="distances-angles-and-connectors">Distances, angles and connectors</h2>
+<pre><code class="language-text">set labelsize 12, linecolour black, linewidth 0.8, labeloffset 0 1 0;
+distance position res-atom 200 O1B position res-atom 201 MG;
+angle position res-atom 200 O1B position res-atom 201 MG position res-atom 17 OG;
+connector position res-atom 200 N2 2 5 0 &quot;GDP&quot;;
+</code></pre>
+<p><code>distance vector vector;</code> draws a dashed connector with its length at the
+midpoint, to two decimal places, in angstroms (<code>Å</code>). <code>angle vector vector
+vector;</code> measures the angle at the <strong>second</strong> point, draws dashed arms and an
+arc, and labels degrees (<code>deg</code>). Coincident angle arms are errors. Collinear
+arms are supported; a straight angle's arc uses a deterministic plane.</p>
+<p><code>connector vector vector "caption";</code> is a dashed leader with the caption at
+the second endpoint. It does not infer a bond or chemical interaction. Each
+vector may be three numbers or <code>position atom-selection</code>. A multi-atom
+selection means its geometric centroid; an empty selection is an error.
+For example, <code>res-atom A15 CA</code> addresses the PDB residue named <code>A15</code>, not <code>15</code>.</p>
+<p>An optional scale and unit label convert distances:</p>
+<pre><code class="language-text">distance 0 0 0 3 4 0 scale 0.1 &quot;nm&quot;;
+</code></pre>
+<p>This prints <code>0.50 nm</code>. Units are not inferred from the label: the positive
+scale explicitly supplies the conversion. Coordinates remain Angstroms.</p>
+<p>Text uses the current label size, colour, clipping and offset. Place labels
+manually with <code>labeloffset</code>; no automatic collision avoidance is attempted.
+Dash geometry is generated explicitly so that 3D outputs also show gaps.
+The default dash length is 0.3 Å. A positive <code>linedash</code> sets that length using
+the existing 0.04 Å-per-line-unit conversion. A limit of 20,000 dash intervals
+rejects impractically dense patterns. These commands restore graphics state.</p>
+<p>See <a href="examples/ras_measurements.svg">ligand measurements</a> and its
+<a href="examples/ras_measurements.in">script</a>.</p>
+<h3 id="unit-symbols-and-fonts">Unit symbols and fonts</h3>
+<p>Generated distance labels use <code>Å</code> (U+00C5, A with a ring), and MolAuto B-factor
+legend titles use <code>Å²</code>. Script strings are UTF-8; for example:</p>
+<pre><code class="language-text">label 0 0 0 &quot;Distance / Å&quot;;
+legend &quot;B-factor (Å²)&quot; -16 -30 0 32 1.5 0 100 blue-white-red;
+</code></pre>
+<p>SVG, VRML, X3D and WebGL retain UTF-8 text. PostScript uses a Latin-1-encoded
+Times font. MetaPost composes the ring and superscript as vector graphics,
+without requiring TeX. OpenGL and its raster outputs support the symbols with
+both bundled bitmap and optional FreeType fonts; Raster3D uses bundled stroke
+geometry even in the basic build. See <a href="FONTS.html">output fonts</a> for family
+selection and font-file options. The alternative angstrom sign <code>Å</code> (U+212B) is
+also supported. This is not a promise of general Unicode support in the legacy
+fonts: PostScript is limited to Latin-1 and the bundled bitmap/stroke fonts to
+ASCII plus these unit symbols. Avoid legacy Greek <code>labelmask</code> substitutions on
+multibyte text.</p>
+<p>POV-Ray still exports labels as comments, not visible text. Converting SVG to
+PNG preserves the SVG text, independently of the OpenGL font setting.</p>
+<h2 id="backbones-through-c-alpha-atoms">Backbones through C-alpha atoms</h2>
+<p>Use a thin <code>turn</code> to draw a smooth curve through every selected C-alpha atom:</p>
+<pre><code class="language-text">set coilradius 0, linewidth 1.2;
+turn amino-acids;
+</code></pre>
+<p><code>coil</code> performs Priestle smoothing first, so its curve normally <strong>does not</strong>
+pass through the original C-alpha coordinates. Use <code>turn</code>, or explicitly set
+<code>smoothsteps 0</code> before <code>coil</code>, when exact interpolation is wanted. Zero is now
+an accepted smoothing count; the default remains two. This also disables
+coordinate smoothing for strands, but does not turn their ribbon edges or
+arrowheads into a C-alpha trace. <code>trace</code> remains straight atom-to-atom segments.</p>
+<p>SVG, PostScript and MetaPost use exact cubic Bezier controls derived from the
+original Hermite spline, rather than fitting another curve to sampled points.
+Changing <code>segments</code> or <code>curvetolerance</code> subdivides the same thin backbone curve
+without changing its shape, apart from output-coordinate rounding. Colour
+boundaries retain the same tangents; chain breaks are never joined. Vector
+depth sorting still splits paths, so intersection handling remains approximate.
+Other backends retain sampled thin lines; solid tubes keep their own rendering.</p>
+<p>The <a href="examples/ras_curved_lines.svg">thin backbone example</a> now uses <code>turn</code>, with
+small black spheres marking the C-alpha positions. Its
+<a href="examples/ras_curved_lines.in">script</a> is editable.</p>
+<h2 id="adaptive-curve-sampling">Adaptive curve sampling</h2>
+<pre><code class="language-text">set curvetolerance 0.02;
+</code></pre>
+<p>The tolerance is in Angstroms. Sampling is chosen separately for each cubic
+backbone interval in coils, turns, double helices, helices and strand bodies.
+The maximum norm of the cubic's second derivative bounds the centreline
+polyline chord error by <code>M / (8*n*n)</code>. Straight intervals need fewer samples
+than tightly curved ones. An even number of subdivisions retains categorical
+colour boundaries at the interval midpoint.</p>
+<p><code>curvetolerance 0</code> is the default and retains the existing <code>segments</code> rule.
+With a positive tolerance, that rule is replaced for these backbone intervals.
+The minimum is two subdivisions; a requested tolerance requiring over 4,096
+subdivisions per interval produces an error rather than silently being relaxed.
+<code>segments</code> still controls other geometry, such as mesh spheres and cylinders.
+<code>segmentsize</code> still controls vector depth subdivision.</p>
+<p>The bound concerns the sampled centreline, not ribbon-edge rotation, tube
+circumference, arrowheads, pixel coverage, vector depth sorting, or
+POV-Ray spline fitting. It is not screen-space antialiasing and does not change
+the molecular smoothing algorithm. Strand arrowheads retain their fixed layout.</p>
+<p>MolAuto accepts <code>-curvetolerance 0.02</code> and emits the corresponding editable
+state command.</p>
+<h2 id="continuous-scalar-colouring">Continuous scalar colouring</h2>
+<pre><code class="language-text">set colourparts on,
+    residuecolour amino-acids b-factor 0 100 alphafold-gradient,
+    colourinterpolate on;
+</code></pre>
+<p><code>colourinterpolate on</code> interpolates normalized scalar values between adjacent
+residues, then evaluates the original colour ramp at each sampled point. This
+means blue-white-red passes through white, not purple. The ramp and range are
+captured when <code>residuecolour ... b-factor</code> is set; later ramp changes cannot
+silently recolour already assigned residues. Values are clamped to the range
+before interpolation, matching the endpoint colours.</p>
+<p>This affects coils, thin backbone curves, helices and strand bodies. Rendering
+uses sampled colours, not an analytic surface gradient. Enabling interpolation
+also imposes at least 16 subdivisions per interval for colour resolution.
+Native helix cylinders remain residue-banded, and strand arrowheads retain
+their existing categorical treatment.</p>
+<p>The discrete <code>alphafold</code> ramp is never interpolated. Explicit residue colours,
+secondary-structure palettes and sequence rainbows also keep hard boundaries.
+Interpolation requires adjacent residues in the same molecule/chain with the
+same scalar range and ramp. Reassigning an explicit colour clears its scalar
+metadata. As with other copied molecular styling, set scalar colours after a
+<code>copy</code> command if you want interpolation on the new molecule.</p>
+<p><code>colourinterpolate off</code> is the default. MolAuto accepts <code>-colourinterpolate</code>
+with <code>-bfactor</code>, <code>-alphafold_gradient</code> or <code>-alphafold</code>; the last still retains
+its four discrete bins. The option does not override <code>colourparts off</code>.</p>
+<p>See <a href="examples/ras_smooth_scalar.svg">adaptive scalar cartoon</a> and its
+<a href="examples/ras_smooth_scalar.in">script</a>.</p>
+<h2 id="legend-layouts-and-categories">Legend layouts and categories</h2>
+<p>The original legend command remains valid. Append <code>vertical</code> to run low-to-high
+upwards. Append <code>ticks { value "label"; ... }</code> for explicit positions and text:</p>
+<pre><code class="language-text">legend &quot;Confidence&quot; 10 -15 0 1.8 28 0 100 alphafold-gradient vertical
+  ticks { 0 &quot;low&quot;; 70 &quot;confident&quot;; 100 &quot;high&quot;; };
+</code></pre>
+<p>Width and height describe the bar, regardless of orientation. Tick positions
+must increase strictly and lie within LOW and HIGH. An empty <code>ticks {}</code> hides
+ticks and tick labels. Omit the clause to retain the existing automatic ticks.
+Allow space to the right of a vertical bar for labels; text remains horizontal.
+The optional clauses must appear in the order <code>vertical</code>, then <code>ticks</code>.</p>
+<p>Categorical keys use explicit colour/caption pairs:</p>
+<pre><code class="language-text">key &quot;Secondary structure&quot; -22 -4 0 2 15 vertical {
+  red &quot;Helix&quot;;
+  blue &quot;Strand&quot;;
+  grey 0.5 &quot;Coil&quot;;
+};
+</code></pre>
+<p>Omit <code>vertical</code> for left-to-right items. Vertical categories run top-to-bottom.
+Width and height cover the swatch layout; gaps occupy 20% of each swatch cell.
+Labels are below horizontal swatches and to the right of vertical ones.
+Keys do not recolour the molecule: use the same colours in the drawing commands.
+Each key must have at least one item. Both custom ticks and keys allow up to
+256 items. These are scene geometry, not screen overlays.</p>
+<p>See <a href="examples/legend_layouts.svg">layout examples</a> and their
+<a href="examples/legend_layouts.in">script</a>. Earlier legend details remain in
+<a href="ANNOTATIONS_AND_CHECKS.html">ANNOTATIONS_AND_CHECKS.md</a>.</p>
+<h2 id="reusable-views">Reusable views</h2>
+<p>Export a script's cumulative whole-molecule coordinate transform, area, window
+and slab as ordinary MolScript macros:</p>
+<pre><code class="language-bash">./molscript -svg -in model.in -out model.svg -viewout model.view.inc
+./molauto -nice -bfactor -view model.view.inc aligned-model.pdb &gt; aligned-model.in
+./molscript -svg -in aligned-model.in -out aligned-model.svg
+</code></pre>
+<p>The new file contains <code>view_header</code> and <code>view_transform</code>. It is editable text,
+and existing files are deliberately not overwritten. Choose a new filename
+when exporting another view. To reuse it manually:</p>
+<pre><code class="language-text">@&quot;model.view.inc&quot;
+plot
+  $view_header
+  read mol &quot;aligned-model.pdb&quot;;
+  transform atom * $view_transform;
+  coil amino-acids;
+end_plot
+</code></pre>
+<p>Quoted include paths now support spaces. Paths remain relative to the working
+directory, not to the referring script. Import the macros before <code>plot</code>; expand
+the header before coordinate commands. Do not centre again: the saved
+translation is already included. Related structures must be aligned in the
+original coordinate frame. View reuse does not perform structural alignment.</p>
+<p><code>-viewout</code> requires one nonempty plot. It rejects partial-coordinate transforms,
+transforms after drawing, and coordinate reads after transforms, since those
+do not describe a single common frame. It cannot be combined with <code>-check</code>.
+MolAuto <code>-view</code> replaces its usual centring and conflicts with <code>-window</code>,
+<code>-rotate</code> and <code>-translate</code>. It references the supplied macro file rather than
+embedding a second copy.</p>
+<p>This exports the scripted view, not subsequent mouse navigation in OpenGL or
+WebGL. It does not save lighting, labels, colours, perspective settings, or
+backend-specific camera behaviour. Exact image framing requires the same
+backend/aspect settings; <code>area</code> is meaningful for vector output, not every 3D
+viewer. There is no hidden session state.</p>
+<p>See <a href="examples/ras_reused_view.svg">reused Ras view</a>, its
+<a href="examples/ras_reused_view.in">script</a>, and the
+<a href="examples/ras_saved_view.inc">saved macros</a>.</p>
+<h2 id="tests-and-examples">Tests and examples</h2>
+<pre><code class="language-bash">python3 scripts/test-figure-tools.py
+python3 scripts/generate-figure-examples.py
+</code></pre>
+<p>The generator writes four examples and their native scene formats and SVG PNG
+previews. It deliberately replaces the generated <code>examples/ras_saved_view.inc</code>.
+It requires CairoSVG only for previews; the C implementation has no new
+external dependency.</p>
+</main>
+</body>
+</html>

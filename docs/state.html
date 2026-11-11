@@ -1,10 +1,16 @@
 <html>
 <head>
-<title>MolScriptSVG 2.2: The graphics state</title>
+<title>MolScriptSVG 2.3: The graphics state</title>
 <link href="style.css" type="text/css" rel="stylesheet"></link>
 </head>
 
 <body>
+
+<p><strong>New in 2.3:</strong> colour ramps also accept
+<code>blue-white-red</code>, <code>alphafold</code> and
+<code>alphafold-gradient</code>. Use <code>b-factor 0 100 alphafold</code>
+for confidence values. Cylinders now honour <code>colourparts on</code>.
+See <a href="../SCALAR_COLOURS.html">scalar colour documentation</a>.</p>
 
 <h1 align=center>The graphics state</h1>
 
@@ -36,8 +42,10 @@ fine-tune the image.
 <li><a href="#bonddistance">bonddistance</a>
 <li><a href="#bondcross">bondcross</a>
 <li><a href="#coilradius">coilradius</a>
+<li><a href="#colourinterpolate">colourinterpolate</a>
 <li><a href="#colourparts">colourparts</a>
 <li><a href="#colourramp">colourramp</a>
+<li><a href="#curvetolerance">curvetolerance</a>
 <li><a href="#cylinderradius">cylinderradius</a>
 <li><a href="#depthcue">depthcue</a>
 <li><a href="#emissivecolour">emissivecolour</a>
@@ -47,6 +55,7 @@ fine-tune the image.
 <li><a href="#labelbackground">labelbackground</a>
 <li><a href="#labelcentre">labelcentre</a>
 <li><a href="#labelclip">labelclip</a>
+<li><a href="#labelfont">labelfont</a>
 <li><a href="#labelmask">labelmask</a>
 <li><a href="#labeloffset">labeloffset</a>
 <li><a href="#labelrotation">labelrotation</a>
@@ -300,6 +309,18 @@ at the terminii is twice the value of this parameter. The unit is
 <hr>
 
 <h3>
+<a id="colourinterpolate"></a>colourinterpolate &lt; on | off &gt;
+</h3>
+<p>Interpolate scalar values between adjacent residues before evaluating their
+original B-factor or confidence ramp. Requires <code>colourparts on</code> and
+matching scalar ramps/ranges on adjacent residues. Coils, turns, helices and
+strand bodies use sampled colours; helix cylinders remain residue-banded.
+Discrete AlphaFold bins, sequence rainbows and explicitly assigned colours are
+not blended. Default: <code>off</code>. See
+<a href="../FIGURE_TOOLS.html#continuous-scalar-colouring">details</a>.</p>
+<hr>
+
+<h3>
 <a name="colourparts">colourparts
 &lt; <a href="values.html#logical">on</a> |
 <a href="values.html#logical">off</a> &gt;
@@ -347,6 +368,17 @@ performed when setting <a href="#residuecolour">residuecolour</a> and
 <b>Default:</b> <strong>hsb</strong>
 <br>
 <b>Used for:</b> all output modes
+<hr>
+
+<h3>
+<a id="curvetolerance"></a>curvetolerance <i>number</i>
+</h3>
+<p>A positive tolerance in &Aring; selects samples per backbone interval from a
+bound on the cubic centreline's chord error. Default: <code>0</code>, which
+retains fixed <code>segments</code>. The bound does not cover ribbon edges,
+arrowheads, tube circumference or vector occlusion. At most 4,096 subdivisions
+per interval are allowed. See
+<a href="../FIGURE_TOOLS.html#adaptive-curve-sampling">details</a>.</p>
 <hr>
 
 <h3>
@@ -548,6 +580,24 @@ objects as if they were all in front of them.
 <br>
 <b>Used for:</b>
 <a href="output.html#PostScript">PostScript</a> only
+<hr>
+
+<h3>
+<a name="labelfont">labelfont</a>
+<a href="values.html#string"><i>string</i></a>
+</h3>
+
+<p>Select the font for subsequent labels, including legends and measurements.
+Use <code>"default"</code>, <code>"serif"</code>, <code>"sans"</code>,
+<code>"monospace"</code> or a native font name. The state is saved and restored
+by <code>push</code>/<code>pop</code>. The initial value comes from
+<code>-font</code>, or <code>"default"</code> if omitted. Explicitly setting
+<code>"default"</code> restores the backend's original default.</p>
+<p>Supported by SVG, PostScript, MetaPost, VRML, X3D and WebGL. Raster3D offers
+only <code>"default"</code>/<code>"roman"</code> and <code>"monospace"</code>.
+OpenGL/image outputs use global bitmap/FreeType options instead. Unsupported
+non-default selections are errors. See <a href="../FONTS.html">output fonts</a>
+for native names, installation requirements and limitations.</p>
 <hr>
 
 <h3>
@@ -1206,13 +1256,15 @@ to the coordinates of the CA atoms in the selected residues for the
 <a href="residue_commands.html#strand">strand</a> commands.
 <p>
 The higher the value is, the smoother is the path of the coil or
-strand. The <a href="residue_commands.html#coil">coil</a> command would be the
-same as the <a href="residue_commands.html#turn">turn</a> command if this
-parameter were to have the value 0.
+strand. Since 2.3, <code>smoothsteps 0</code> disables coordinate smoothing.
+The <a href="residue_commands.html#coil">coil</a> command then follows the
+same centreline as <a href="residue_commands.html#turn">turn</a>, passing
+through the C-alpha positions. Strand ribbon edges and arrowheads still use
+their own construction.
 <p>
 <b>Default:</b> 2
 <br>
-<b>Required:</b> &gt;= 1
+<b>Required:</b> &gt;= 0
 <br>
 <b>Applies to:</b>
 <a href="residue_commands.html#coil">coil</a>,

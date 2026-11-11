@@ -1,6 +1,6 @@
 /* xform.c
 
-   MolScriptSVG v2.2
+   MolScriptSVG v2.3
 
    Coordinate transformation.
 
@@ -18,6 +18,63 @@
 #include "xform.h"
 #include "global.h"
 #include "select.h"
+#include "graphics.h"
+#include "clib/extent3d.h"
+#include <math.h>
+
+char *view_filename = NULL;
+static double view_matrix[4][4];
+static int view_valid, view_transformed, view_drawn, view_plots;
+
+void
+view_plot_init (void)
+{
+  matrix3_initialize (view_matrix);
+  view_valid = TRUE; view_transformed = view_drawn = FALSE;
+  if (view_filename && ++view_plots > 1) yyerror ("-viewout requires a single plot");
+}
+
+void
+view_note_read (void)
+{
+  if (view_transformed) view_valid = FALSE;
+}
+
+void
+view_note_draw (void)
+{
+  view_drawn = TRUE;
+}
+
+void
+view_export (void)
+{
+  FILE *file;
+  int i, j;
+  vector3 low, high;
+  if (!view_filename) return;
+  if (!view_valid) {
+    yyerror ("cannot export one view after partial transforms, drawing before transforms, or reading coordinates after transforms");
+    return;
+  }
+  ext3d_get_low_high (&low, &high);
+  if (low.x > high.x) { yyerror("cannot export a view of an empty plot"); return; }
+  set_extent();
+  for (i = 0; i < 4; i++) for (j = 0; j < 4; j++)
+    if (!isfinite(view_matrix[i][j])) { yyerror("non-finite view matrix"); return; }
+  file = fopen (view_filename, "wx");
+  if (!file) { yyerror ("cannot create view file (existing files are not overwritten)"); return; }
+  fprintf (file, "! Reusable MolScript view; apply to coordinates in the original frame.\n");
+  fprintf (file, "macro view_header\n  area %.17g %.17g %.17g %.17g;\n  window %.17g;\n  slab %.17g;\nend_macro\n",
+           area[0], area[1], area[2], area[3], 2*window, 2*slab);
+  fprintf (file, "macro view_transform\n  by rotation\n");
+  for (i = 0; i < 3; i++)
+    fprintf (file, "    %.17g %.17g %.17g\n", view_matrix[0][i], view_matrix[1][i], view_matrix[2][i]);
+  fprintf (file, "  by translation %.17g %.17g %.17g\nend_macro\n",
+           view_matrix[3][0], view_matrix[3][1], view_matrix[3][2]);
+  if (ferror(file)) { fclose(file); yyerror("could not write view file"); return; }
+  if (fclose(file)) yyerror("could not close view file");
+}
 
 
 /*============================================================*/
@@ -194,6 +251,12 @@ xform_atoms (void)
   }
 
   pop_atom_selection();
+  if (count) {
+    if (count != total_atoms || view_drawn) view_valid = FALSE;
+    matrix3_concatenate (view_matrix, xform);
+    view_transformed = TRUE;
+  }
+  if (check_mode && !count) yywarning ("empty atom selection for transform");
 
   if (message_mode) {
     int i, j;

@@ -1,0 +1,11 @@
+! Exact backbone spline through C-alpha atoms, marked by small black spheres.
+! Unlike coil (smoothed by default), turn interpolates the C-alpha positions.
+plot
+  read mol "ras.pdb";
+  transform atom * by centre position atom *;
+  set coilradius 0, linewidth 1.2, colourparts on,
+      residuecolour amino-acids rainbow;
+  turn amino-acids;
+  set atomcolour atom CA black, atomradius atom CA 0.15;
+  cpk atom CA;
+end_plot

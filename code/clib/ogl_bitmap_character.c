@@ -1,6 +1,7 @@
 /* Display-independent OpenGL labels. Copyright (C) 2026 James W. Murray.
    Original interface: Copyright (C) 1998 Per Kraulis. See LICENSE.txt. */
 #include "ogl_bitmap_character.h"
+#include "str_utils.h"
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -106,6 +107,28 @@ bitmap_character (int size, int c)
   unsigned char pixels[64] = {0};
   int h = size - 2, w = h * 5 / 7, stride = (w + 7) / 8;
   int x, y;
+  /* Keep a distinct open ring above the full-height A, even at 10 pixels. */
+  if (c == 0xc5 || c == 0x212b) {
+    int ring_w = 3, left = (w - ring_w) / 2;
+    bitmap_character (size, 'A');
+    memset (pixels, 0, sizeof pixels);
+    for (y = 0; y < 3; y++)
+      for (x = 0; x < ring_w; x++)
+        if (y == 1 ? x != 1 : x == 1)
+          pixels[y * stride + (left+x)/8] |= 0x80 >> ((left+x)%8);
+    glBitmap (w, 3, w+2, -h-1, 0, 0, pixels);
+    return;
+  }
+  if (c == 0xb2) {
+    static const unsigned char rows[5] = {6, 9, 2, 4, 15};
+    int height = h * 2 / 3, width = w * 2 / 3;
+    for (y = 0; y < height; y++)
+      for (x = 0; x < width; x++)
+        if (rows[4-y*5/height] & (1 << (3-x*4/width)))
+          pixels[y * stride + x/8] |= 0x80 >> (x%8);
+    glBitmap (w, height, 0, height-h, width+2, 0, pixels);
+    return;
+  }
   if (c < 32 || c > 126) c = '?';
   for (y = 0; y < h; y++)
     for (x = 0; x < w; x++)
@@ -138,8 +161,8 @@ ogl_bitmap_character (void *font, int c)
     unsigned char *pixels;
     int y, stride;
     if (FT_Set_Pixel_Sizes (face, 0, size) ||
-        FT_Load_Char (face, (unsigned char) c, FT_LOAD_RENDER | FT_LOAD_TARGET_MONO)) {
-      fprintf (stderr, "Error: could not rasterize FreeType glyph %u\n", (unsigned char) c);
+        FT_Load_Char (face, c, FT_LOAD_RENDER | FT_LOAD_TARGET_MONO)) {
+      fprintf (stderr, "Error: could not rasterize FreeType glyph %u\n", (unsigned int) c);
       exit (1);
     }
     glyph = face->glyph;
@@ -173,7 +196,8 @@ ogl_bitmap_character (void *font, int c)
 void
 ogl_bitmap_string (void *font, char *str)
 {
+  const char *text = str;
   assert (font);
   assert (str);
-  for (; *str; str++) ogl_bitmap_character (font, (unsigned char) *str);
+  while (*text) ogl_bitmap_character (font, str_utf8_next (&text));
 }

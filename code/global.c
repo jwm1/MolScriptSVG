@@ -1,6 +1,6 @@
 /* global.c
 
-   MolScriptSVG 2.2
+   MolScriptSVG 2.3
 
    Global stuff.
 
@@ -10,6 +10,8 @@
 
 #include <assert.h>
 #include <string.h>
+#include <math.h>
+#include <sys/stat.h>
 
 #include "clib/args.h"
 #include "clib/str_utils.h"
@@ -48,7 +50,7 @@
 
 
 /*------------------------------------------------------------*/
-const char program_str[] = "MolScriptSVG 2.2";
+const char program_str[] = "MolScriptSVG 2.3";
 const char copyright_str[] = "Copyright (C) 1997-1998 Per J. Kraulis";
 char user_str[81];
 
@@ -62,6 +64,9 @@ FILE *outfile;
 boolean message_mode = TRUE;
 boolean exit_on_error = TRUE;
 boolean pretty_format = FALSE;
+boolean check_mode = FALSE;
+boolean svg_groups = TRUE;
+int check_warnings = 0;
 int output_width = 500;
 int output_height = 500;
 
@@ -117,6 +122,8 @@ void
 push_double (double d)
 {
   assert (dstack_size < MAX_DSTACK);
+
+  if (!isfinite(d)) { yyerror ("non-finite numeric value"); return; }
 
   dstack[dstack_size++] = d;
 }
@@ -198,6 +205,9 @@ process_arguments (int *argcp, char *argv[])
     fprintf (stderr, "Usage: molscript [options] < script > outfile\n");
     fprintf (stderr, "-ps -postscript      PostScript file output (default)\n");
     fprintf (stderr, "-svg                 SVG file output\n");
+    fprintf (stderr, "-svgplain            omit semantic groups from SVG output\n");
+    fprintf (stderr, "-viewout filename    export one script view as editable macros (new file only)\n");
+    fprintf (stderr, "-check               validate without output; exit 2 for warnings, 1 for errors\n");
     fprintf (stderr, "-mp -metapost        MetaPost source output\n");
     fprintf (stderr, "-mpaxes              draw projected axes with distance ticks in MetaPost output\n");
     fprintf (stderr, "-pov -povray         POV-Ray scene file output\n");
@@ -232,6 +242,8 @@ process_arguments (int *argcp, char *argv[])
 #endif
 #endif
     fprintf (stderr, "-pretty              nicely formatted output (VRML only)\n");
+    fprintf (stderr, "-font name           label font: default, serif, sans, monospace or native name\n");
+    fprintf (stderr, "                     SVG/PS/MetaPost/VRML/X3D/WebGL; Raster3D: roman/monospace\n");
     fprintf (stderr, "-size width height   size of output image (pixels; default 500 500)\n");
     fprintf (stderr, "-s -silent           silent execution; no messages\n");
     fprintf (stderr, "-out filename        output to the named file, instead of stdout\n");
@@ -241,6 +253,18 @@ process_arguments (int *argcp, char *argv[])
     fprintf (stderr, "-h                   output this message\n");
     banner();
     exit (0);
+  }
+
+  slot = args_exists ("-check");
+  if (slot) {
+    args_flag (slot);
+    check_mode = TRUE;
+    svg_set(); /* Reuse the vector geometry path, but never write it. */
+  }
+  slot = args_exists ("-svgplain");
+  if (slot) {
+    args_flag (slot);
+    svg_groups = FALSE;
   }
 
   slot = args_exists ("-ps");
@@ -495,6 +519,7 @@ process_arguments (int *argcp, char *argv[])
 
   slot = args_exists ("-out");
   if (slot) {
+    if (check_mode) argument_error ("-check cannot be combined with -out", slot);
     str = args_item (slot + 1);
     args_flag (slot);
     if (str) {
@@ -504,6 +529,15 @@ process_arguments (int *argcp, char *argv[])
     } else {
       argument_error ("no filename given for option -out", -1);
     }
+  }
+
+  slot = args_exists ("-viewout");
+  if (slot) {
+    if (check_mode) argument_error ("-viewout cannot be combined with -check", slot);
+    str = args_item (slot+1);
+    if (!str || str[0] == '-') argument_error ("missing view filename", slot);
+    args_flag (slot); args_flag (slot+1);
+    view_filename = str;
   }
 
   slot = args_exists ("-in");
@@ -547,10 +581,21 @@ process_arguments (int *argcp, char *argv[])
     }
   }
 
+  if (output_mode == UNDEFINED_MODE) ps_set();
+  slot = args_exists ("-font");
+  if (slot) {
+    const char *error;
+    str = args_item (slot + 1);
+    if (!str || str[0] == '-') argument_error ("missing -font name", -1);
+    error = label_font_error (str);
+    if (error) argument_error (error, -1);
+    strcpy (default_labelfont, str);
+    args_flag (slot);
+    args_flag (slot + 1);
+  }
+
   if (args_unflagged() >= 0)
     argument_error ("invalid command line option", args_unflagged());
-
-  if (output_mode == UNDEFINED_MODE) ps_set();
 
   return;
 
@@ -567,6 +612,11 @@ set_outfile (const char *mode)
   assert (*mode);
 
   if (output_filename) {
+    struct stat view_stat, out_stat;
+    if (view_filename && !stat(view_filename, &view_stat) && !stat(output_filename, &out_stat) &&
+        view_stat.st_dev == out_stat.st_dev && view_stat.st_ino == out_stat.st_ino) {
+      yyerror ("view file and output file must be different"); return;
+    }
     outfile = fopen (output_filename, mode);
     if (outfile == NULL) yyerror ("could not create the output file");
     output_filename = NULL;

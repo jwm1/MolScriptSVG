@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>MolScriptSVG 2.2: Residue graphics commands</title>
+<title>MolScriptSVG 2.3: Residue graphics commands</title>
 <link href="style.css" type="text/css" rel="stylesheet"></link>
 </head>
 
@@ -357,6 +357,10 @@ The same algorithm is used to create this representation as for
 <a href="#coil">coil</a>, except that no smoothing of the CA positions
 is performed. The coil created by this command therefore goes through
 all the exact CA positions. At least two consecutive CA atoms are needed.
+<p>In SVG, PostScript and MetaPost, thin turns now use exact cubic Bezier
+controls from the original spline, rather than fitting sampled points.
+See the <a href="../examples/ras_curved_lines.svg">C-alpha-marked example</a>
+and <a href="../FIGURE_TOOLS.html#backbones-through-c-alpha-atoms">curve details</a>.
 <p>
 The radius of the turn is determined by the parameter
 <a href="state.html#coilradius">coilradius</a>. If the value of the

@@ -1,14 +1,13 @@
 /* gif_img.c
 
-   MolScriptSVG v2.2
+   MolScriptSVG v2.3
 
    GIF image file.
 
-   This implementation uses the gd 1.3 library by Thomas Boutell,
-   http://www.boutell.com. The source code for this library does *not*
-   use LZW compression, so there is no conflict with the (infamous)
-   Unisys patent on the LZW algorithm. This implementation relies on
-   the 'image.c' code, and therefore implicitly on OpenGL and GLX.
+   GIF encoding uses libgd (https://libgd.github.io/) via gdImageGif.
+   The historical GIF/LZW patents have expired; the old gd 1.3 non-LZW
+   workaround is no longer needed. Rendering uses image.c and OpenGL,
+   with headless EGL or the GLUT/X11 fallback.
 
    Copyright (C) 1998 Per Kraulis
     29-Jul-1998  first attempts

@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MolScriptSVG: ANNOTATIONS AND CHECKS</title>
+<link rel="stylesheet" href="docs/style.css">
+<link rel="stylesheet" href="docs/documentation.css">
+</head>
+<body>
+<!-- Generated from ANNOTATIONS_AND_CHECKS.md by scripts/build-html-docs.py. -->
+<nav><a href="docs/index.html">Manual</a> | <a href="README.html">README</a> |
+<a href="examples/index.html">Examples</a> | <a href="CHANGES.html">Changelog</a></nav>
+<main>
+<h1 id="legends-checking-and-svg-groups-23">Legends, checking and SVG groups (2.3)</h1>
+<p>See <a href="FIGURE_TOOLS.html">FIGURE_TOOLS.md</a> for vertical/custom-tick legends,
+categorical keys, measurements, adaptive sampling and reusable views.</p>
+<h2 id="legends">Legends</h2>
+<p>The native command is:</p>
+<pre><code class="language-text">legend &quot;Title (units)&quot; X Y Z WIDTH HEIGHT LOW HIGH ramp;
+</code></pre>
+<p><code>X Y Z</code> is the lower-left corner in the transformed molecular coordinate
+frame, in Angstroms. The bar runs along positive X; its height runs along
+positive Y. This is ordinary scene geometry, not a screen overlay: it affects
+automatic framing, can be clipped or occluded, and rotates with a 3D scene.
+Leave space for the title above and tick labels below. <code>position</code> followed by
+an atom selection can replace the three position numbers, as for other vectors.</p>
+<p><code>ramp</code> accepts <code>blue-white-red</code>, <code>alphafold</code>, <code>alphafold-gradient</code>, <code>rainbow</code>,
+or <code>from colour to colour</code>. The discrete <code>alphafold</code> key requires LOW=0 and
+HIGH=100; its four swatches have widths proportional to their ranges and ticks
+at 0, 50, 70, 90 and 100. The intervals are &lt;=50, &gt;50 to 70, &gt;70 to 90, &gt;90.
+Other ramps use 256 colour samples and five equally spaced numeric ticks.
+The legend and molecular colours must be given the same range and ramp.</p>
+<p>For example, inside a plot:</p>
+<pre><code class="language-text">set colourparts on,
+    residuecolour amino-acids b-factor 0 100 alphafold;
+coil amino-acids;
+push;
+set labelsize 12;
+legend &quot;pLDDT (B column)&quot; -16 -30 0 32 1.5 0 100 alphafold;
+pop;
+</code></pre>
+<p>Legends use the current label size and line colour. They use opaque swatches,
+centred unrotated text without label offsets, no depth cueing, and solid
+0.5-point ticks in vector output. These local settings do not change later
+drawing commands. Font appearance and lighting in 3D/image outputs follow
+the selected backend; a legend is not a colour-calibration target under 3D
+lighting. Labels may require external fonts in POV-Ray, as ordinary labels do.</p>
+<p>MolAuto can generate the command with the exact range it chose:</p>
+<pre><code class="language-bash">./molauto -nice -alphafold \
+  -legend -16 -30 0 32 1.5 model.pdb &gt; model.in
+./molscript -svg -in model.in -out model.svg
+</code></pre>
+<p><code>-legend X Y Z WIDTH HEIGHT</code> requires <code>-bfactor</code>, <code>-alphafold</code> or
+<code>-alphafold_gradient</code>. MolAuto writes editable commands with a 12-point
+label size. Position is explicit, not automatically collision-avoiding.
+For a fixed <code>window</code>, reserve space for both the molecule and legend.</p>
+<p>Examples: <a href="examples/ras_bfactor_legend.svg">B-factor</a>,
+<a href="examples/ras_confidence_legend.svg">four confidence bins</a>,
+<a href="examples/ras_confidence_gradient_legend.svg">continuous confidence</a>.
+Confidence examples use synthetic values, not an AlphaFold prediction.</p>
+<h2 id="checking-without-rendering">Checking without rendering</h2>
+<pre><code class="language-bash">./molscript -check -in model.in
+</code></pre>
+<p>Coordinate and object paths in scripts are relative to the working directory,
+not to the script. For the supplied examples run from <code>examples</code> instead:</p>
+<pre><code class="language-bash">cd examples
+../molscript -check -in ras_std.in
+</code></pre>
+<p>The checker executes parsing, selections, transforms and the vector geometry
+pipeline. It writes diagnostics only to stderr, creates no output file, and
+does not open X11 or initialize OpenGL. Do not combine <code>-check</code> with an output
+format or <code>-out</code>. It is not merely a syntax check, and large scenes still need
+the memory and computation used to construct their geometry.</p>
+<p>It reports selected atom/residue counts for drawing commands, empty drawing
+selections, empty colour/radius/transform selections, missing CA/P backbone
+atoms, distance breaks, fragments too short for their drawing command, empty
+plots, and geometry extending beyond an explicit window/slab. Existing syntax,
+invalid-number, coordinate and degenerate-geometry errors remain fatal.
+Warnings include lexer location information. An intentional crop still warns.</p>
+<p>Exit status is <strong>0</strong> for no warnings, <strong>2</strong> for warnings, <strong>1</strong> for errors.
+<code>-s</code> suppresses ordinary progress messages but not check results. Fatal errors
+stop checking; the checker does not attempt recovery or rewrite the script.</p>
+<p>Bounds use the existing geometry extent calculation. They are conservative
+for cartoons and do not measure glyph boxes or stroke overhang. The checker
+does not test external fonts, WebGL runtimes, 3D lighting, or every backend's
+capabilities, and does not infer missing coordinates or alter selections.</p>
+<h2 id="semantic-svg-groups">Semantic SVG groups</h2>
+<p>SVG output now records each graphics command automatically. A metadata entry
+in namespace <code>urn:molscript:svg</code> has a stable document-local ID such as
+<code>plot-1-command-3</code>, a command kind, and a snapshot of its resolved selection.
+The snapshot includes molecule/model, chain, residue name/type, and selected
+atom names/alternate locations for atom commands. Residue commands list the
+selected residues, not just the atoms used to build their geometry. Paired
+atom selections are recorded separately, in consumption order.</p>
+<p>Contiguous depth-sorted fragments are enclosed in groups such as:</p>
+<pre><code class="language-xml">&lt;g id=&quot;plot-1-fragment-7&quot;
+   data-command=&quot;plot-1-command-3&quot; data-kind=&quot;helix&quot;&gt;
+  &lt;title&gt;helix&lt;/title&gt;
+  &lt;!-- unchanged graphical primitives --&gt;
+&lt;/g&gt;
+</code></pre>
+<p>A command can have several groups because other geometry passes in front of
+and behind it. Grouping a whole helix in one place would change the image.
+Fragment IDs are unique across plots; all fragments of one command share
+<code>data-command</code>. Empty or fully clipped selections may have metadata but no
+visible fragment. Labels outside the plot clip retain their own groups.</p>
+<p>This is useful for inspecting SVGs or selecting related fragments in an SVG
+editor/script. It does not make every command one editor layer. Metadata
+captures resolved identities rather than the original selection expression;
+explicit lines, objects and legends have command kinds but no atom selection.
+To omit metadata and semantic groups, use <code>-svg -svgplain</code>.</p>
+<h2 id="tests">Tests</h2>
+<pre><code class="language-bash">python3 scripts/test-annotations.py
+</code></pre>
+<p>Tests cover numeric keys and exact discrete colours, custom ramps, validation,
+MolAuto generation, several backends, checker diagnostics/exit statuses,
+output-file protection, escaped selection metadata, multiple plots, and
+pixel-identical rendering with and without semantic groups. CairoSVG and
+Pillow enable the pixel test; Ghostscript and MetaPost enable external checks.</p>
+</main>
+</body>
+</html>

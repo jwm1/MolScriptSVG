@@ -1,6 +1,6 @@
 /* x3d.c
 
-   MolScriptSVG v2.2
+   MolScriptSVG v2.3
 
    X3D Classic
 
@@ -245,7 +245,7 @@ x3d_is_multi_string_field (const char *field)
 {
   return str_eq (field, "info") || str_eq (field, "type") ||
          str_eq (field, "url") || str_eq (field, "parameter") ||
-         str_eq (field, "string") || str_eq (field, "c");
+         str_eq (field, "string") || str_eq (field, "c") || str_eq (field, "family");
 }
 
 
@@ -587,7 +587,9 @@ static int
 x3d_proto_field_arity (const char *field_name)
 {
   if (str_eq (field_name, "p")) return 3;
+  if (str_eq (field_name, "tc") || str_eq (field_name, "bc")) return 1;
   if (str_eq (field_name, "c")) return 1;
+  if (str_eq (field_name, "family")) return 1;
   if (str_eq (field_name, "rad")) return 1;
   if (str_eq (field_name, "dc") || str_eq (field_name, "ec") ||
       str_eq (field_name, "sc")) return 3;
@@ -1513,6 +1515,8 @@ x3d_first_plot (void)
   x3d_finish_node();
 
   x3d_proto ("Cyl");
+  x3d_s_newline ("initializeOnly SFBool tc TRUE");
+  x3d_s_newline ("initializeOnly SFBool bc TRUE");
   x3d_s_newline ("inputOutput SFVec3f p 0 0 0");
   x3d_s_newline ("inputOutput SFRotation r 0 0 1 0");
   x3d_s_newline ("inputOutput SFVec3f s 1 1 1");
@@ -1540,7 +1544,10 @@ x3d_first_plot (void)
   x3d_finish_node();
   x3d_finish_node();
   indent_newline();
-  indent_string ("geometry Cylinder { }");
+  x3d_node ("geometry Cylinder");
+  x3d_s_newline ("top IS tc");
+  x3d_s_newline ("bottom IS bc");
+  x3d_finish_node();
   x3d_finish_node();
   x3d_finish_list();
   x3d_finish_node();
@@ -1601,6 +1608,7 @@ x3d_first_plot (void)
   x3d_s_newline ("initializeOnly SFVec3f p 0 0 0");
   x3d_s_newline ("initializeOnly SFFloat sz 1");
   x3d_s_newline ("initializeOnly MFString c []");
+  x3d_s_newline ("initializeOnly MFString family [\"SERIF\"]");
   x3d_s_newline ("initializeOnly SFVec3f o 0 0 0");
   x3d_s_newline ("initializeOnly SFColor dc 1 1 1");
   x3d_s_newline ("initializeOnly SFColor ec 0 0 0");
@@ -1633,6 +1641,7 @@ x3d_first_plot (void)
   x3d_node ("geometry Text");
   x3d_s_newline ("string IS c");
   x3d_node ("fontStyle FontStyle");
+  x3d_s_newline ("family IS family");
   indent_string ("size IS sz");
   x3d_finish_node();
   x3d_finish_node();
@@ -2269,6 +2278,8 @@ x3d_cylinder (vector3 *v1, vector3 *v2)
 
   indent_newline();
   x3d_node ("Cyl");
+  if (!cylinder_start_cap) x3d_s_newline ("tc FALSE");
+  if (!cylinder_end_cap) x3d_s_newline ("bc FALSE");
   indent_string ("p ");
   x3d_v3 (&middle);
   output_rot (&rot, angle);
@@ -2426,6 +2437,8 @@ x3d_label (vector3 *p, char *label, colour *c)
   x3d_v3 (p);
   indent_string ("c");
   x3d_s_quoted (label);
+  indent_string ("family");
+  x3d_s_quoted ((char *) label_font_name (current_state, X3D_MODE));
   if (v3_length (&(current_state->labeloffset)) >= 0.001) {
     indent_string (" o ");
     x3d_v3 (&(current_state->labeloffset));

@@ -1,6 +1,6 @@
 /* povray.h
 
-   MolScriptSVG v2.2
+   MolScriptSVG v2.3
 
    POV-Ray scene file output.
 */

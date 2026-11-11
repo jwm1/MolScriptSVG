@@ -1,0 +1,2731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MolScriptSVG 2.3</title>
+  <script defer src="https://cdn.jsdelivr.net/npm/x_ite@12.1.9/dist/x_ite.min.js"></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', function () {
+      try {
+        const scene = document.getElementById('molscript-scene-data');
+        const canvas = document.getElementById('molscript-scene');
+        const xml = scene.value.trimStart();
+        console.log('MolScriptSVG WebGL: parsing XML scene', xml.length);
+        const doc = new DOMParser().parseFromString(xml, 'application/xml');
+        const parseError = doc.querySelector('parsererror');
+        if (parseError) {
+          throw new Error(parseError.textContent || 'X3D XML parse error');
+        }
+        canvas.appendChild(document.importNode(doc.documentElement, true));
+        console.log('MolScriptSVG WebGL: scene attached');
+      } catch (error) {
+        console.error('MolScriptSVG WebGL load failed:', error);
+      }
+    });
+  </script>
+  <style>
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      background: #ffffff;
+    }
+    x3d-canvas {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+    }
+    #molscript-scene-data {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <textarea id="molscript-scene-data">&lt;?xml version="1.0" encoding="UTF-8"?>
+&lt;X3D profile="Immersive" version="3.3" xmlns:xsd="http://www.w3.org/2001/XMLSchema-instance" xsd:noNamespaceSchemaLocation="http://www.web3d.org/specifications/x3d-3.3.xsd">
+  &lt;Scene>
+  &lt;WorldInfo info="&amp;quot;Program: MolScriptSVG 2.3, Copyright (C) 1997-1998 Per J. Kraulis&amp;quot; &amp;quot;Author: jwm&amp;quot;"/>
+  &lt;ProtoDeclare name="Ball">
+    &lt;ProtoInterface>
+      &lt;field accessType="inputOutput" type="SFVec3f" name="p" value="0 0 0"/>
+      &lt;field accessType="initializeOnly" type="SFFloat" name="rad" value="1.5"/>
+      &lt;field accessType="initializeOnly" type="SFColor" name="dc" value="1 1 1"/>
+      &lt;field accessType="initializeOnly" type="SFColor" name="ec" value="0 0 0"/>
+      &lt;field accessType="initializeOnly" type="SFColor" name="sc" value="0.2 0.2 0.2"/>
+      &lt;field accessType="initializeOnly" type="SFFloat" name="sh" value="0"/>
+      &lt;field accessType="initializeOnly" type="SFFloat" name="tr" value="0"/>
+    &lt;/ProtoInterface>
+    &lt;ProtoBody>
+      &lt;Transform>
+        &lt;Shape>
+          &lt;Appearance>
+            &lt;Material>
+              &lt;IS>
+                &lt;connect nodeField="diffuseColor" protoField="dc"/>
+                &lt;connect nodeField="emissiveColor" protoField="ec"/>
+                &lt;connect nodeField="specularColor" protoField="sc"/>
+                &lt;connect nodeField="shininess" protoField="sh"/>
+                &lt;connect nodeField="transparency" protoField="tr"/>
+              &lt;/IS>
+            &lt;/Material>
+          &lt;/Appearance>
+          &lt;Sphere>
+            &lt;IS>
+              &lt;connect nodeField="radius" protoField="rad"/>
+            &lt;/IS>
+          &lt;/Sphere>
+        &lt;/Shape>
+        &lt;IS>
+          &lt;connect nodeField="translation" protoField="p"/>
+        &lt;/IS>
+      &lt;/Transform>
+    &lt;/ProtoBody>
+  &lt;/ProtoDeclare>
+  &lt;ProtoDeclare name="Cyl">
+    &lt;ProtoInterface>
+      &lt;field accessType="initializeOnly" type="SFBool" name="tc" value="TRUE"/>
+      &lt;field accessType="initializeOnly" type="SFBool" name="bc" value="TRUE"/>
+      &lt;field accessType="inputOutput" type="SFVec3f" name="p" value="0 0 0"/>
+      &lt;field accessType="inputOutput" type="SFRotation" name="r" value="0 0 1 0"/>
+      &lt;field accessType="inputOutput" type="SFVec3f" name="s" value="1 1 1"/>
+      &lt;field accessType="initializeOnly" type="SFColor" name="dc" value="1 1 1"/>
+      &lt;field accessType="initializeOnly" type="SFColor" name="ec" value="0 0 0"/>
+      &lt;field accessType="initializeOnly" type="SFColor" name="sc" value="0.2 0.2 0.2"/>
+      &lt;field accessType="initializeOnly" type="SFFloat" name="sh" value="0"/>
+      &lt;field accessType="initializeOnly" type="SFFloat" name="tr" value="0"/>
+    &lt;/ProtoInterface>
+    &lt;ProtoBody>
+      &lt;Transform>
+        &lt;Shape>
+          &lt;Appearance>
+            &lt;Material>
+              &lt;IS>
+                &lt;connect nodeField="diffuseColor" protoField="dc"/>
+                &lt;connect nodeField="emissiveColor" protoField="ec"/>
+                &lt;connect nodeField="specularColor" protoField="sc"/>
+                &lt;connect nodeField="shininess" protoField="sh"/>
+                &lt;connect nodeField="transparency" protoField="tr"/>
+              &lt;/IS>
+            &lt;/Material>
+          &lt;/Appearance>
+          &lt;Cylinder>
+            &lt;IS>
+              &lt;connect nodeField="top" protoField="tc"/>
+              &lt;connect nodeField="bottom" protoField="bc"/>
+            &lt;/IS>
+          &lt;/Cylinder>
+        &lt;/Shape>
+        &lt;IS>
+          &lt;connect nodeField="translation" protoField="p"/>
+          &lt;connect nodeField="rotation" protoField="r"/>
+          &lt;connect nodeField="scale" protoField="s"/>
+        &lt;/IS>
+      &lt;/Transform>
+    &lt;/ProtoBody>
+  &lt;/ProtoDeclare>
+  &lt;ProtoDeclare name="Stick">
+    &lt;ProtoInterface>
+      &lt;field accessType="inputOutput" type="SFVec3f" name="p" value="0 0 0"/>
+      &lt;field accessType="inputOutput" type="SFRotation" name="r" value="0 0 1 0"/>
+      &lt;field accessType="inputOutput" type="SFVec3f" name="s" value="1 1 1"/>
+      &lt;field accessType="initializeOnly" type="SFColor" name="dc" value="1 1 1"/>
+      &lt;field accessType="initializeOnly" type="SFColor" name="ec" value="0 0 0"/>
+      &lt;field accessType="initializeOnly" type="SFColor" name="sc" value="0.2 0.2 0.2"/>
+      &lt;field accessType="initializeOnly" type="SFFloat" name="sh" value="0"/>
+      &lt;field accessType="initializeOnly" type="SFFloat" name="tr" value="0"/>
+    &lt;/ProtoInterface>
+    &lt;ProtoBody>
+      &lt;Transform>
+        &lt;Shape>
+          &lt;Appearance>
+            &lt;Material>
+              &lt;IS>
+                &lt;connect nodeField="diffuseColor" protoField="dc"/>
+                &lt;connect nodeField="emissiveColor" protoField="ec"/>
+                &lt;connect nodeField="specularColor" protoField="sc"/>
+                &lt;connect nodeField="shininess" protoField="sh"/>
+                &lt;connect nodeField="transparency" protoField="tr"/>
+              &lt;/IS>
+            &lt;/Material>
+          &lt;/Appearance>
+          &lt;Extrusion spine="0 -1 0 0 1 0" crossSection="1 0 0.707107 -0.707107 -1.83697e-16 -1 -0.707107 -0.707107 -1 1.22465e-16 -0.707107 0.707107 6.12323e-17 1 0.707107 0.707107 1 0" beginCap="FALSE" endCap="FALSE" creaseAngle="1.7"/>
+        &lt;/Shape>
+        &lt;IS>
+          &lt;connect nodeField="translation" protoField="p"/>
+          &lt;connect nodeField="rotation" protoField="r"/>
+          &lt;connect nodeField="scale" protoField="s"/>
+        &lt;/IS>
+      &lt;/Transform>
+    &lt;/ProtoBody>
+  &lt;/ProtoDeclare>
+  &lt;ProtoDeclare name="Label">
+    &lt;ProtoInterface>
+      &lt;field accessType="initializeOnly" type="SFVec3f" name="p" value="0 0 0"/>
+      &lt;field accessType="initializeOnly" type="SFFloat" name="sz" value="1"/>
+      &lt;field accessType="initializeOnly" type="MFString" name="c" value=""/>
+      &lt;field accessType="initializeOnly" type="MFString" name="family" value="&amp;quot;SERIF&amp;quot;"/>
+      &lt;field accessType="initializeOnly" type="SFVec3f" name="o" value="0 0 0"/>
+      &lt;field accessType="initializeOnly" type="SFColor" name="dc" value="1 1 1"/>
+      &lt;field accessType="initializeOnly" type="SFColor" name="ec" value="0 0 0"/>
+      &lt;field accessType="initializeOnly" type="SFColor" name="sc" value="0.2 0.2 0.2"/>
+      &lt;field accessType="initializeOnly" type="SFFloat" name="sh" value="0"/>
+      &lt;field accessType="initializeOnly" type="SFFloat" name="tr" value="0"/>
+    &lt;/ProtoInterface>
+    &lt;ProtoBody>
+      &lt;Transform>
+        &lt;Billboard axisOfRotation="0 0 0">
+          &lt;Transform>
+            &lt;Shape>
+              &lt;Appearance>
+                &lt;Material>
+                  &lt;IS>
+                    &lt;connect nodeField="diffuseColor" protoField="dc"/>
+                    &lt;connect nodeField="emissiveColor" protoField="ec"/>
+                    &lt;connect nodeField="specularColor" protoField="sc"/>
+                    &lt;connect nodeField="shininess" protoField="sh"/>
+                    &lt;connect nodeField="transparency" protoField="tr"/>
+                  &lt;/IS>
+                &lt;/Material>
+              &lt;/Appearance>
+              &lt;Text>
+                &lt;FontStyle>
+                  &lt;IS>
+                    &lt;connect nodeField="family" protoField="family"/>
+                    &lt;connect nodeField="size" protoField="sz"/>
+                  &lt;/IS>
+                &lt;/FontStyle>
+                &lt;IS>
+                  &lt;connect nodeField="string" protoField="c"/>
+                &lt;/IS>
+              &lt;/Text>
+            &lt;/Shape>
+            &lt;IS>
+              &lt;connect nodeField="translation" protoField="o"/>
+            &lt;/IS>
+          &lt;/Transform>
+        &lt;/Billboard>
+        &lt;IS>
+          &lt;connect nodeField="translation" protoField="p"/>
+        &lt;/IS>
+      &lt;/Transform>
+    &lt;/ProtoBody>
+  &lt;/ProtoDeclare>
+  &lt;Collision collide="FALSE" bboxCenter="-4.56 -1.75 0" bboxSize="36.88 37.5 2">
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -15.00 0.00 11.80 -15.00 0.00 11.80 -14.89 0.00 10.00 -15.00 0.00 11.80 -14.89 0.00 10.00 -14.89 0.00"/>
+        &lt;Color color="0.933502 0.518995 0.325398 0.933502 0.518995 0.325398 0.933502 0.518995 0.325398 0.933502 0.518995 0.325398 0.933502 0.518995 0.325398 0.933502 0.518995 0.325398"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -14.89 0.00 11.80 -14.89 0.00 11.80 -14.78 0.00 10.00 -14.89 0.00 11.80 -14.78 0.00 10.00 -14.78 0.00"/>
+        &lt;Color color="0.933839 0.521691 0.325214 0.933839 0.521691 0.325214 0.933839 0.521691 0.325214 0.933839 0.521691 0.325214 0.933839 0.521691 0.325214 0.933839 0.521691 0.325214"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -14.78 0.00 11.80 -14.78 0.00 11.80 -14.67 0.00 10.00 -14.78 0.00 11.80 -14.67 0.00 10.00 -14.67 0.00"/>
+        &lt;Color color="0.934176 0.524387 0.325031 0.934176 0.524387 0.325031 0.934176 0.524387 0.325031 0.934176 0.524387 0.325031 0.934176 0.524387 0.325031 0.934176 0.524387 0.325031"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -14.67 0.00 11.80 -14.67 0.00 11.80 -14.56 0.00 10.00 -14.67 0.00 11.80 -14.56 0.00 10.00 -14.56 0.00"/>
+        &lt;Color color="0.934513 0.527083 0.324847 0.934513 0.527083 0.324847 0.934513 0.527083 0.324847 0.934513 0.527083 0.324847 0.934513 0.527083 0.324847 0.934513 0.527083 0.324847"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -14.56 0.00 11.80 -14.56 0.00 11.80 -14.45 0.00 10.00 -14.56 0.00 11.80 -14.45 0.00 10.00 -14.45 0.00"/>
+        &lt;Color color="0.93485 0.529779 0.324663 0.93485 0.529779 0.324663 0.93485 0.529779 0.324663 0.93485 0.529779 0.324663 0.93485 0.529779 0.324663 0.93485 0.529779 0.324663"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -14.45 0.00 11.80 -14.45 0.00 11.80 -14.34 0.00 10.00 -14.45 0.00 11.80 -14.34 0.00 10.00 -14.34 0.00"/>
+        &lt;Color color="0.935187 0.532475 0.324479 0.935187 0.532475 0.324479 0.935187 0.532475 0.324479 0.935187 0.532475 0.324479 0.935187 0.532475 0.324479 0.935187 0.532475 0.324479"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -14.34 0.00 11.80 -14.34 0.00 11.80 -14.23 0.00 10.00 -14.34 0.00 11.80 -14.23 0.00 10.00 -14.23 0.00"/>
+        &lt;Color color="0.935524 0.535172 0.324295 0.935524 0.535172 0.324295 0.935524 0.535172 0.324295 0.935524 0.535172 0.324295 0.935524 0.535172 0.324295 0.935524 0.535172 0.324295"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -14.23 0.00 11.80 -14.23 0.00 11.80 -14.12 0.00 10.00 -14.23 0.00 11.80 -14.12 0.00 10.00 -14.12 0.00"/>
+        &lt;Color color="0.935861 0.537868 0.324112 0.935861 0.537868 0.324112 0.935861 0.537868 0.324112 0.935861 0.537868 0.324112 0.935861 0.537868 0.324112 0.935861 0.537868 0.324112"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -14.12 0.00 11.80 -14.12 0.00 11.80 -14.02 0.00 10.00 -14.12 0.00 11.80 -14.02 0.00 10.00 -14.02 0.00"/>
+        &lt;Color color="0.936198 0.540564 0.323928 0.936198 0.540564 0.323928 0.936198 0.540564 0.323928 0.936198 0.540564 0.323928 0.936198 0.540564 0.323928 0.936198 0.540564 0.323928"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -14.02 0.00 11.80 -14.02 0.00 11.80 -13.91 0.00 10.00 -14.02 0.00 11.80 -13.91 0.00 10.00 -13.91 0.00"/>
+        &lt;Color color="0.936535 0.54326 0.323744 0.936535 0.54326 0.323744 0.936535 0.54326 0.323744 0.936535 0.54326 0.323744 0.936535 0.54326 0.323744 0.936535 0.54326 0.323744"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -13.91 0.00 11.80 -13.91 0.00 11.80 -13.80 0.00 10.00 -13.91 0.00 11.80 -13.80 0.00 10.00 -13.80 0.00"/>
+        &lt;Color color="0.936872 0.545956 0.32356 0.936872 0.545956 0.32356 0.936872 0.545956 0.32356 0.936872 0.545956 0.32356 0.936872 0.545956 0.32356 0.936872 0.545956 0.32356"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -13.80 0.00 11.80 -13.80 0.00 11.80 -13.69 0.00 10.00 -13.80 0.00 11.80 -13.69 0.00 10.00 -13.69 0.00"/>
+        &lt;Color color="0.937209 0.548652 0.323376 0.937209 0.548652 0.323376 0.937209 0.548652 0.323376 0.937209 0.548652 0.323376 0.937209 0.548652 0.323376 0.937209 0.548652 0.323376"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -13.69 0.00 11.80 -13.69 0.00 11.80 -13.58 0.00 10.00 -13.69 0.00 11.80 -13.58 0.00 10.00 -13.58 0.00"/>
+        &lt;Color color="0.937546 0.551348 0.323192 0.937546 0.551348 0.323192 0.937546 0.551348 0.323192 0.937546 0.551348 0.323192 0.937546 0.551348 0.323192 0.937546 0.551348 0.323192"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -13.58 0.00 11.80 -13.58 0.00 11.80 -13.47 0.00 10.00 -13.58 0.00 11.80 -13.47 0.00 10.00 -13.47 0.00"/>
+        &lt;Color color="0.937883 0.554044 0.323009 0.937883 0.554044 0.323009 0.937883 0.554044 0.323009 0.937883 0.554044 0.323009 0.937883 0.554044 0.323009 0.937883 0.554044 0.323009"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -13.47 0.00 11.80 -13.47 0.00 11.80 -13.36 0.00 10.00 -13.47 0.00 11.80 -13.36 0.00 10.00 -13.36 0.00"/>
+        &lt;Color color="0.93822 0.55674 0.322825 0.93822 0.55674 0.322825 0.93822 0.55674 0.322825 0.93822 0.55674 0.322825 0.93822 0.55674 0.322825 0.93822 0.55674 0.322825"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -13.36 0.00 11.80 -13.36 0.00 11.80 -13.25 0.00 10.00 -13.36 0.00 11.80 -13.25 0.00 10.00 -13.25 0.00"/>
+        &lt;Color color="0.938557 0.559436 0.322641 0.938557 0.559436 0.322641 0.938557 0.559436 0.322641 0.938557 0.559436 0.322641 0.938557 0.559436 0.322641 0.938557 0.559436 0.322641"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -13.25 0.00 11.80 -13.25 0.00 11.80 -13.14 0.00 10.00 -13.25 0.00 11.80 -13.14 0.00 10.00 -13.14 0.00"/>
+        &lt;Color color="0.938894 0.562132 0.322457 0.938894 0.562132 0.322457 0.938894 0.562132 0.322457 0.938894 0.562132 0.322457 0.938894 0.562132 0.322457 0.938894 0.562132 0.322457"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -13.14 0.00 11.80 -13.14 0.00 11.80 -13.03 0.00 10.00 -13.14 0.00 11.80 -13.03 0.00 10.00 -13.03 0.00"/>
+        &lt;Color color="0.939231 0.564828 0.322273 0.939231 0.564828 0.322273 0.939231 0.564828 0.322273 0.939231 0.564828 0.322273 0.939231 0.564828 0.322273 0.939231 0.564828 0.322273"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -13.03 0.00 11.80 -13.03 0.00 11.80 -12.92 0.00 10.00 -13.03 0.00 11.80 -12.92 0.00 10.00 -12.92 0.00"/>
+        &lt;Color color="0.939568 0.567525 0.322089 0.939568 0.567525 0.322089 0.939568 0.567525 0.322089 0.939568 0.567525 0.322089 0.939568 0.567525 0.322089 0.939568 0.567525 0.322089"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -12.92 0.00 11.80 -12.92 0.00 11.80 -12.81 0.00 10.00 -12.92 0.00 11.80 -12.81 0.00 10.00 -12.81 0.00"/>
+        &lt;Color color="0.939905 0.570221 0.321906 0.939905 0.570221 0.321906 0.939905 0.570221 0.321906 0.939905 0.570221 0.321906 0.939905 0.570221 0.321906 0.939905 0.570221 0.321906"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -12.81 0.00 11.80 -12.81 0.00 11.80 -12.70 0.00 10.00 -12.81 0.00 11.80 -12.70 0.00 10.00 -12.70 0.00"/>
+        &lt;Color color="0.940242 0.572917 0.321722 0.940242 0.572917 0.321722 0.940242 0.572917 0.321722 0.940242 0.572917 0.321722 0.940242 0.572917 0.321722 0.940242 0.572917 0.321722"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -12.70 0.00 11.80 -12.70 0.00 11.80 -12.59 0.00 10.00 -12.70 0.00 11.80 -12.59 0.00 10.00 -12.59 0.00"/>
+        &lt;Color color="0.940579 0.575613 0.321538 0.940579 0.575613 0.321538 0.940579 0.575613 0.321538 0.940579 0.575613 0.321538 0.940579 0.575613 0.321538 0.940579 0.575613 0.321538"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -12.59 0.00 11.80 -12.59 0.00 11.80 -12.48 0.00 10.00 -12.59 0.00 11.80 -12.48 0.00 10.00 -12.48 0.00"/>
+        &lt;Color color="0.940916 0.578309 0.321354 0.940916 0.578309 0.321354 0.940916 0.578309 0.321354 0.940916 0.578309 0.321354 0.940916 0.578309 0.321354 0.940916 0.578309 0.321354"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -12.48 0.00 11.80 -12.48 0.00 11.80 -12.38 0.00 10.00 -12.48 0.00 11.80 -12.38 0.00 10.00 -12.38 0.00"/>
+        &lt;Color color="0.941253 0.581005 0.32117 0.941253 0.581005 0.32117 0.941253 0.581005 0.32117 0.941253 0.581005 0.32117 0.941253 0.581005 0.32117 0.941253 0.581005 0.32117"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -12.38 0.00 11.80 -12.38 0.00 11.80 -12.27 0.00 10.00 -12.38 0.00 11.80 -12.27 0.00 10.00 -12.27 0.00"/>
+        &lt;Color color="0.94159 0.583701 0.320987 0.94159 0.583701 0.320987 0.94159 0.583701 0.320987 0.94159 0.583701 0.320987 0.94159 0.583701 0.320987 0.94159 0.583701 0.320987"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -12.27 0.00 11.80 -12.27 0.00 11.80 -12.16 0.00 10.00 -12.27 0.00 11.80 -12.16 0.00 10.00 -12.16 0.00"/>
+        &lt;Color color="0.941927 0.586397 0.320803 0.941927 0.586397 0.320803 0.941927 0.586397 0.320803 0.941927 0.586397 0.320803 0.941927 0.586397 0.320803 0.941927 0.586397 0.320803"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -12.16 0.00 11.80 -12.16 0.00 11.80 -12.05 0.00 10.00 -12.16 0.00 11.80 -12.05 0.00 10.00 -12.05 0.00"/>
+        &lt;Color color="0.942264 0.589093 0.320619 0.942264 0.589093 0.320619 0.942264 0.589093 0.320619 0.942264 0.589093 0.320619 0.942264 0.589093 0.320619 0.942264 0.589093 0.320619"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -12.05 0.00 11.80 -12.05 0.00 11.80 -11.94 0.00 10.00 -12.05 0.00 11.80 -11.94 0.00 10.00 -11.94 0.00"/>
+        &lt;Color color="0.942601 0.591789 0.320435 0.942601 0.591789 0.320435 0.942601 0.591789 0.320435 0.942601 0.591789 0.320435 0.942601 0.591789 0.320435 0.942601 0.591789 0.320435"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -11.94 0.00 11.80 -11.94 0.00 11.80 -11.83 0.00 10.00 -11.94 0.00 11.80 -11.83 0.00 10.00 -11.83 0.00"/>
+        &lt;Color color="0.942938 0.594485 0.320251 0.942938 0.594485 0.320251 0.942938 0.594485 0.320251 0.942938 0.594485 0.320251 0.942938 0.594485 0.320251 0.942938 0.594485 0.320251"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -11.83 0.00 11.80 -11.83 0.00 11.80 -11.72 0.00 10.00 -11.83 0.00 11.80 -11.72 0.00 10.00 -11.72 0.00"/>
+        &lt;Color color="0.943275 0.597181 0.320067 0.943275 0.597181 0.320067 0.943275 0.597181 0.320067 0.943275 0.597181 0.320067 0.943275 0.597181 0.320067 0.943275 0.597181 0.320067"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -11.72 0.00 11.80 -11.72 0.00 11.80 -11.61 0.00 10.00 -11.72 0.00 11.80 -11.61 0.00 10.00 -11.61 0.00"/>
+        &lt;Color color="0.943612 0.599877 0.319884 0.943612 0.599877 0.319884 0.943612 0.599877 0.319884 0.943612 0.599877 0.319884 0.943612 0.599877 0.319884 0.943612 0.599877 0.319884"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -11.61 0.00 11.80 -11.61 0.00 11.80 -11.50 0.00 10.00 -11.61 0.00 11.80 -11.50 0.00 10.00 -11.50 0.00"/>
+        &lt;Color color="0.943949 0.602574 0.3197 0.943949 0.602574 0.3197 0.943949 0.602574 0.3197 0.943949 0.602574 0.3197 0.943949 0.602574 0.3197 0.943949 0.602574 0.3197"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -11.50 0.00 11.80 -11.50 0.00 11.80 -11.39 0.00 10.00 -11.50 0.00 11.80 -11.39 0.00 10.00 -11.39 0.00"/>
+        &lt;Color color="0.944286 0.60527 0.319516 0.944286 0.60527 0.319516 0.944286 0.60527 0.319516 0.944286 0.60527 0.319516 0.944286 0.60527 0.319516 0.944286 0.60527 0.319516"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -11.39 0.00 11.80 -11.39 0.00 11.80 -11.28 0.00 10.00 -11.39 0.00 11.80 -11.28 0.00 10.00 -11.28 0.00"/>
+        &lt;Color color="0.944623 0.607966 0.319332 0.944623 0.607966 0.319332 0.944623 0.607966 0.319332 0.944623 0.607966 0.319332 0.944623 0.607966 0.319332 0.944623 0.607966 0.319332"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -11.28 0.00 11.80 -11.28 0.00 11.80 -11.17 0.00 10.00 -11.28 0.00 11.80 -11.17 0.00 10.00 -11.17 0.00"/>
+        &lt;Color color="0.94496 0.610662 0.319148 0.94496 0.610662 0.319148 0.94496 0.610662 0.319148 0.94496 0.610662 0.319148 0.94496 0.610662 0.319148 0.94496 0.610662 0.319148"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -11.17 0.00 11.80 -11.17 0.00 11.80 -11.06 0.00 10.00 -11.17 0.00 11.80 -11.06 0.00 10.00 -11.06 0.00"/>
+        &lt;Color color="0.945297 0.613358 0.318964 0.945297 0.613358 0.318964 0.945297 0.613358 0.318964 0.945297 0.613358 0.318964 0.945297 0.613358 0.318964 0.945297 0.613358 0.318964"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -11.06 0.00 11.80 -11.06 0.00 11.80 -10.95 0.00 10.00 -11.06 0.00 11.80 -10.95 0.00 10.00 -10.95 0.00"/>
+        &lt;Color color="0.945634 0.616054 0.318781 0.945634 0.616054 0.318781 0.945634 0.616054 0.318781 0.945634 0.616054 0.318781 0.945634 0.616054 0.318781 0.945634 0.616054 0.318781"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -10.95 0.00 11.80 -10.95 0.00 11.80 -10.84 0.00 10.00 -10.95 0.00 11.80 -10.84 0.00 10.00 -10.84 0.00"/>
+        &lt;Color color="0.945971 0.61875 0.318597 0.945971 0.61875 0.318597 0.945971 0.61875 0.318597 0.945971 0.61875 0.318597 0.945971 0.61875 0.318597 0.945971 0.61875 0.318597"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -10.84 0.00 11.80 -10.84 0.00 11.80 -10.73 0.00 10.00 -10.84 0.00 11.80 -10.73 0.00 10.00 -10.73 0.00"/>
+        &lt;Color color="0.946308 0.621446 0.318413 0.946308 0.621446 0.318413 0.946308 0.621446 0.318413 0.946308 0.621446 0.318413 0.946308 0.621446 0.318413 0.946308 0.621446 0.318413"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -10.73 0.00 11.80 -10.73 0.00 11.80 -10.62 0.00 10.00 -10.73 0.00 11.80 -10.62 0.00 10.00 -10.62 0.00"/>
+        &lt;Color color="0.946645 0.624142 0.318229 0.946645 0.624142 0.318229 0.946645 0.624142 0.318229 0.946645 0.624142 0.318229 0.946645 0.624142 0.318229 0.946645 0.624142 0.318229"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -10.62 0.00 11.80 -10.62 0.00 11.80 -10.52 0.00 10.00 -10.62 0.00 11.80 -10.52 0.00 10.00 -10.52 0.00"/>
+        &lt;Color color="0.946982 0.626838 0.318045 0.946982 0.626838 0.318045 0.946982 0.626838 0.318045 0.946982 0.626838 0.318045 0.946982 0.626838 0.318045 0.946982 0.626838 0.318045"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -10.52 0.00 11.80 -10.52 0.00 11.80 -10.41 0.00 10.00 -10.52 0.00 11.80 -10.41 0.00 10.00 -10.41 0.00"/>
+        &lt;Color color="0.947319 0.629534 0.317862 0.947319 0.629534 0.317862 0.947319 0.629534 0.317862 0.947319 0.629534 0.317862 0.947319 0.629534 0.317862 0.947319 0.629534 0.317862"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -10.41 0.00 11.80 -10.41 0.00 11.80 -10.30 0.00 10.00 -10.41 0.00 11.80 -10.30 0.00 10.00 -10.30 0.00"/>
+        &lt;Color color="0.947656 0.63223 0.317678 0.947656 0.63223 0.317678 0.947656 0.63223 0.317678 0.947656 0.63223 0.317678 0.947656 0.63223 0.317678 0.947656 0.63223 0.317678"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -10.30 0.00 11.80 -10.30 0.00 11.80 -10.19 0.00 10.00 -10.30 0.00 11.80 -10.19 0.00 10.00 -10.19 0.00"/>
+        &lt;Color color="0.947993 0.634926 0.317494 0.947993 0.634926 0.317494 0.947993 0.634926 0.317494 0.947993 0.634926 0.317494 0.947993 0.634926 0.317494 0.947993 0.634926 0.317494"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -10.19 0.00 11.80 -10.19 0.00 11.80 -10.08 0.00 10.00 -10.19 0.00 11.80 -10.08 0.00 10.00 -10.08 0.00"/>
+        &lt;Color color="0.94833 0.637623 0.31731 0.94833 0.637623 0.31731 0.94833 0.637623 0.31731 0.94833 0.637623 0.31731 0.94833 0.637623 0.31731 0.94833 0.637623 0.31731"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -10.08 0.00 11.80 -10.08 0.00 11.80 -9.97 0.00 10.00 -10.08 0.00 11.80 -9.97 0.00 10.00 -9.97 0.00"/>
+        &lt;Color color="0.948667 0.640319 0.317126 0.948667 0.640319 0.317126 0.948667 0.640319 0.317126 0.948667 0.640319 0.317126 0.948667 0.640319 0.317126 0.948667 0.640319 0.317126"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -9.97 0.00 11.80 -9.97 0.00 11.80 -9.86 0.00 10.00 -9.97 0.00 11.80 -9.86 0.00 10.00 -9.86 0.00"/>
+        &lt;Color color="0.949004 0.643015 0.316942 0.949004 0.643015 0.316942 0.949004 0.643015 0.316942 0.949004 0.643015 0.316942 0.949004 0.643015 0.316942 0.949004 0.643015 0.316942"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -9.86 0.00 11.80 -9.86 0.00 11.80 -9.75 0.00 10.00 -9.86 0.00 11.80 -9.75 0.00 10.00 -9.75 0.00"/>
+        &lt;Color color="0.949341 0.645711 0.316759 0.949341 0.645711 0.316759 0.949341 0.645711 0.316759 0.949341 0.645711 0.316759 0.949341 0.645711 0.316759 0.949341 0.645711 0.316759"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -9.75 0.00 11.80 -9.75 0.00 11.80 -9.64 0.00 10.00 -9.75 0.00 11.80 -9.64 0.00 10.00 -9.64 0.00"/>
+        &lt;Color color="0.949678 0.648407 0.316575 0.949678 0.648407 0.316575 0.949678 0.648407 0.316575 0.949678 0.648407 0.316575 0.949678 0.648407 0.316575 0.949678 0.648407 0.316575"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -9.64 0.00 11.80 -9.64 0.00 11.80 -9.53 0.00 10.00 -9.64 0.00 11.80 -9.53 0.00 10.00 -9.53 0.00"/>
+        &lt;Color color="0.950015 0.651103 0.316391 0.950015 0.651103 0.316391 0.950015 0.651103 0.316391 0.950015 0.651103 0.316391 0.950015 0.651103 0.316391 0.950015 0.651103 0.316391"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -9.53 0.00 11.80 -9.53 0.00 11.80 -9.42 0.00 10.00 -9.53 0.00 11.80 -9.42 0.00 10.00 -9.42 0.00"/>
+        &lt;Color color="0.950352 0.653799 0.316207 0.950352 0.653799 0.316207 0.950352 0.653799 0.316207 0.950352 0.653799 0.316207 0.950352 0.653799 0.316207 0.950352 0.653799 0.316207"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -9.42 0.00 11.80 -9.42 0.00 11.80 -9.31 0.00 10.00 -9.42 0.00 11.80 -9.31 0.00 10.00 -9.31 0.00"/>
+        &lt;Color color="0.950689 0.656495 0.316023 0.950689 0.656495 0.316023 0.950689 0.656495 0.316023 0.950689 0.656495 0.316023 0.950689 0.656495 0.316023 0.950689 0.656495 0.316023"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -9.31 0.00 11.80 -9.31 0.00 11.80 -9.20 0.00 10.00 -9.31 0.00 11.80 -9.20 0.00 10.00 -9.20 0.00"/>
+        &lt;Color color="0.951026 0.659191 0.315839 0.951026 0.659191 0.315839 0.951026 0.659191 0.315839 0.951026 0.659191 0.315839 0.951026 0.659191 0.315839 0.951026 0.659191 0.315839"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -9.20 0.00 11.80 -9.20 0.00 11.80 -9.09 0.00 10.00 -9.20 0.00 11.80 -9.09 0.00 10.00 -9.09 0.00"/>
+        &lt;Color color="0.951363 0.661887 0.315656 0.951363 0.661887 0.315656 0.951363 0.661887 0.315656 0.951363 0.661887 0.315656 0.951363 0.661887 0.315656 0.951363 0.661887 0.315656"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -9.09 0.00 11.80 -9.09 0.00 11.80 -8.98 0.00 10.00 -9.09 0.00 11.80 -8.98 0.00 10.00 -8.98 0.00"/>
+        &lt;Color color="0.9517 0.664583 0.315472 0.9517 0.664583 0.315472 0.9517 0.664583 0.315472 0.9517 0.664583 0.315472 0.9517 0.664583 0.315472 0.9517 0.664583 0.315472"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -8.98 0.00 11.80 -8.98 0.00 11.80 -8.88 0.00 10.00 -8.98 0.00 11.80 -8.88 0.00 10.00 -8.88 0.00"/>
+        &lt;Color color="0.952037 0.667279 0.315288 0.952037 0.667279 0.315288 0.952037 0.667279 0.315288 0.952037 0.667279 0.315288 0.952037 0.667279 0.315288 0.952037 0.667279 0.315288"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -8.88 0.00 11.80 -8.88 0.00 11.80 -8.77 0.00 10.00 -8.88 0.00 11.80 -8.77 0.00 10.00 -8.77 0.00"/>
+        &lt;Color color="0.952374 0.669975 0.315104 0.952374 0.669975 0.315104 0.952374 0.669975 0.315104 0.952374 0.669975 0.315104 0.952374 0.669975 0.315104 0.952374 0.669975 0.315104"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -8.77 0.00 11.80 -8.77 0.00 11.80 -8.66 0.00 10.00 -8.77 0.00 11.80 -8.66 0.00 10.00 -8.66 0.00"/>
+        &lt;Color color="0.952711 0.672672 0.31492 0.952711 0.672672 0.31492 0.952711 0.672672 0.31492 0.952711 0.672672 0.31492 0.952711 0.672672 0.31492 0.952711 0.672672 0.31492"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -8.66 0.00 11.80 -8.66 0.00 11.80 -8.55 0.00 10.00 -8.66 0.00 11.80 -8.55 0.00 10.00 -8.55 0.00"/>
+        &lt;Color color="0.953048 0.675368 0.314737 0.953048 0.675368 0.314737 0.953048 0.675368 0.314737 0.953048 0.675368 0.314737 0.953048 0.675368 0.314737 0.953048 0.675368 0.314737"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -8.55 0.00 11.80 -8.55 0.00 11.80 -8.44 0.00 10.00 -8.55 0.00 11.80 -8.44 0.00 10.00 -8.44 0.00"/>
+        &lt;Color color="0.953385 0.678064 0.314553 0.953385 0.678064 0.314553 0.953385 0.678064 0.314553 0.953385 0.678064 0.314553 0.953385 0.678064 0.314553 0.953385 0.678064 0.314553"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -8.44 0.00 11.80 -8.44 0.00 11.80 -8.33 0.00 10.00 -8.44 0.00 11.80 -8.33 0.00 10.00 -8.33 0.00"/>
+        &lt;Color color="0.953722 0.68076 0.314369 0.953722 0.68076 0.314369 0.953722 0.68076 0.314369 0.953722 0.68076 0.314369 0.953722 0.68076 0.314369 0.953722 0.68076 0.314369"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -8.33 0.00 11.80 -8.33 0.00 11.80 -8.22 0.00 10.00 -8.33 0.00 11.80 -8.22 0.00 10.00 -8.22 0.00"/>
+        &lt;Color color="0.954059 0.683456 0.314185 0.954059 0.683456 0.314185 0.954059 0.683456 0.314185 0.954059 0.683456 0.314185 0.954059 0.683456 0.314185 0.954059 0.683456 0.314185"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -8.22 0.00 11.80 -8.22 0.00 11.80 -8.11 0.00 10.00 -8.22 0.00 11.80 -8.11 0.00 10.00 -8.11 0.00"/>
+        &lt;Color color="0.954396 0.686152 0.314001 0.954396 0.686152 0.314001 0.954396 0.686152 0.314001 0.954396 0.686152 0.314001 0.954396 0.686152 0.314001 0.954396 0.686152 0.314001"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -8.11 0.00 11.80 -8.11 0.00 11.80 -8.00 0.00 10.00 -8.11 0.00 11.80 -8.00 0.00 10.00 -8.00 0.00"/>
+        &lt;Color color="0.954733 0.688848 0.313817 0.954733 0.688848 0.313817 0.954733 0.688848 0.313817 0.954733 0.688848 0.313817 0.954733 0.688848 0.313817 0.954733 0.688848 0.313817"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -8.00 0.00 11.80 -8.00 0.00 11.80 -7.89 0.00 10.00 -8.00 0.00 11.80 -7.89 0.00 10.00 -7.89 0.00"/>
+        &lt;Color color="0.95507 0.691544 0.313634 0.95507 0.691544 0.313634 0.95507 0.691544 0.313634 0.95507 0.691544 0.313634 0.95507 0.691544 0.313634 0.95507 0.691544 0.313634"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -7.89 0.00 11.80 -7.89 0.00 11.80 -7.78 0.00 10.00 -7.89 0.00 11.80 -7.78 0.00 10.00 -7.78 0.00"/>
+        &lt;Color color="0.955407 0.69424 0.31345 0.955407 0.69424 0.31345 0.955407 0.69424 0.31345 0.955407 0.69424 0.31345 0.955407 0.69424 0.31345 0.955407 0.69424 0.31345"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -7.78 0.00 11.80 -7.78 0.00 11.80 -7.67 0.00 10.00 -7.78 0.00 11.80 -7.67 0.00 10.00 -7.67 0.00"/>
+        &lt;Color color="0.955744 0.696936 0.313266 0.955744 0.696936 0.313266 0.955744 0.696936 0.313266 0.955744 0.696936 0.313266 0.955744 0.696936 0.313266 0.955744 0.696936 0.313266"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -7.67 0.00 11.80 -7.67 0.00 11.80 -7.56 0.00 10.00 -7.67 0.00 11.80 -7.56 0.00 10.00 -7.56 0.00"/>
+        &lt;Color color="0.956081 0.699632 0.313082 0.956081 0.699632 0.313082 0.956081 0.699632 0.313082 0.956081 0.699632 0.313082 0.956081 0.699632 0.313082 0.956081 0.699632 0.313082"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -7.56 0.00 11.80 -7.56 0.00 11.80 -7.45 0.00 10.00 -7.56 0.00 11.80 -7.45 0.00 10.00 -7.45 0.00"/>
+        &lt;Color color="0.956419 0.702328 0.312898 0.956419 0.702328 0.312898 0.956419 0.702328 0.312898 0.956419 0.702328 0.312898 0.956419 0.702328 0.312898 0.956419 0.702328 0.312898"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -7.45 0.00 11.80 -7.45 0.00 11.80 -7.34 0.00 10.00 -7.45 0.00 11.80 -7.34 0.00 10.00 -7.34 0.00"/>
+        &lt;Color color="0.956756 0.705025 0.312714 0.956756 0.705025 0.312714 0.956756 0.705025 0.312714 0.956756 0.705025 0.312714 0.956756 0.705025 0.312714 0.956756 0.705025 0.312714"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -7.34 0.00 11.80 -7.34 0.00 11.80 -7.23 0.00 10.00 -7.34 0.00 11.80 -7.23 0.00 10.00 -7.23 0.00"/>
+        &lt;Color color="0.957093 0.707721 0.312531 0.957093 0.707721 0.312531 0.957093 0.707721 0.312531 0.957093 0.707721 0.312531 0.957093 0.707721 0.312531 0.957093 0.707721 0.312531"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -7.23 0.00 11.80 -7.23 0.00 11.80 -7.12 0.00 10.00 -7.23 0.00 11.80 -7.12 0.00 10.00 -7.12 0.00"/>
+        &lt;Color color="0.95743 0.710417 0.312347 0.95743 0.710417 0.312347 0.95743 0.710417 0.312347 0.95743 0.710417 0.312347 0.95743 0.710417 0.312347 0.95743 0.710417 0.312347"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -7.12 0.00 11.80 -7.12 0.00 11.80 -7.02 0.00 10.00 -7.12 0.00 11.80 -7.02 0.00 10.00 -7.02 0.00"/>
+        &lt;Color color="0.957767 0.713113 0.312163 0.957767 0.713113 0.312163 0.957767 0.713113 0.312163 0.957767 0.713113 0.312163 0.957767 0.713113 0.312163 0.957767 0.713113 0.312163"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -7.02 0.00 11.80 -7.02 0.00 11.80 -6.91 0.00 10.00 -7.02 0.00 11.80 -6.91 0.00 10.00 -6.91 0.00"/>
+        &lt;Color color="0.958104 0.715809 0.311979 0.958104 0.715809 0.311979 0.958104 0.715809 0.311979 0.958104 0.715809 0.311979 0.958104 0.715809 0.311979 0.958104 0.715809 0.311979"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -6.91 0.00 11.80 -6.91 0.00 11.80 -6.80 0.00 10.00 -6.91 0.00 11.80 -6.80 0.00 10.00 -6.80 0.00"/>
+        &lt;Color color="0.958441 0.718505 0.311795 0.958441 0.718505 0.311795 0.958441 0.718505 0.311795 0.958441 0.718505 0.311795 0.958441 0.718505 0.311795 0.958441 0.718505 0.311795"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -6.80 0.00 11.80 -6.80 0.00 11.80 -6.69 0.00 10.00 -6.80 0.00 11.80 -6.69 0.00 10.00 -6.69 0.00"/>
+        &lt;Color color="0.958778 0.721201 0.311612 0.958778 0.721201 0.311612 0.958778 0.721201 0.311612 0.958778 0.721201 0.311612 0.958778 0.721201 0.311612 0.958778 0.721201 0.311612"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -6.69 0.00 11.80 -6.69 0.00 11.80 -6.58 0.00 10.00 -6.69 0.00 11.80 -6.58 0.00 10.00 -6.58 0.00"/>
+        &lt;Color color="0.959115 0.723897 0.311428 0.959115 0.723897 0.311428 0.959115 0.723897 0.311428 0.959115 0.723897 0.311428 0.959115 0.723897 0.311428 0.959115 0.723897 0.311428"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -6.58 0.00 11.80 -6.58 0.00 11.80 -6.47 0.00 10.00 -6.58 0.00 11.80 -6.47 0.00 10.00 -6.47 0.00"/>
+        &lt;Color color="0.959452 0.726593 0.311244 0.959452 0.726593 0.311244 0.959452 0.726593 0.311244 0.959452 0.726593 0.311244 0.959452 0.726593 0.311244 0.959452 0.726593 0.311244"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -6.47 0.00 11.80 -6.47 0.00 11.80 -6.36 0.00 10.00 -6.47 0.00 11.80 -6.36 0.00 10.00 -6.36 0.00"/>
+        &lt;Color color="0.959789 0.729289 0.31106 0.959789 0.729289 0.31106 0.959789 0.729289 0.31106 0.959789 0.729289 0.31106 0.959789 0.729289 0.31106 0.959789 0.729289 0.31106"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -6.36 0.00 11.80 -6.36 0.00 11.80 -6.25 0.00 10.00 -6.36 0.00 11.80 -6.25 0.00 10.00 -6.25 0.00"/>
+        &lt;Color color="0.960126 0.731985 0.310876 0.960126 0.731985 0.310876 0.960126 0.731985 0.310876 0.960126 0.731985 0.310876 0.960126 0.731985 0.310876 0.960126 0.731985 0.310876"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -6.25 0.00 11.80 -6.25 0.00 11.80 -6.14 0.00 10.00 -6.25 0.00 11.80 -6.14 0.00 10.00 -6.14 0.00"/>
+        &lt;Color color="0.960463 0.734681 0.310692 0.960463 0.734681 0.310692 0.960463 0.734681 0.310692 0.960463 0.734681 0.310692 0.960463 0.734681 0.310692 0.960463 0.734681 0.310692"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -6.14 0.00 11.80 -6.14 0.00 11.80 -6.03 0.00 10.00 -6.14 0.00 11.80 -6.03 0.00 10.00 -6.03 0.00"/>
+        &lt;Color color="0.9608 0.737377 0.310509 0.9608 0.737377 0.310509 0.9608 0.737377 0.310509 0.9608 0.737377 0.310509 0.9608 0.737377 0.310509 0.9608 0.737377 0.310509"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -6.03 0.00 11.80 -6.03 0.00 11.80 -5.92 0.00 10.00 -6.03 0.00 11.80 -5.92 0.00 10.00 -5.92 0.00"/>
+        &lt;Color color="0.961137 0.740074 0.310325 0.961137 0.740074 0.310325 0.961137 0.740074 0.310325 0.961137 0.740074 0.310325 0.961137 0.740074 0.310325 0.961137 0.740074 0.310325"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -5.92 0.00 11.80 -5.92 0.00 11.80 -5.81 0.00 10.00 -5.92 0.00 11.80 -5.81 0.00 10.00 -5.81 0.00"/>
+        &lt;Color color="0.961474 0.74277 0.310141 0.961474 0.74277 0.310141 0.961474 0.74277 0.310141 0.961474 0.74277 0.310141 0.961474 0.74277 0.310141 0.961474 0.74277 0.310141"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -5.81 0.00 11.80 -5.81 0.00 11.80 -5.70 0.00 10.00 -5.81 0.00 11.80 -5.70 0.00 10.00 -5.70 0.00"/>
+        &lt;Color color="0.961811 0.745466 0.309957 0.961811 0.745466 0.309957 0.961811 0.745466 0.309957 0.961811 0.745466 0.309957 0.961811 0.745466 0.309957 0.961811 0.745466 0.309957"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -5.70 0.00 11.80 -5.70 0.00 11.80 -5.59 0.00 10.00 -5.70 0.00 11.80 -5.59 0.00 10.00 -5.59 0.00"/>
+        &lt;Color color="0.962148 0.748162 0.309773 0.962148 0.748162 0.309773 0.962148 0.748162 0.309773 0.962148 0.748162 0.309773 0.962148 0.748162 0.309773 0.962148 0.748162 0.309773"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -5.59 0.00 11.80 -5.59 0.00 11.80 -5.48 0.00 10.00 -5.59 0.00 11.80 -5.48 0.00 10.00 -5.48 0.00"/>
+        &lt;Color color="0.962485 0.750858 0.309589 0.962485 0.750858 0.309589 0.962485 0.750858 0.309589 0.962485 0.750858 0.309589 0.962485 0.750858 0.309589 0.962485 0.750858 0.309589"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -5.48 0.00 11.80 -5.48 0.00 11.80 -5.38 0.00 10.00 -5.48 0.00 11.80 -5.38 0.00 10.00 -5.38 0.00"/>
+        &lt;Color color="0.962822 0.753554 0.309406 0.962822 0.753554 0.309406 0.962822 0.753554 0.309406 0.962822 0.753554 0.309406 0.962822 0.753554 0.309406 0.962822 0.753554 0.309406"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -5.38 0.00 11.80 -5.38 0.00 11.80 -5.27 0.00 10.00 -5.38 0.00 11.80 -5.27 0.00 10.00 -5.27 0.00"/>
+        &lt;Color color="0.963159 0.75625 0.309222 0.963159 0.75625 0.309222 0.963159 0.75625 0.309222 0.963159 0.75625 0.309222 0.963159 0.75625 0.309222 0.963159 0.75625 0.309222"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -5.27 0.00 11.80 -5.27 0.00 11.80 -5.16 0.00 10.00 -5.27 0.00 11.80 -5.16 0.00 10.00 -5.16 0.00"/>
+        &lt;Color color="0.963496 0.758946 0.309038 0.963496 0.758946 0.309038 0.963496 0.758946 0.309038 0.963496 0.758946 0.309038 0.963496 0.758946 0.309038 0.963496 0.758946 0.309038"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -5.16 0.00 11.80 -5.16 0.00 11.80 -5.05 0.00 10.00 -5.16 0.00 11.80 -5.05 0.00 10.00 -5.05 0.00"/>
+        &lt;Color color="0.963833 0.761642 0.308854 0.963833 0.761642 0.308854 0.963833 0.761642 0.308854 0.963833 0.761642 0.308854 0.963833 0.761642 0.308854 0.963833 0.761642 0.308854"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -5.05 0.00 11.80 -5.05 0.00 11.80 -4.94 0.00 10.00 -5.05 0.00 11.80 -4.94 0.00 10.00 -4.94 0.00"/>
+        &lt;Color color="0.96417 0.764338 0.30867 0.96417 0.764338 0.30867 0.96417 0.764338 0.30867 0.96417 0.764338 0.30867 0.96417 0.764338 0.30867 0.96417 0.764338 0.30867"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -4.94 0.00 11.80 -4.94 0.00 11.80 -4.83 0.00 10.00 -4.94 0.00 11.80 -4.83 0.00 10.00 -4.83 0.00"/>
+        &lt;Color color="0.964507 0.767034 0.308487 0.964507 0.767034 0.308487 0.964507 0.767034 0.308487 0.964507 0.767034 0.308487 0.964507 0.767034 0.308487 0.964507 0.767034 0.308487"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -4.83 0.00 11.80 -4.83 0.00 11.80 -4.72 0.00 10.00 -4.83 0.00 11.80 -4.72 0.00 10.00 -4.72 0.00"/>
+        &lt;Color color="0.964844 0.76973 0.308303 0.964844 0.76973 0.308303 0.964844 0.76973 0.308303 0.964844 0.76973 0.308303 0.964844 0.76973 0.308303 0.964844 0.76973 0.308303"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -4.72 0.00 11.80 -4.72 0.00 11.80 -4.61 0.00 10.00 -4.72 0.00 11.80 -4.61 0.00 10.00 -4.61 0.00"/>
+        &lt;Color color="0.965181 0.772426 0.308119 0.965181 0.772426 0.308119 0.965181 0.772426 0.308119 0.965181 0.772426 0.308119 0.965181 0.772426 0.308119 0.965181 0.772426 0.308119"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -4.61 0.00 11.80 -4.61 0.00 11.80 -4.50 0.00 10.00 -4.61 0.00 11.80 -4.50 0.00 10.00 -4.50 0.00"/>
+        &lt;Color color="0.965518 0.775123 0.307935 0.965518 0.775123 0.307935 0.965518 0.775123 0.307935 0.965518 0.775123 0.307935 0.965518 0.775123 0.307935 0.965518 0.775123 0.307935"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -4.50 0.00 11.80 -4.50 0.00 11.80 -4.39 0.00 10.00 -4.50 0.00 11.80 -4.39 0.00 10.00 -4.39 0.00"/>
+        &lt;Color color="0.965855 0.777819 0.307751 0.965855 0.777819 0.307751 0.965855 0.777819 0.307751 0.965855 0.777819 0.307751 0.965855 0.777819 0.307751 0.965855 0.777819 0.307751"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -4.39 0.00 11.80 -4.39 0.00 11.80 -4.28 0.00 10.00 -4.39 0.00 11.80 -4.28 0.00 10.00 -4.28 0.00"/>
+        &lt;Color color="0.966192 0.780515 0.307567 0.966192 0.780515 0.307567 0.966192 0.780515 0.307567 0.966192 0.780515 0.307567 0.966192 0.780515 0.307567 0.966192 0.780515 0.307567"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -4.28 0.00 11.80 -4.28 0.00 11.80 -4.17 0.00 10.00 -4.28 0.00 11.80 -4.17 0.00 10.00 -4.17 0.00"/>
+        &lt;Color color="0.966529 0.783211 0.307384 0.966529 0.783211 0.307384 0.966529 0.783211 0.307384 0.966529 0.783211 0.307384 0.966529 0.783211 0.307384 0.966529 0.783211 0.307384"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -4.17 0.00 11.80 -4.17 0.00 11.80 -4.06 0.00 10.00 -4.17 0.00 11.80 -4.06 0.00 10.00 -4.06 0.00"/>
+        &lt;Color color="0.966866 0.785907 0.3072 0.966866 0.785907 0.3072 0.966866 0.785907 0.3072 0.966866 0.785907 0.3072 0.966866 0.785907 0.3072 0.966866 0.785907 0.3072"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -4.06 0.00 11.80 -4.06 0.00 11.80 -3.95 0.00 10.00 -4.06 0.00 11.80 -3.95 0.00 10.00 -3.95 0.00"/>
+        &lt;Color color="0.967203 0.788603 0.307016 0.967203 0.788603 0.307016 0.967203 0.788603 0.307016 0.967203 0.788603 0.307016 0.967203 0.788603 0.307016 0.967203 0.788603 0.307016"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -3.95 0.00 11.80 -3.95 0.00 11.80 -3.84 0.00 10.00 -3.95 0.00 11.80 -3.84 0.00 10.00 -3.84 0.00"/>
+        &lt;Color color="0.96754 0.791299 0.306832 0.96754 0.791299 0.306832 0.96754 0.791299 0.306832 0.96754 0.791299 0.306832 0.96754 0.791299 0.306832 0.96754 0.791299 0.306832"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -3.84 0.00 11.80 -3.84 0.00 11.80 -3.73 0.00 10.00 -3.84 0.00 11.80 -3.73 0.00 10.00 -3.73 0.00"/>
+        &lt;Color color="0.967877 0.793995 0.306648 0.967877 0.793995 0.306648 0.967877 0.793995 0.306648 0.967877 0.793995 0.306648 0.967877 0.793995 0.306648 0.967877 0.793995 0.306648"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -3.73 0.00 11.80 -3.73 0.00 11.80 -3.62 0.00 10.00 -3.73 0.00 11.80 -3.62 0.00 10.00 -3.62 0.00"/>
+        &lt;Color color="0.968214 0.796691 0.306464 0.968214 0.796691 0.306464 0.968214 0.796691 0.306464 0.968214 0.796691 0.306464 0.968214 0.796691 0.306464 0.968214 0.796691 0.306464"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -3.62 0.00 11.80 -3.62 0.00 11.80 -3.52 0.00 10.00 -3.62 0.00 11.80 -3.52 0.00 10.00 -3.52 0.00"/>
+        &lt;Color color="0.968551 0.799387 0.306281 0.968551 0.799387 0.306281 0.968551 0.799387 0.306281 0.968551 0.799387 0.306281 0.968551 0.799387 0.306281 0.968551 0.799387 0.306281"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -3.52 0.00 11.80 -3.52 0.00 11.80 -3.41 0.00 10.00 -3.52 0.00 11.80 -3.41 0.00 10.00 -3.41 0.00"/>
+        &lt;Color color="0.968888 0.802083 0.306097 0.968888 0.802083 0.306097 0.968888 0.802083 0.306097 0.968888 0.802083 0.306097 0.968888 0.802083 0.306097 0.968888 0.802083 0.306097"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -3.41 0.00 11.80 -3.41 0.00 11.80 -3.30 0.00 10.00 -3.41 0.00 11.80 -3.30 0.00 10.00 -3.30 0.00"/>
+        &lt;Color color="0.969225 0.804779 0.305913 0.969225 0.804779 0.305913 0.969225 0.804779 0.305913 0.969225 0.804779 0.305913 0.969225 0.804779 0.305913 0.969225 0.804779 0.305913"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -3.30 0.00 11.80 -3.30 0.00 11.80 -3.19 0.00 10.00 -3.30 0.00 11.80 -3.19 0.00 10.00 -3.19 0.00"/>
+        &lt;Color color="0.969562 0.807475 0.305729 0.969562 0.807475 0.305729 0.969562 0.807475 0.305729 0.969562 0.807475 0.305729 0.969562 0.807475 0.305729 0.969562 0.807475 0.305729"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -3.19 0.00 11.80 -3.19 0.00 11.80 -3.08 0.00 10.00 -3.19 0.00 11.80 -3.08 0.00 10.00 -3.08 0.00"/>
+        &lt;Color color="0.969899 0.810172 0.305545 0.969899 0.810172 0.305545 0.969899 0.810172 0.305545 0.969899 0.810172 0.305545 0.969899 0.810172 0.305545 0.969899 0.810172 0.305545"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -3.08 0.00 11.80 -3.08 0.00 11.80 -2.97 0.00 10.00 -3.08 0.00 11.80 -2.97 0.00 10.00 -2.97 0.00"/>
+        &lt;Color color="0.970236 0.812868 0.305362 0.970236 0.812868 0.305362 0.970236 0.812868 0.305362 0.970236 0.812868 0.305362 0.970236 0.812868 0.305362 0.970236 0.812868 0.305362"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -2.97 0.00 11.80 -2.97 0.00 11.80 -2.86 0.00 10.00 -2.97 0.00 11.80 -2.86 0.00 10.00 -2.86 0.00"/>
+        &lt;Color color="0.970573 0.815564 0.305178 0.970573 0.815564 0.305178 0.970573 0.815564 0.305178 0.970573 0.815564 0.305178 0.970573 0.815564 0.305178 0.970573 0.815564 0.305178"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -2.86 0.00 11.80 -2.86 0.00 11.80 -2.75 0.00 10.00 -2.86 0.00 11.80 -2.75 0.00 10.00 -2.75 0.00"/>
+        &lt;Color color="0.97091 0.81826 0.304994 0.97091 0.81826 0.304994 0.97091 0.81826 0.304994 0.97091 0.81826 0.304994 0.97091 0.81826 0.304994 0.97091 0.81826 0.304994"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -2.75 0.00 11.80 -2.75 0.00 11.80 -2.64 0.00 10.00 -2.75 0.00 11.80 -2.64 0.00 10.00 -2.64 0.00"/>
+        &lt;Color color="0.971247 0.820956 0.30481 0.971247 0.820956 0.30481 0.971247 0.820956 0.30481 0.971247 0.820956 0.30481 0.971247 0.820956 0.30481 0.971247 0.820956 0.30481"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -2.64 0.00 11.80 -2.64 0.00 11.80 -2.53 0.00 10.00 -2.64 0.00 11.80 -2.53 0.00 10.00 -2.53 0.00"/>
+        &lt;Color color="0.971584 0.823652 0.304626 0.971584 0.823652 0.304626 0.971584 0.823652 0.304626 0.971584 0.823652 0.304626 0.971584 0.823652 0.304626 0.971584 0.823652 0.304626"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -2.53 0.00 11.80 -2.53 0.00 11.80 -2.42 0.00 10.00 -2.53 0.00 11.80 -2.42 0.00 10.00 -2.42 0.00"/>
+        &lt;Color color="0.971921 0.826348 0.304442 0.971921 0.826348 0.304442 0.971921 0.826348 0.304442 0.971921 0.826348 0.304442 0.971921 0.826348 0.304442 0.971921 0.826348 0.304442"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -2.42 0.00 11.80 -2.42 0.00 11.80 -2.31 0.00 10.00 -2.42 0.00 11.80 -2.31 0.00 10.00 -2.31 0.00"/>
+        &lt;Color color="0.972258 0.829044 0.304259 0.972258 0.829044 0.304259 0.972258 0.829044 0.304259 0.972258 0.829044 0.304259 0.972258 0.829044 0.304259 0.972258 0.829044 0.304259"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -2.31 0.00 11.80 -2.31 0.00 11.80 -2.20 0.00 10.00 -2.31 0.00 11.80 -2.20 0.00 10.00 -2.20 0.00"/>
+        &lt;Color color="0.972595 0.83174 0.304075 0.972595 0.83174 0.304075 0.972595 0.83174 0.304075 0.972595 0.83174 0.304075 0.972595 0.83174 0.304075 0.972595 0.83174 0.304075"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -2.20 0.00 11.80 -2.20 0.00 11.80 -2.09 0.00 10.00 -2.20 0.00 11.80 -2.09 0.00 10.00 -2.09 0.00"/>
+        &lt;Color color="0.972932 0.834436 0.303891 0.972932 0.834436 0.303891 0.972932 0.834436 0.303891 0.972932 0.834436 0.303891 0.972932 0.834436 0.303891 0.972932 0.834436 0.303891"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -2.09 0.00 11.80 -2.09 0.00 11.80 -1.98 0.00 10.00 -2.09 0.00 11.80 -1.98 0.00 10.00 -1.98 0.00"/>
+        &lt;Color color="0.973269 0.837132 0.303707 0.973269 0.837132 0.303707 0.973269 0.837132 0.303707 0.973269 0.837132 0.303707 0.973269 0.837132 0.303707 0.973269 0.837132 0.303707"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -1.98 0.00 11.80 -1.98 0.00 11.80 -1.88 0.00 10.00 -1.98 0.00 11.80 -1.88 0.00 10.00 -1.88 0.00"/>
+        &lt;Color color="0.973606 0.839828 0.303523 0.973606 0.839828 0.303523 0.973606 0.839828 0.303523 0.973606 0.839828 0.303523 0.973606 0.839828 0.303523 0.973606 0.839828 0.303523"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -1.88 0.00 11.80 -1.88 0.00 11.80 -1.77 0.00 10.00 -1.88 0.00 11.80 -1.77 0.00 10.00 -1.77 0.00"/>
+        &lt;Color color="0.973943 0.842525 0.303339 0.973943 0.842525 0.303339 0.973943 0.842525 0.303339 0.973943 0.842525 0.303339 0.973943 0.842525 0.303339 0.973943 0.842525 0.303339"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -1.77 0.00 11.80 -1.77 0.00 11.80 -1.66 0.00 10.00 -1.77 0.00 11.80 -1.66 0.00 10.00 -1.66 0.00"/>
+        &lt;Color color="0.97428 0.845221 0.303156 0.97428 0.845221 0.303156 0.97428 0.845221 0.303156 0.97428 0.845221 0.303156 0.97428 0.845221 0.303156 0.97428 0.845221 0.303156"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -1.66 0.00 11.80 -1.66 0.00 11.80 -1.55 0.00 10.00 -1.66 0.00 11.80 -1.55 0.00 10.00 -1.55 0.00"/>
+        &lt;Color color="0.974617 0.847917 0.302972 0.974617 0.847917 0.302972 0.974617 0.847917 0.302972 0.974617 0.847917 0.302972 0.974617 0.847917 0.302972 0.974617 0.847917 0.302972"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -1.55 0.00 11.80 -1.55 0.00 11.80 -1.44 0.00 10.00 -1.55 0.00 11.80 -1.44 0.00 10.00 -1.44 0.00"/>
+        &lt;Color color="0.974954 0.850613 0.302788 0.974954 0.850613 0.302788 0.974954 0.850613 0.302788 0.974954 0.850613 0.302788 0.974954 0.850613 0.302788 0.974954 0.850613 0.302788"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -1.44 0.00 11.80 -1.44 0.00 11.80 -1.33 0.00 10.00 -1.44 0.00 11.80 -1.33 0.00 10.00 -1.33 0.00"/>
+        &lt;Color color="0.975291 0.853309 0.302604 0.975291 0.853309 0.302604 0.975291 0.853309 0.302604 0.975291 0.853309 0.302604 0.975291 0.853309 0.302604 0.975291 0.853309 0.302604"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -1.33 0.00 11.80 -1.33 0.00 11.80 -1.22 0.00 10.00 -1.33 0.00 11.80 -1.22 0.00 10.00 -1.22 0.00"/>
+        &lt;Color color="0.975628 0.856005 0.30242 0.975628 0.856005 0.30242 0.975628 0.856005 0.30242 0.975628 0.856005 0.30242 0.975628 0.856005 0.30242 0.975628 0.856005 0.30242"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -1.22 0.00 11.80 -1.22 0.00 11.80 -1.11 0.00 10.00 -1.22 0.00 11.80 -1.11 0.00 10.00 -1.11 0.00"/>
+        &lt;Color color="0.975965 0.858701 0.302237 0.975965 0.858701 0.302237 0.975965 0.858701 0.302237 0.975965 0.858701 0.302237 0.975965 0.858701 0.302237 0.975965 0.858701 0.302237"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -1.11 0.00 11.80 -1.11 0.00 11.80 -1.00 0.00 10.00 -1.11 0.00 11.80 -1.00 0.00 10.00 -1.00 0.00"/>
+        &lt;Color color="0.976302 0.861397 0.302053 0.976302 0.861397 0.302053 0.976302 0.861397 0.302053 0.976302 0.861397 0.302053 0.976302 0.861397 0.302053 0.976302 0.861397 0.302053"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -1.00 0.00 11.80 -1.00 0.00 11.80 -0.89 0.00 10.00 -1.00 0.00 11.80 -0.89 0.00 10.00 -0.89 0.00"/>
+        &lt;Color color="0.971415 0.861941 0.308356 0.971415 0.861941 0.308356 0.971415 0.861941 0.308356 0.971415 0.861941 0.308356 0.971415 0.861941 0.308356 0.971415 0.861941 0.308356"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -0.89 0.00 11.80 -0.89 0.00 11.80 -0.78 0.00 10.00 -0.89 0.00 11.80 -0.78 0.00 10.00 -0.78 0.00"/>
+        &lt;Color color="0.961305 0.860332 0.321147 0.961305 0.860332 0.321147 0.961305 0.860332 0.321147 0.961305 0.860332 0.321147 0.961305 0.860332 0.321147 0.961305 0.860332 0.321147"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -0.78 0.00 11.80 -0.78 0.00 11.80 -0.67 0.00 10.00 -0.78 0.00 11.80 -0.67 0.00 10.00 -0.67 0.00"/>
+        &lt;Color color="0.951195 0.858724 0.333938 0.951195 0.858724 0.333938 0.951195 0.858724 0.333938 0.951195 0.858724 0.333938 0.951195 0.858724 0.333938 0.951195 0.858724 0.333938"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -0.67 0.00 11.80 -0.67 0.00 11.80 -0.56 0.00 10.00 -0.67 0.00 11.80 -0.56 0.00 10.00 -0.56 0.00"/>
+        &lt;Color color="0.941085 0.857116 0.346729 0.941085 0.857116 0.346729 0.941085 0.857116 0.346729 0.941085 0.857116 0.346729 0.941085 0.857116 0.346729 0.941085 0.857116 0.346729"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -0.56 0.00 11.80 -0.56 0.00 11.80 -0.45 0.00 10.00 -0.56 0.00 11.80 -0.45 0.00 10.00 -0.45 0.00"/>
+        &lt;Color color="0.930974 0.855507 0.359521 0.930974 0.855507 0.359521 0.930974 0.855507 0.359521 0.930974 0.855507 0.359521 0.930974 0.855507 0.359521 0.930974 0.855507 0.359521"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -0.45 0.00 11.80 -0.45 0.00 11.80 -0.34 0.00 10.00 -0.45 0.00 11.80 -0.34 0.00 10.00 -0.34 0.00"/>
+        &lt;Color color="0.920864 0.853899 0.372312 0.920864 0.853899 0.372312 0.920864 0.853899 0.372312 0.920864 0.853899 0.372312 0.920864 0.853899 0.372312 0.920864 0.853899 0.372312"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -0.34 0.00 11.80 -0.34 0.00 11.80 -0.23 0.00 10.00 -0.34 0.00 11.80 -0.23 0.00 10.00 -0.23 0.00"/>
+        &lt;Color color="0.910754 0.85229 0.385103 0.910754 0.85229 0.385103 0.910754 0.85229 0.385103 0.910754 0.85229 0.385103 0.910754 0.85229 0.385103 0.910754 0.85229 0.385103"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -0.23 0.00 11.80 -0.23 0.00 11.80 -0.12 0.00 10.00 -0.23 0.00 11.80 -0.12 0.00 10.00 -0.12 0.00"/>
+        &lt;Color color="0.900643 0.850682 0.397894 0.900643 0.850682 0.397894 0.900643 0.850682 0.397894 0.900643 0.850682 0.397894 0.900643 0.850682 0.397894 0.900643 0.850682 0.397894"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -0.12 0.00 11.80 -0.12 0.00 11.80 -0.02 0.00 10.00 -0.12 0.00 11.80 -0.02 0.00 10.00 -0.02 0.00"/>
+        &lt;Color color="0.890533 0.849073 0.410685 0.890533 0.849073 0.410685 0.890533 0.849073 0.410685 0.890533 0.849073 0.410685 0.890533 0.849073 0.410685 0.890533 0.849073 0.410685"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 -0.02 0.00 11.80 -0.02 0.00 11.80 0.09 0.00 10.00 -0.02 0.00 11.80 0.09 0.00 10.00 0.09 0.00"/>
+        &lt;Color color="0.880423 0.847465 0.423476 0.880423 0.847465 0.423476 0.880423 0.847465 0.423476 0.880423 0.847465 0.423476 0.880423 0.847465 0.423476 0.880423 0.847465 0.423476"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 0.09 0.00 11.80 0.09 0.00 11.80 0.20 0.00 10.00 0.09 0.00 11.80 0.20 0.00 10.00 0.20 0.00"/>
+        &lt;Color color="0.870313 0.845856 0.436267 0.870313 0.845856 0.436267 0.870313 0.845856 0.436267 0.870313 0.845856 0.436267 0.870313 0.845856 0.436267 0.870313 0.845856 0.436267"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 0.20 0.00 11.80 0.20 0.00 11.80 0.31 0.00 10.00 0.20 0.00 11.80 0.31 0.00 10.00 0.31 0.00"/>
+        &lt;Color color="0.860202 0.844248 0.449058 0.860202 0.844248 0.449058 0.860202 0.844248 0.449058 0.860202 0.844248 0.449058 0.860202 0.844248 0.449058 0.860202 0.844248 0.449058"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 0.31 0.00 11.80 0.31 0.00 11.80 0.42 0.00 10.00 0.31 0.00 11.80 0.42 0.00 10.00 0.42 0.00"/>
+        &lt;Color color="0.850092 0.842639 0.461849 0.850092 0.842639 0.461849 0.850092 0.842639 0.461849 0.850092 0.842639 0.461849 0.850092 0.842639 0.461849 0.850092 0.842639 0.461849"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 0.42 0.00 11.80 0.42 0.00 11.80 0.53 0.00 10.00 0.42 0.00 11.80 0.53 0.00 10.00 0.53 0.00"/>
+        &lt;Color color="0.839982 0.841031 0.47464 0.839982 0.841031 0.47464 0.839982 0.841031 0.47464 0.839982 0.841031 0.47464 0.839982 0.841031 0.47464 0.839982 0.841031 0.47464"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 0.53 0.00 11.80 0.53 0.00 11.80 0.64 0.00 10.00 0.53 0.00 11.80 0.64 0.00 10.00 0.64 0.00"/>
+        &lt;Color color="0.829871 0.839422 0.487431 0.829871 0.839422 0.487431 0.829871 0.839422 0.487431 0.829871 0.839422 0.487431 0.829871 0.839422 0.487431 0.829871 0.839422 0.487431"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 0.64 0.00 11.80 0.64 0.00 11.80 0.75 0.00 10.00 0.64 0.00 11.80 0.75 0.00 10.00 0.75 0.00"/>
+        &lt;Color color="0.819761 0.837814 0.500222 0.819761 0.837814 0.500222 0.819761 0.837814 0.500222 0.819761 0.837814 0.500222 0.819761 0.837814 0.500222 0.819761 0.837814 0.500222"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 0.75 0.00 11.80 0.75 0.00 11.80 0.86 0.00 10.00 0.75 0.00 11.80 0.86 0.00 10.00 0.86 0.00"/>
+        &lt;Color color="0.809651 0.836206 0.513013 0.809651 0.836206 0.513013 0.809651 0.836206 0.513013 0.809651 0.836206 0.513013 0.809651 0.836206 0.513013 0.809651 0.836206 0.513013"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 0.86 0.00 11.80 0.86 0.00 11.80 0.97 0.00 10.00 0.86 0.00 11.80 0.97 0.00 10.00 0.97 0.00"/>
+        &lt;Color color="0.79954 0.834597 0.525804 0.79954 0.834597 0.525804 0.79954 0.834597 0.525804 0.79954 0.834597 0.525804 0.79954 0.834597 0.525804 0.79954 0.834597 0.525804"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 0.97 0.00 11.80 0.97 0.00 11.80 1.08 0.00 10.00 0.97 0.00 11.80 1.08 0.00 10.00 1.08 0.00"/>
+        &lt;Color color="0.78943 0.832989 0.538595 0.78943 0.832989 0.538595 0.78943 0.832989 0.538595 0.78943 0.832989 0.538595 0.78943 0.832989 0.538595 0.78943 0.832989 0.538595"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 1.08 0.00 11.80 1.08 0.00 11.80 1.19 0.00 10.00 1.08 0.00 11.80 1.19 0.00 10.00 1.19 0.00"/>
+        &lt;Color color="0.77932 0.83138 0.551386 0.77932 0.83138 0.551386 0.77932 0.83138 0.551386 0.77932 0.83138 0.551386 0.77932 0.83138 0.551386 0.77932 0.83138 0.551386"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 1.19 0.00 11.80 1.19 0.00 11.80 1.30 0.00 10.00 1.19 0.00 11.80 1.30 0.00 10.00 1.30 0.00"/>
+        &lt;Color color="0.76921 0.829772 0.564177 0.76921 0.829772 0.564177 0.76921 0.829772 0.564177 0.76921 0.829772 0.564177 0.76921 0.829772 0.564177 0.76921 0.829772 0.564177"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 1.30 0.00 11.80 1.30 0.00 11.80 1.41 0.00 10.00 1.30 0.00 11.80 1.41 0.00 10.00 1.41 0.00"/>
+        &lt;Color color="0.759099 0.828163 0.576968 0.759099 0.828163 0.576968 0.759099 0.828163 0.576968 0.759099 0.828163 0.576968 0.759099 0.828163 0.576968 0.759099 0.828163 0.576968"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 1.41 0.00 11.80 1.41 0.00 11.80 1.52 0.00 10.00 1.41 0.00 11.80 1.52 0.00 10.00 1.52 0.00"/>
+        &lt;Color color="0.748989 0.826555 0.589759 0.748989 0.826555 0.589759 0.748989 0.826555 0.589759 0.748989 0.826555 0.589759 0.748989 0.826555 0.589759 0.748989 0.826555 0.589759"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 1.52 0.00 11.80 1.52 0.00 11.80 1.62 0.00 10.00 1.52 0.00 11.80 1.62 0.00 10.00 1.62 0.00"/>
+        &lt;Color color="0.738879 0.824946 0.602551 0.738879 0.824946 0.602551 0.738879 0.824946 0.602551 0.738879 0.824946 0.602551 0.738879 0.824946 0.602551 0.738879 0.824946 0.602551"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 1.62 0.00 11.80 1.62 0.00 11.80 1.73 0.00 10.00 1.62 0.00 11.80 1.73 0.00 10.00 1.73 0.00"/>
+        &lt;Color color="0.728768 0.823338 0.615342 0.728768 0.823338 0.615342 0.728768 0.823338 0.615342 0.728768 0.823338 0.615342 0.728768 0.823338 0.615342 0.728768 0.823338 0.615342"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 1.73 0.00 11.80 1.73 0.00 11.80 1.84 0.00 10.00 1.73 0.00 11.80 1.84 0.00 10.00 1.84 0.00"/>
+        &lt;Color color="0.718658 0.821729 0.628133 0.718658 0.821729 0.628133 0.718658 0.821729 0.628133 0.718658 0.821729 0.628133 0.718658 0.821729 0.628133 0.718658 0.821729 0.628133"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 1.84 0.00 11.80 1.84 0.00 11.80 1.95 0.00 10.00 1.84 0.00 11.80 1.95 0.00 10.00 1.95 0.00"/>
+        &lt;Color color="0.708548 0.820121 0.640924 0.708548 0.820121 0.640924 0.708548 0.820121 0.640924 0.708548 0.820121 0.640924 0.708548 0.820121 0.640924 0.708548 0.820121 0.640924"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 1.95 0.00 11.80 1.95 0.00 11.80 2.06 0.00 10.00 1.95 0.00 11.80 2.06 0.00 10.00 2.06 0.00"/>
+        &lt;Color color="0.698438 0.818513 0.653715 0.698438 0.818513 0.653715 0.698438 0.818513 0.653715 0.698438 0.818513 0.653715 0.698438 0.818513 0.653715 0.698438 0.818513 0.653715"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 2.06 0.00 11.80 2.06 0.00 11.80 2.17 0.00 10.00 2.06 0.00 11.80 2.17 0.00 10.00 2.17 0.00"/>
+        &lt;Color color="0.688327 0.816904 0.666506 0.688327 0.816904 0.666506 0.688327 0.816904 0.666506 0.688327 0.816904 0.666506 0.688327 0.816904 0.666506 0.688327 0.816904 0.666506"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 2.17 0.00 11.80 2.17 0.00 11.80 2.28 0.00 10.00 2.17 0.00 11.80 2.28 0.00 10.00 2.28 0.00"/>
+        &lt;Color color="0.678217 0.815296 0.679297 0.678217 0.815296 0.679297 0.678217 0.815296 0.679297 0.678217 0.815296 0.679297 0.678217 0.815296 0.679297 0.678217 0.815296 0.679297"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 2.28 0.00 11.80 2.28 0.00 11.80 2.39 0.00 10.00 2.28 0.00 11.80 2.39 0.00 10.00 2.39 0.00"/>
+        &lt;Color color="0.668107 0.813687 0.692088 0.668107 0.813687 0.692088 0.668107 0.813687 0.692088 0.668107 0.813687 0.692088 0.668107 0.813687 0.692088 0.668107 0.813687 0.692088"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 2.39 0.00 11.80 2.39 0.00 11.80 2.50 0.00 10.00 2.39 0.00 11.80 2.50 0.00 10.00 2.50 0.00"/>
+        &lt;Color color="0.657996 0.812079 0.704879 0.657996 0.812079 0.704879 0.657996 0.812079 0.704879 0.657996 0.812079 0.704879 0.657996 0.812079 0.704879 0.657996 0.812079 0.704879"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 2.50 0.00 11.80 2.50 0.00 11.80 2.61 0.00 10.00 2.50 0.00 11.80 2.61 0.00 10.00 2.61 0.00"/>
+        &lt;Color color="0.647886 0.81047 0.71767 0.647886 0.81047 0.71767 0.647886 0.81047 0.71767 0.647886 0.81047 0.71767 0.647886 0.81047 0.71767 0.647886 0.81047 0.71767"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 2.61 0.00 11.80 2.61 0.00 11.80 2.72 0.00 10.00 2.61 0.00 11.80 2.72 0.00 10.00 2.72 0.00"/>
+        &lt;Color color="0.637776 0.808862 0.730461 0.637776 0.808862 0.730461 0.637776 0.808862 0.730461 0.637776 0.808862 0.730461 0.637776 0.808862 0.730461 0.637776 0.808862 0.730461"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 2.72 0.00 11.80 2.72 0.00 11.80 2.83 0.00 10.00 2.72 0.00 11.80 2.83 0.00 10.00 2.83 0.00"/>
+        &lt;Color color="0.627665 0.807253 0.743252 0.627665 0.807253 0.743252 0.627665 0.807253 0.743252 0.627665 0.807253 0.743252 0.627665 0.807253 0.743252 0.627665 0.807253 0.743252"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 2.83 0.00 11.80 2.83 0.00 11.80 2.94 0.00 10.00 2.83 0.00 11.80 2.94 0.00 10.00 2.94 0.00"/>
+        &lt;Color color="0.617555 0.805645 0.756043 0.617555 0.805645 0.756043 0.617555 0.805645 0.756043 0.617555 0.805645 0.756043 0.617555 0.805645 0.756043 0.617555 0.805645 0.756043"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 2.94 0.00 11.80 2.94 0.00 11.80 3.05 0.00 10.00 2.94 0.00 11.80 3.05 0.00 10.00 3.05 0.00"/>
+        &lt;Color color="0.607445 0.804036 0.768834 0.607445 0.804036 0.768834 0.607445 0.804036 0.768834 0.607445 0.804036 0.768834 0.607445 0.804036 0.768834 0.607445 0.804036 0.768834"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 3.05 0.00 11.80 3.05 0.00 11.80 3.16 0.00 10.00 3.05 0.00 11.80 3.16 0.00 10.00 3.16 0.00"/>
+        &lt;Color color="0.597335 0.802428 0.781625 0.597335 0.802428 0.781625 0.597335 0.802428 0.781625 0.597335 0.802428 0.781625 0.597335 0.802428 0.781625 0.597335 0.802428 0.781625"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 3.16 0.00 11.80 3.16 0.00 11.80 3.27 0.00 10.00 3.16 0.00 11.80 3.27 0.00 10.00 3.27 0.00"/>
+        &lt;Color color="0.587224 0.80082 0.794416 0.587224 0.80082 0.794416 0.587224 0.80082 0.794416 0.587224 0.80082 0.794416 0.587224 0.80082 0.794416 0.587224 0.80082 0.794416"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 3.27 0.00 11.80 3.27 0.00 11.80 3.38 0.00 10.00 3.27 0.00 11.80 3.38 0.00 10.00 3.38 0.00"/>
+        &lt;Color color="0.577114 0.799211 0.807207 0.577114 0.799211 0.807207 0.577114 0.799211 0.807207 0.577114 0.799211 0.807207 0.577114 0.799211 0.807207 0.577114 0.799211 0.807207"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 3.38 0.00 11.80 3.38 0.00 11.80 3.48 0.00 10.00 3.38 0.00 11.80 3.48 0.00 10.00 3.48 0.00"/>
+        &lt;Color color="0.567004 0.797603 0.819998 0.567004 0.797603 0.819998 0.567004 0.797603 0.819998 0.567004 0.797603 0.819998 0.567004 0.797603 0.819998 0.567004 0.797603 0.819998"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 3.48 0.00 11.80 3.48 0.00 11.80 3.59 0.00 10.00 3.48 0.00 11.80 3.59 0.00 10.00 3.59 0.00"/>
+        &lt;Color color="0.556893 0.795994 0.83279 0.556893 0.795994 0.83279 0.556893 0.795994 0.83279 0.556893 0.795994 0.83279 0.556893 0.795994 0.83279 0.556893 0.795994 0.83279"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 3.59 0.00 11.80 3.59 0.00 11.80 3.70 0.00 10.00 3.59 0.00 11.80 3.70 0.00 10.00 3.70 0.00"/>
+        &lt;Color color="0.546783 0.794386 0.845581 0.546783 0.794386 0.845581 0.546783 0.794386 0.845581 0.546783 0.794386 0.845581 0.546783 0.794386 0.845581 0.546783 0.794386 0.845581"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 3.70 0.00 11.80 3.70 0.00 11.80 3.81 0.00 10.00 3.70 0.00 11.80 3.81 0.00 10.00 3.81 0.00"/>
+        &lt;Color color="0.536673 0.792777 0.858372 0.536673 0.792777 0.858372 0.536673 0.792777 0.858372 0.536673 0.792777 0.858372 0.536673 0.792777 0.858372 0.536673 0.792777 0.858372"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 3.81 0.00 11.80 3.81 0.00 11.80 3.92 0.00 10.00 3.81 0.00 11.80 3.92 0.00 10.00 3.92 0.00"/>
+        &lt;Color color="0.526562 0.791169 0.871163 0.526562 0.791169 0.871163 0.526562 0.791169 0.871163 0.526562 0.791169 0.871163 0.526562 0.791169 0.871163 0.526562 0.791169 0.871163"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 3.92 0.00 11.80 3.92 0.00 11.80 4.03 0.00 10.00 3.92 0.00 11.80 4.03 0.00 10.00 4.03 0.00"/>
+        &lt;Color color="0.516452 0.78956 0.883954 0.516452 0.78956 0.883954 0.516452 0.78956 0.883954 0.516452 0.78956 0.883954 0.516452 0.78956 0.883954 0.516452 0.78956 0.883954"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 4.03 0.00 11.80 4.03 0.00 11.80 4.14 0.00 10.00 4.03 0.00 11.80 4.14 0.00 10.00 4.14 0.00"/>
+        &lt;Color color="0.506342 0.787952 0.896745 0.506342 0.787952 0.896745 0.506342 0.787952 0.896745 0.506342 0.787952 0.896745 0.506342 0.787952 0.896745 0.506342 0.787952 0.896745"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 4.14 0.00 11.80 4.14 0.00 11.80 4.25 0.00 10.00 4.14 0.00 11.80 4.25 0.00 10.00 4.25 0.00"/>
+        &lt;Color color="0.496232 0.786343 0.909536 0.496232 0.786343 0.909536 0.496232 0.786343 0.909536 0.496232 0.786343 0.909536 0.496232 0.786343 0.909536 0.496232 0.786343 0.909536"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 4.25 0.00 11.80 4.25 0.00 11.80 4.36 0.00 10.00 4.25 0.00 11.80 4.36 0.00 10.00 4.36 0.00"/>
+        &lt;Color color="0.486121 0.784735 0.922327 0.486121 0.784735 0.922327 0.486121 0.784735 0.922327 0.486121 0.784735 0.922327 0.486121 0.784735 0.922327 0.486121 0.784735 0.922327"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 4.36 0.00 11.80 4.36 0.00 11.80 4.47 0.00 10.00 4.36 0.00 11.80 4.47 0.00 10.00 4.47 0.00"/>
+        &lt;Color color="0.476011 0.783127 0.935118 0.476011 0.783127 0.935118 0.476011 0.783127 0.935118 0.476011 0.783127 0.935118 0.476011 0.783127 0.935118 0.476011 0.783127 0.935118"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 4.47 0.00 11.80 4.47 0.00 11.80 4.58 0.00 10.00 4.47 0.00 11.80 4.58 0.00 10.00 4.58 0.00"/>
+        &lt;Color color="0.465901 0.781518 0.947909 0.465901 0.781518 0.947909 0.465901 0.781518 0.947909 0.465901 0.781518 0.947909 0.465901 0.781518 0.947909 0.465901 0.781518 0.947909"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 4.58 0.00 11.80 4.58 0.00 11.80 4.69 0.00 10.00 4.58 0.00 11.80 4.69 0.00 10.00 4.69 0.00"/>
+        &lt;Color color="0.457537 0.7786 0.956281 0.457537 0.7786 0.956281 0.457537 0.7786 0.956281 0.457537 0.7786 0.956281 0.457537 0.7786 0.956281 0.457537 0.7786 0.956281"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 4.69 0.00 11.80 4.69 0.00 11.80 4.80 0.00 10.00 4.69 0.00 11.80 4.80 0.00 10.00 4.80 0.00"/>
+        &lt;Color color="0.453248 0.772626 0.95434 0.453248 0.772626 0.95434 0.453248 0.772626 0.95434 0.453248 0.772626 0.95434 0.453248 0.772626 0.95434 0.453248 0.772626 0.95434"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 4.80 0.00 11.80 4.80 0.00 11.80 4.91 0.00 10.00 4.80 0.00 11.80 4.91 0.00 10.00 4.91 0.00"/>
+        &lt;Color color="0.448958 0.766651 0.9524 0.448958 0.766651 0.9524 0.448958 0.766651 0.9524 0.448958 0.766651 0.9524 0.448958 0.766651 0.9524 0.448958 0.766651 0.9524"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 4.91 0.00 11.80 4.91 0.00 11.80 5.02 0.00 10.00 4.91 0.00 11.80 5.02 0.00 10.00 5.02 0.00"/>
+        &lt;Color color="0.444669 0.760677 0.95046 0.444669 0.760677 0.95046 0.444669 0.760677 0.95046 0.444669 0.760677 0.95046 0.444669 0.760677 0.95046 0.444669 0.760677 0.95046"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 5.02 0.00 11.80 5.02 0.00 11.80 5.12 0.00 10.00 5.02 0.00 11.80 5.12 0.00 10.00 5.12 0.00"/>
+        &lt;Color color="0.44038 0.754703 0.948519 0.44038 0.754703 0.948519 0.44038 0.754703 0.948519 0.44038 0.754703 0.948519 0.44038 0.754703 0.948519 0.44038 0.754703 0.948519"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 5.12 0.00 11.80 5.12 0.00 11.80 5.23 0.00 10.00 5.12 0.00 11.80 5.23 0.00 10.00 5.23 0.00"/>
+        &lt;Color color="0.436091 0.748729 0.946579 0.436091 0.748729 0.946579 0.436091 0.748729 0.946579 0.436091 0.748729 0.946579 0.436091 0.748729 0.946579 0.436091 0.748729 0.946579"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 5.23 0.00 11.80 5.23 0.00 11.80 5.34 0.00 10.00 5.23 0.00 11.80 5.34 0.00 10.00 5.34 0.00"/>
+        &lt;Color color="0.431801 0.742754 0.944638 0.431801 0.742754 0.944638 0.431801 0.742754 0.944638 0.431801 0.742754 0.944638 0.431801 0.742754 0.944638 0.431801 0.742754 0.944638"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 5.34 0.00 11.80 5.34 0.00 11.80 5.45 0.00 10.00 5.34 0.00 11.80 5.45 0.00 10.00 5.45 0.00"/>
+        &lt;Color color="0.427512 0.73678 0.942698 0.427512 0.73678 0.942698 0.427512 0.73678 0.942698 0.427512 0.73678 0.942698 0.427512 0.73678 0.942698 0.427512 0.73678 0.942698"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 5.45 0.00 11.80 5.45 0.00 11.80 5.56 0.00 10.00 5.45 0.00 11.80 5.56 0.00 10.00 5.56 0.00"/>
+        &lt;Color color="0.423223 0.730806 0.940758 0.423223 0.730806 0.940758 0.423223 0.730806 0.940758 0.423223 0.730806 0.940758 0.423223 0.730806 0.940758 0.423223 0.730806 0.940758"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 5.56 0.00 11.80 5.56 0.00 11.80 5.67 0.00 10.00 5.56 0.00 11.80 5.67 0.00 10.00 5.67 0.00"/>
+        &lt;Color color="0.418934 0.724831 0.938817 0.418934 0.724831 0.938817 0.418934 0.724831 0.938817 0.418934 0.724831 0.938817 0.418934 0.724831 0.938817 0.418934 0.724831 0.938817"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 5.67 0.00 11.80 5.67 0.00 11.80 5.78 0.00 10.00 5.67 0.00 11.80 5.78 0.00 10.00 5.78 0.00"/>
+        &lt;Color color="0.414645 0.718857 0.936877 0.414645 0.718857 0.936877 0.414645 0.718857 0.936877 0.414645 0.718857 0.936877 0.414645 0.718857 0.936877 0.414645 0.718857 0.936877"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 5.78 0.00 11.80 5.78 0.00 11.80 5.89 0.00 10.00 5.78 0.00 11.80 5.89 0.00 10.00 5.89 0.00"/>
+        &lt;Color color="0.410355 0.712883 0.934937 0.410355 0.712883 0.934937 0.410355 0.712883 0.934937 0.410355 0.712883 0.934937 0.410355 0.712883 0.934937 0.410355 0.712883 0.934937"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 5.89 0.00 11.80 5.89 0.00 11.80 6.00 0.00 10.00 5.89 0.00 11.80 6.00 0.00 10.00 6.00 0.00"/>
+        &lt;Color color="0.406066 0.706909 0.932996 0.406066 0.706909 0.932996 0.406066 0.706909 0.932996 0.406066 0.706909 0.932996 0.406066 0.706909 0.932996 0.406066 0.706909 0.932996"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 6.00 0.00 11.80 6.00 0.00 11.80 6.11 0.00 10.00 6.00 0.00 11.80 6.11 0.00 10.00 6.11 0.00"/>
+        &lt;Color color="0.401777 0.700934 0.931056 0.401777 0.700934 0.931056 0.401777 0.700934 0.931056 0.401777 0.700934 0.931056 0.401777 0.700934 0.931056 0.401777 0.700934 0.931056"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 6.11 0.00 11.80 6.11 0.00 11.80 6.22 0.00 10.00 6.11 0.00 11.80 6.22 0.00 10.00 6.22 0.00"/>
+        &lt;Color color="0.397488 0.69496 0.929116 0.397488 0.69496 0.929116 0.397488 0.69496 0.929116 0.397488 0.69496 0.929116 0.397488 0.69496 0.929116 0.397488 0.69496 0.929116"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 6.22 0.00 11.80 6.22 0.00 11.80 6.33 0.00 10.00 6.22 0.00 11.80 6.33 0.00 10.00 6.33 0.00"/>
+        &lt;Color color="0.393199 0.688986 0.927175 0.393199 0.688986 0.927175 0.393199 0.688986 0.927175 0.393199 0.688986 0.927175 0.393199 0.688986 0.927175 0.393199 0.688986 0.927175"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 6.33 0.00 11.80 6.33 0.00 11.80 6.44 0.00 10.00 6.33 0.00 11.80 6.44 0.00 10.00 6.44 0.00"/>
+        &lt;Color color="0.388909 0.683012 0.925235 0.388909 0.683012 0.925235 0.388909 0.683012 0.925235 0.388909 0.683012 0.925235 0.388909 0.683012 0.925235 0.388909 0.683012 0.925235"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 6.44 0.00 11.80 6.44 0.00 11.80 6.55 0.00 10.00 6.44 0.00 11.80 6.55 0.00 10.00 6.55 0.00"/>
+        &lt;Color color="0.38462 0.677037 0.923295 0.38462 0.677037 0.923295 0.38462 0.677037 0.923295 0.38462 0.677037 0.923295 0.38462 0.677037 0.923295 0.38462 0.677037 0.923295"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 6.55 0.00 11.80 6.55 0.00 11.80 6.66 0.00 10.00 6.55 0.00 11.80 6.66 0.00 10.00 6.66 0.00"/>
+        &lt;Color color="0.380331 0.671063 0.921354 0.380331 0.671063 0.921354 0.380331 0.671063 0.921354 0.380331 0.671063 0.921354 0.380331 0.671063 0.921354 0.380331 0.671063 0.921354"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 6.66 0.00 11.80 6.66 0.00 11.80 6.77 0.00 10.00 6.66 0.00 11.80 6.77 0.00 10.00 6.77 0.00"/>
+        &lt;Color color="0.376042 0.665089 0.919414 0.376042 0.665089 0.919414 0.376042 0.665089 0.919414 0.376042 0.665089 0.919414 0.376042 0.665089 0.919414 0.376042 0.665089 0.919414"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 6.77 0.00 11.80 6.77 0.00 11.80 6.88 0.00 10.00 6.77 0.00 11.80 6.88 0.00 10.00 6.88 0.00"/>
+        &lt;Color color="0.371752 0.659115 0.917473 0.371752 0.659115 0.917473 0.371752 0.659115 0.917473 0.371752 0.659115 0.917473 0.371752 0.659115 0.917473 0.371752 0.659115 0.917473"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 6.88 0.00 11.80 6.88 0.00 11.80 6.98 0.00 10.00 6.88 0.00 11.80 6.98 0.00 10.00 6.98 0.00"/>
+        &lt;Color color="0.367463 0.65314 0.915533 0.367463 0.65314 0.915533 0.367463 0.65314 0.915533 0.367463 0.65314 0.915533 0.367463 0.65314 0.915533 0.367463 0.65314 0.915533"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 6.98 0.00 11.80 6.98 0.00 11.80 7.09 0.00 10.00 6.98 0.00 11.80 7.09 0.00 10.00 7.09 0.00"/>
+        &lt;Color color="0.363174 0.647166 0.913593 0.363174 0.647166 0.913593 0.363174 0.647166 0.913593 0.363174 0.647166 0.913593 0.363174 0.647166 0.913593 0.363174 0.647166 0.913593"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 7.09 0.00 11.80 7.09 0.00 11.80 7.20 0.00 10.00 7.09 0.00 11.80 7.20 0.00 10.00 7.20 0.00"/>
+        &lt;Color color="0.358885 0.641192 0.911652 0.358885 0.641192 0.911652 0.358885 0.641192 0.911652 0.358885 0.641192 0.911652 0.358885 0.641192 0.911652 0.358885 0.641192 0.911652"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 7.20 0.00 11.80 7.20 0.00 11.80 7.31 0.00 10.00 7.20 0.00 11.80 7.31 0.00 10.00 7.31 0.00"/>
+        &lt;Color color="0.354596 0.635218 0.909712 0.354596 0.635218 0.909712 0.354596 0.635218 0.909712 0.354596 0.635218 0.909712 0.354596 0.635218 0.909712 0.354596 0.635218 0.909712"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 7.31 0.00 11.80 7.31 0.00 11.80 7.42 0.00 10.00 7.31 0.00 11.80 7.42 0.00 10.00 7.42 0.00"/>
+        &lt;Color color="0.350306 0.629243 0.907772 0.350306 0.629243 0.907772 0.350306 0.629243 0.907772 0.350306 0.629243 0.907772 0.350306 0.629243 0.907772 0.350306 0.629243 0.907772"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 7.42 0.00 11.80 7.42 0.00 11.80 7.53 0.00 10.00 7.42 0.00 11.80 7.53 0.00 10.00 7.53 0.00"/>
+        &lt;Color color="0.346017 0.623269 0.905831 0.346017 0.623269 0.905831 0.346017 0.623269 0.905831 0.346017 0.623269 0.905831 0.346017 0.623269 0.905831 0.346017 0.623269 0.905831"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 7.53 0.00 11.80 7.53 0.00 11.80 7.64 0.00 10.00 7.53 0.00 11.80 7.64 0.00 10.00 7.64 0.00"/>
+        &lt;Color color="0.341728 0.617295 0.903891 0.341728 0.617295 0.903891 0.341728 0.617295 0.903891 0.341728 0.617295 0.903891 0.341728 0.617295 0.903891 0.341728 0.617295 0.903891"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 7.64 0.00 11.80 7.64 0.00 11.80 7.75 0.00 10.00 7.64 0.00 11.80 7.75 0.00 10.00 7.75 0.00"/>
+        &lt;Color color="0.337439 0.61132 0.901951 0.337439 0.61132 0.901951 0.337439 0.61132 0.901951 0.337439 0.61132 0.901951 0.337439 0.61132 0.901951 0.337439 0.61132 0.901951"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 7.75 0.00 11.80 7.75 0.00 11.80 7.86 0.00 10.00 7.75 0.00 11.80 7.86 0.00 10.00 7.86 0.00"/>
+        &lt;Color color="0.33315 0.605346 0.90001 0.33315 0.605346 0.90001 0.33315 0.605346 0.90001 0.33315 0.605346 0.90001 0.33315 0.605346 0.90001 0.33315 0.605346 0.90001"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 7.86 0.00 11.80 7.86 0.00 11.80 7.97 0.00 10.00 7.86 0.00 11.80 7.97 0.00 10.00 7.97 0.00"/>
+        &lt;Color color="0.32886 0.599372 0.89807 0.32886 0.599372 0.89807 0.32886 0.599372 0.89807 0.32886 0.599372 0.89807 0.32886 0.599372 0.89807 0.32886 0.599372 0.89807"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 7.97 0.00 11.80 7.97 0.00 11.80 8.08 0.00 10.00 7.97 0.00 11.80 8.08 0.00 10.00 8.08 0.00"/>
+        &lt;Color color="0.324571 0.593398 0.896129 0.324571 0.593398 0.896129 0.324571 0.593398 0.896129 0.324571 0.593398 0.896129 0.324571 0.593398 0.896129 0.324571 0.593398 0.896129"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 8.08 0.00 11.80 8.08 0.00 11.80 8.19 0.00 10.00 8.08 0.00 11.80 8.19 0.00 10.00 8.19 0.00"/>
+        &lt;Color color="0.320282 0.587423 0.894189 0.320282 0.587423 0.894189 0.320282 0.587423 0.894189 0.320282 0.587423 0.894189 0.320282 0.587423 0.894189 0.320282 0.587423 0.894189"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 8.19 0.00 11.80 8.19 0.00 11.80 8.30 0.00 10.00 8.19 0.00 11.80 8.30 0.00 10.00 8.30 0.00"/>
+        &lt;Color color="0.315993 0.581449 0.892249 0.315993 0.581449 0.892249 0.315993 0.581449 0.892249 0.315993 0.581449 0.892249 0.315993 0.581449 0.892249 0.315993 0.581449 0.892249"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 8.30 0.00 11.80 8.30 0.00 11.80 8.41 0.00 10.00 8.30 0.00 11.80 8.41 0.00 10.00 8.41 0.00"/>
+        &lt;Color color="0.311703 0.575475 0.890308 0.311703 0.575475 0.890308 0.311703 0.575475 0.890308 0.311703 0.575475 0.890308 0.311703 0.575475 0.890308 0.311703 0.575475 0.890308"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 8.41 0.00 11.80 8.41 0.00 11.80 8.52 0.00 10.00 8.41 0.00 11.80 8.52 0.00 10.00 8.52 0.00"/>
+        &lt;Color color="0.307414 0.569501 0.888368 0.307414 0.569501 0.888368 0.307414 0.569501 0.888368 0.307414 0.569501 0.888368 0.307414 0.569501 0.888368 0.307414 0.569501 0.888368"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 8.52 0.00 11.80 8.52 0.00 11.80 8.62 0.00 10.00 8.52 0.00 11.80 8.62 0.00 10.00 8.62 0.00"/>
+        &lt;Color color="0.303125 0.563526 0.886428 0.303125 0.563526 0.886428 0.303125 0.563526 0.886428 0.303125 0.563526 0.886428 0.303125 0.563526 0.886428 0.303125 0.563526 0.886428"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 8.62 0.00 11.80 8.62 0.00 11.80 8.73 0.00 10.00 8.62 0.00 11.80 8.73 0.00 10.00 8.73 0.00"/>
+        &lt;Color color="0.298836 0.557552 0.884487 0.298836 0.557552 0.884487 0.298836 0.557552 0.884487 0.298836 0.557552 0.884487 0.298836 0.557552 0.884487 0.298836 0.557552 0.884487"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 8.73 0.00 11.80 8.73 0.00 11.80 8.84 0.00 10.00 8.73 0.00 11.80 8.84 0.00 10.00 8.84 0.00"/>
+        &lt;Color color="0.294547 0.551578 0.882547 0.294547 0.551578 0.882547 0.294547 0.551578 0.882547 0.294547 0.551578 0.882547 0.294547 0.551578 0.882547 0.294547 0.551578 0.882547"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 8.84 0.00 11.80 8.84 0.00 11.80 8.95 0.00 10.00 8.84 0.00 11.80 8.95 0.00 10.00 8.95 0.00"/>
+        &lt;Color color="0.290257 0.545604 0.880607 0.290257 0.545604 0.880607 0.290257 0.545604 0.880607 0.290257 0.545604 0.880607 0.290257 0.545604 0.880607 0.290257 0.545604 0.880607"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 8.95 0.00 11.80 8.95 0.00 11.80 9.06 0.00 10.00 8.95 0.00 11.80 9.06 0.00 10.00 9.06 0.00"/>
+        &lt;Color color="0.285968 0.539629 0.878666 0.285968 0.539629 0.878666 0.285968 0.539629 0.878666 0.285968 0.539629 0.878666 0.285968 0.539629 0.878666 0.285968 0.539629 0.878666"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 9.06 0.00 11.80 9.06 0.00 11.80 9.17 0.00 10.00 9.06 0.00 11.80 9.17 0.00 10.00 9.17 0.00"/>
+        &lt;Color color="0.281679 0.533655 0.876726 0.281679 0.533655 0.876726 0.281679 0.533655 0.876726 0.281679 0.533655 0.876726 0.281679 0.533655 0.876726 0.281679 0.533655 0.876726"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 9.17 0.00 11.80 9.17 0.00 11.80 9.28 0.00 10.00 9.17 0.00 11.80 9.28 0.00 10.00 9.28 0.00"/>
+        &lt;Color color="0.27739 0.527681 0.874786 0.27739 0.527681 0.874786 0.27739 0.527681 0.874786 0.27739 0.527681 0.874786 0.27739 0.527681 0.874786 0.27739 0.527681 0.874786"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 9.28 0.00 11.80 9.28 0.00 11.80 9.39 0.00 10.00 9.28 0.00 11.80 9.39 0.00 10.00 9.39 0.00"/>
+        &lt;Color color="0.2731 0.521706 0.872845 0.2731 0.521706 0.872845 0.2731 0.521706 0.872845 0.2731 0.521706 0.872845 0.2731 0.521706 0.872845 0.2731 0.521706 0.872845"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 9.39 0.00 11.80 9.39 0.00 11.80 9.50 0.00 10.00 9.39 0.00 11.80 9.50 0.00 10.00 9.50 0.00"/>
+        &lt;Color color="0.268811 0.515732 0.870905 0.268811 0.515732 0.870905 0.268811 0.515732 0.870905 0.268811 0.515732 0.870905 0.268811 0.515732 0.870905 0.268811 0.515732 0.870905"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 9.50 0.00 11.80 9.50 0.00 11.80 9.61 0.00 10.00 9.50 0.00 11.80 9.61 0.00 10.00 9.61 0.00"/>
+        &lt;Color color="0.264522 0.509758 0.868964 0.264522 0.509758 0.868964 0.264522 0.509758 0.868964 0.264522 0.509758 0.868964 0.264522 0.509758 0.868964 0.264522 0.509758 0.868964"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 9.61 0.00 11.80 9.61 0.00 11.80 9.72 0.00 10.00 9.61 0.00 11.80 9.72 0.00 10.00 9.72 0.00"/>
+        &lt;Color color="0.260233 0.503784 0.867024 0.260233 0.503784 0.867024 0.260233 0.503784 0.867024 0.260233 0.503784 0.867024 0.260233 0.503784 0.867024 0.260233 0.503784 0.867024"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 9.72 0.00 11.80 9.72 0.00 11.80 9.83 0.00 10.00 9.72 0.00 11.80 9.83 0.00 10.00 9.83 0.00"/>
+        &lt;Color color="0.255944 0.497809 0.865084 0.255944 0.497809 0.865084 0.255944 0.497809 0.865084 0.255944 0.497809 0.865084 0.255944 0.497809 0.865084 0.255944 0.497809 0.865084"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 9.83 0.00 11.80 9.83 0.00 11.80 9.94 0.00 10.00 9.83 0.00 11.80 9.94 0.00 10.00 9.94 0.00"/>
+        &lt;Color color="0.251654 0.491835 0.863143 0.251654 0.491835 0.863143 0.251654 0.491835 0.863143 0.251654 0.491835 0.863143 0.251654 0.491835 0.863143 0.251654 0.491835 0.863143"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 9.94 0.00 11.80 9.94 0.00 11.80 10.05 0.00 10.00 9.94 0.00 11.80 10.05 0.00 10.00 10.05 0.00"/>
+        &lt;Color color="0.247365 0.485861 0.861203 0.247365 0.485861 0.861203 0.247365 0.485861 0.861203 0.247365 0.485861 0.861203 0.247365 0.485861 0.861203 0.247365 0.485861 0.861203"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 10.05 0.00 11.80 10.05 0.00 11.80 10.16 0.00 10.00 10.05 0.00 11.80 10.16 0.00 10.00 10.16 0.00"/>
+        &lt;Color color="0.243076 0.479887 0.859263 0.243076 0.479887 0.859263 0.243076 0.479887 0.859263 0.243076 0.479887 0.859263 0.243076 0.479887 0.859263 0.243076 0.479887 0.859263"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 10.16 0.00 11.80 10.16 0.00 11.80 10.27 0.00 10.00 10.16 0.00 11.80 10.27 0.00 10.00 10.27 0.00"/>
+        &lt;Color color="0.238787 0.473912 0.857322 0.238787 0.473912 0.857322 0.238787 0.473912 0.857322 0.238787 0.473912 0.857322 0.238787 0.473912 0.857322 0.238787 0.473912 0.857322"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 10.27 0.00 11.80 10.27 0.00 11.80 10.38 0.00 10.00 10.27 0.00 11.80 10.38 0.00 10.00 10.38 0.00"/>
+        &lt;Color color="0.234498 0.467938 0.855382 0.234498 0.467938 0.855382 0.234498 0.467938 0.855382 0.234498 0.467938 0.855382 0.234498 0.467938 0.855382 0.234498 0.467938 0.855382"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 10.38 0.00 11.80 10.38 0.00 11.80 10.48 0.00 10.00 10.38 0.00 11.80 10.48 0.00 10.00 10.48 0.00"/>
+        &lt;Color color="0.230208 0.461964 0.853442 0.230208 0.461964 0.853442 0.230208 0.461964 0.853442 0.230208 0.461964 0.853442 0.230208 0.461964 0.853442 0.230208 0.461964 0.853442"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 10.48 0.00 11.80 10.48 0.00 11.80 10.59 0.00 10.00 10.48 0.00 11.80 10.59 0.00 10.00 10.59 0.00"/>
+        &lt;Color color="0.225919 0.45599 0.851501 0.225919 0.45599 0.851501 0.225919 0.45599 0.851501 0.225919 0.45599 0.851501 0.225919 0.45599 0.851501 0.225919 0.45599 0.851501"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 10.59 0.00 11.80 10.59 0.00 11.80 10.70 0.00 10.00 10.59 0.00 11.80 10.70 0.00 10.00 10.70 0.00"/>
+        &lt;Color color="0.22163 0.450015 0.849561 0.22163 0.450015 0.849561 0.22163 0.450015 0.849561 0.22163 0.450015 0.849561 0.22163 0.450015 0.849561 0.22163 0.450015 0.849561"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 10.70 0.00 11.80 10.70 0.00 11.80 10.81 0.00 10.00 10.70 0.00 11.80 10.81 0.00 10.00 10.81 0.00"/>
+        &lt;Color color="0.217341 0.444041 0.847621 0.217341 0.444041 0.847621 0.217341 0.444041 0.847621 0.217341 0.444041 0.847621 0.217341 0.444041 0.847621 0.217341 0.444041 0.847621"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 10.81 0.00 11.80 10.81 0.00 11.80 10.92 0.00 10.00 10.81 0.00 11.80 10.92 0.00 10.00 10.92 0.00"/>
+        &lt;Color color="0.213051 0.438067 0.84568 0.213051 0.438067 0.84568 0.213051 0.438067 0.84568 0.213051 0.438067 0.84568 0.213051 0.438067 0.84568 0.213051 0.438067 0.84568"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 10.92 0.00 11.80 10.92 0.00 11.80 11.03 0.00 10.00 10.92 0.00 11.80 11.03 0.00 10.00 11.03 0.00"/>
+        &lt;Color color="0.208762 0.432093 0.84374 0.208762 0.432093 0.84374 0.208762 0.432093 0.84374 0.208762 0.432093 0.84374 0.208762 0.432093 0.84374 0.208762 0.432093 0.84374"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 11.03 0.00 11.80 11.03 0.00 11.80 11.14 0.00 10.00 11.03 0.00 11.80 11.14 0.00 10.00 11.14 0.00"/>
+        &lt;Color color="0.204473 0.426118 0.841799 0.204473 0.426118 0.841799 0.204473 0.426118 0.841799 0.204473 0.426118 0.841799 0.204473 0.426118 0.841799 0.204473 0.426118 0.841799"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 11.14 0.00 11.80 11.14 0.00 11.80 11.25 0.00 10.00 11.14 0.00 11.80 11.25 0.00 10.00 11.25 0.00"/>
+        &lt;Color color="0.200184 0.420144 0.839859 0.200184 0.420144 0.839859 0.200184 0.420144 0.839859 0.200184 0.420144 0.839859 0.200184 0.420144 0.839859 0.200184 0.420144 0.839859"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 11.25 0.00 11.80 11.25 0.00 11.80 11.36 0.00 10.00 11.25 0.00 11.80 11.36 0.00 10.00 11.36 0.00"/>
+        &lt;Color color="0.195895 0.41417 0.837919 0.195895 0.41417 0.837919 0.195895 0.41417 0.837919 0.195895 0.41417 0.837919 0.195895 0.41417 0.837919 0.195895 0.41417 0.837919"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 11.36 0.00 11.80 11.36 0.00 11.80 11.47 0.00 10.00 11.36 0.00 11.80 11.47 0.00 10.00 11.47 0.00"/>
+        &lt;Color color="0.191605 0.408195 0.835978 0.191605 0.408195 0.835978 0.191605 0.408195 0.835978 0.191605 0.408195 0.835978 0.191605 0.408195 0.835978 0.191605 0.408195 0.835978"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 11.47 0.00 11.80 11.47 0.00 11.80 11.58 0.00 10.00 11.47 0.00 11.80 11.58 0.00 10.00 11.58 0.00"/>
+        &lt;Color color="0.187316 0.402221 0.834038 0.187316 0.402221 0.834038 0.187316 0.402221 0.834038 0.187316 0.402221 0.834038 0.187316 0.402221 0.834038 0.187316 0.402221 0.834038"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 11.58 0.00 11.80 11.58 0.00 11.80 11.69 0.00 10.00 11.58 0.00 11.80 11.69 0.00 10.00 11.69 0.00"/>
+        &lt;Color color="0.183027 0.396247 0.832098 0.183027 0.396247 0.832098 0.183027 0.396247 0.832098 0.183027 0.396247 0.832098 0.183027 0.396247 0.832098 0.183027 0.396247 0.832098"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 11.69 0.00 11.80 11.69 0.00 11.80 11.80 0.00 10.00 11.69 0.00 11.80 11.80 0.00 10.00 11.80 0.00"/>
+        &lt;Color color="0.178738 0.390273 0.830157 0.178738 0.390273 0.830157 0.178738 0.390273 0.830157 0.178738 0.390273 0.830157 0.178738 0.390273 0.830157 0.178738 0.390273 0.830157"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 11.80 0.00 11.80 11.80 0.00 11.80 11.91 0.00 10.00 11.80 0.00 11.80 11.91 0.00 10.00 11.91 0.00"/>
+        &lt;Color color="0.174449 0.384298 0.828217 0.174449 0.384298 0.828217 0.174449 0.384298 0.828217 0.174449 0.384298 0.828217 0.174449 0.384298 0.828217 0.174449 0.384298 0.828217"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 11.91 0.00 11.80 11.91 0.00 11.80 12.02 0.00 10.00 11.91 0.00 11.80 12.02 0.00 10.00 12.02 0.00"/>
+        &lt;Color color="0.170159 0.378324 0.826277 0.170159 0.378324 0.826277 0.170159 0.378324 0.826277 0.170159 0.378324 0.826277 0.170159 0.378324 0.826277 0.170159 0.378324 0.826277"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 12.02 0.00 11.80 12.02 0.00 11.80 12.12 0.00 10.00 12.02 0.00 11.80 12.12 0.00 10.00 12.12 0.00"/>
+        &lt;Color color="0.16587 0.37235 0.824336 0.16587 0.37235 0.824336 0.16587 0.37235 0.824336 0.16587 0.37235 0.824336 0.16587 0.37235 0.824336 0.16587 0.37235 0.824336"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 12.12 0.00 11.80 12.12 0.00 11.80 12.23 0.00 10.00 12.12 0.00 11.80 12.23 0.00 10.00 12.23 0.00"/>
+        &lt;Color color="0.161581 0.366376 0.822396 0.161581 0.366376 0.822396 0.161581 0.366376 0.822396 0.161581 0.366376 0.822396 0.161581 0.366376 0.822396 0.161581 0.366376 0.822396"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 12.23 0.00 11.80 12.23 0.00 11.80 12.34 0.00 10.00 12.23 0.00 11.80 12.34 0.00 10.00 12.34 0.00"/>
+        &lt;Color color="0.157292 0.360401 0.820455 0.157292 0.360401 0.820455 0.157292 0.360401 0.820455 0.157292 0.360401 0.820455 0.157292 0.360401 0.820455 0.157292 0.360401 0.820455"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 12.34 0.00 11.80 12.34 0.00 11.80 12.45 0.00 10.00 12.34 0.00 11.80 12.45 0.00 10.00 12.45 0.00"/>
+        &lt;Color color="0.153002 0.354427 0.818515 0.153002 0.354427 0.818515 0.153002 0.354427 0.818515 0.153002 0.354427 0.818515 0.153002 0.354427 0.818515 0.153002 0.354427 0.818515"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 12.45 0.00 11.80 12.45 0.00 11.80 12.56 0.00 10.00 12.45 0.00 11.80 12.56 0.00 10.00 12.56 0.00"/>
+        &lt;Color color="0.148713 0.348453 0.816575 0.148713 0.348453 0.816575 0.148713 0.348453 0.816575 0.148713 0.348453 0.816575 0.148713 0.348453 0.816575 0.148713 0.348453 0.816575"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 12.56 0.00 11.80 12.56 0.00 11.80 12.67 0.00 10.00 12.56 0.00 11.80 12.67 0.00 10.00 12.67 0.00"/>
+        &lt;Color color="0.144424 0.342479 0.814634 0.144424 0.342479 0.814634 0.144424 0.342479 0.814634 0.144424 0.342479 0.814634 0.144424 0.342479 0.814634 0.144424 0.342479 0.814634"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 12.67 0.00 11.80 12.67 0.00 11.80 12.78 0.00 10.00 12.67 0.00 11.80 12.78 0.00 10.00 12.78 0.00"/>
+        &lt;Color color="0.140135 0.336504 0.812694 0.140135 0.336504 0.812694 0.140135 0.336504 0.812694 0.140135 0.336504 0.812694 0.140135 0.336504 0.812694 0.140135 0.336504 0.812694"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 12.78 0.00 11.80 12.78 0.00 11.80 12.89 0.00 10.00 12.78 0.00 11.80 12.89 0.00 10.00 12.89 0.00"/>
+        &lt;Color color="0.135846 0.33053 0.810754 0.135846 0.33053 0.810754 0.135846 0.33053 0.810754 0.135846 0.33053 0.810754 0.135846 0.33053 0.810754 0.135846 0.33053 0.810754"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="10.00 12.89 0.00 11.80 12.89 0.00 11.80 13.00 0.00 10.00 12.89 0.00 11.80 13.00 0.00 10.00 13.00 0.00"/>
+        &lt;Color color="0.131556 0.324556 0.808813 0.131556 0.324556 0.808813 0.131556 0.324556 0.808813 0.131556 0.324556 0.808813 0.131556 0.324556 0.808813 0.131556 0.324556 0.808813"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedLineSet coordIndex="0 1">
+        &lt;Coordinate point="11.80 -15.00 0.00 12.34 -15.00 0.00"/>
+      &lt;/IndexedLineSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedLineSet coordIndex="0 1">
+        &lt;Coordinate point="11.80 -1.00 0.00 12.34 -1.00 0.00"/>
+      &lt;/IndexedLineSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedLineSet coordIndex="0 1">
+        &lt;Coordinate point="11.80 4.60 0.00 12.34 4.60 0.00"/>
+      &lt;/IndexedLineSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedLineSet coordIndex="0 1">
+        &lt;Coordinate point="11.80 13.00 0.00 12.34 13.00 0.00"/>
+      &lt;/IndexedLineSet>
+    &lt;/Shape>
+    &lt;ProtoInstance name="Label">
+      &lt;fieldValue name="p" value="12.88 -15.00 0.00"/>
+      &lt;fieldValue name="c" value="&amp;quot;0: low&amp;quot;"/>
+      &lt;fieldValue name="family" value="&amp;quot;SERIF&amp;quot;"/>
+      &lt;fieldValue name="dc" value="0 0 0"/>
+      &lt;fieldValue name="sc" value="0 0 0"/>
+      &lt;fieldValue name="sh" value="0.2"/>
+      &lt;fieldValue name="sz" value="0.65"/>
+    &lt;/ProtoInstance>
+    &lt;ProtoInstance name="Label">
+      &lt;fieldValue name="p" value="12.88 -1.00 0.00"/>
+      &lt;fieldValue name="c" value="&amp;quot;50&amp;quot;"/>
+      &lt;fieldValue name="family" value="&amp;quot;SERIF&amp;quot;"/>
+      &lt;fieldValue name="dc" value="0 0 0"/>
+      &lt;fieldValue name="sc" value="0 0 0"/>
+      &lt;fieldValue name="sh" value="0.2"/>
+      &lt;fieldValue name="sz" value="0.65"/>
+    &lt;/ProtoInstance>
+    &lt;ProtoInstance name="Label">
+      &lt;fieldValue name="p" value="12.88 4.60 0.00"/>
+      &lt;fieldValue name="c" value="&amp;quot;70: confident&amp;quot;"/>
+      &lt;fieldValue name="family" value="&amp;quot;SERIF&amp;quot;"/>
+      &lt;fieldValue name="dc" value="0 0 0"/>
+      &lt;fieldValue name="sc" value="0 0 0"/>
+      &lt;fieldValue name="sh" value="0.2"/>
+      &lt;fieldValue name="sz" value="0.65"/>
+    &lt;/ProtoInstance>
+    &lt;ProtoInstance name="Label">
+      &lt;fieldValue name="p" value="12.88 13.00 0.00"/>
+      &lt;fieldValue name="c" value="&amp;quot;100: high&amp;quot;"/>
+      &lt;fieldValue name="family" value="&amp;quot;SERIF&amp;quot;"/>
+      &lt;fieldValue name="dc" value="0 0 0"/>
+      &lt;fieldValue name="sc" value="0 0 0"/>
+      &lt;fieldValue name="sh" value="0.2"/>
+      &lt;fieldValue name="sz" value="0.65"/>
+    &lt;/ProtoInstance>
+    &lt;ProtoInstance name="Label">
+      &lt;fieldValue name="p" value="10.00 14.80 0.00"/>
+      &lt;fieldValue name="c" value="&amp;quot;Confidence&amp;quot;"/>
+      &lt;fieldValue name="family" value="&amp;quot;SERIF&amp;quot;"/>
+      &lt;fieldValue name="dc" value="0 0 0"/>
+      &lt;fieldValue name="sc" value="0 0 0"/>
+      &lt;fieldValue name="sh" value="0.2"/>
+      &lt;fieldValue name="sz" value="0.65"/>
+    &lt;/ProtoInstance>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="-22.00 6.00 0.00 -20.40 6.00 0.00 -20.40 10.00 0.00 -22.00 6.00 0.00 -20.40 10.00 0.00 -22.00 10.00 0.00"/>
+        &lt;Color color="0.85 0.35 0.15 0.85 0.35 0.15 0.85 0.35 0.15 0.85 0.35 0.15 0.85 0.35 0.15 0.85 0.35 0.15"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="-22.00 1.00 0.00 -20.40 1.00 0.00 -20.40 5.00 0.00 -22.00 1.00 0.00 -20.40 5.00 0.00 -22.00 5.00 0.00"/>
+        &lt;Color color="0.15 0.45 0.75 0.15 0.45 0.75 0.15 0.45 0.75 0.15 0.45 0.75 0.15 0.45 0.75 0.15 0.45 0.75"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="-22.00 -4.00 0.00 -20.40 -4.00 0.00 -20.40 0.00 0.00 -22.00 -4.00 0.00 -20.40 0.00 0.00 -22.00 0.00 0.00"/>
+        &lt;Color color="0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;ProtoInstance name="Label">
+      &lt;fieldValue name="p" value="-19.60 8.00 0.00"/>
+      &lt;fieldValue name="c" value="&amp;quot;Helix&amp;quot;"/>
+      &lt;fieldValue name="family" value="&amp;quot;SERIF&amp;quot;"/>
+      &lt;fieldValue name="dc" value="0 0 0"/>
+      &lt;fieldValue name="sc" value="0 0 0"/>
+      &lt;fieldValue name="sh" value="0.2"/>
+      &lt;fieldValue name="sz" value="0.65"/>
+    &lt;/ProtoInstance>
+    &lt;ProtoInstance name="Label">
+      &lt;fieldValue name="p" value="-19.60 3.00 0.00"/>
+      &lt;fieldValue name="c" value="&amp;quot;Strand&amp;quot;"/>
+      &lt;fieldValue name="family" value="&amp;quot;SERIF&amp;quot;"/>
+      &lt;fieldValue name="dc" value="0 0 0"/>
+      &lt;fieldValue name="sc" value="0 0 0"/>
+      &lt;fieldValue name="sh" value="0.2"/>
+      &lt;fieldValue name="sz" value="0.65"/>
+    &lt;/ProtoInstance>
+    &lt;ProtoInstance name="Label">
+      &lt;fieldValue name="p" value="-19.60 -2.00 0.00"/>
+      &lt;fieldValue name="c" value="&amp;quot;Coil&amp;quot;"/>
+      &lt;fieldValue name="family" value="&amp;quot;SERIF&amp;quot;"/>
+      &lt;fieldValue name="dc" value="0 0 0"/>
+      &lt;fieldValue name="sc" value="0 0 0"/>
+      &lt;fieldValue name="sh" value="0.2"/>
+      &lt;fieldValue name="sz" value="0.65"/>
+    &lt;/ProtoInstance>
+    &lt;ProtoInstance name="Label">
+      &lt;fieldValue name="p" value="-22.00 16.00 0.00"/>
+      &lt;fieldValue name="c" value="&amp;quot;Secondary structure&amp;quot;"/>
+      &lt;fieldValue name="family" value="&amp;quot;SERIF&amp;quot;"/>
+      &lt;fieldValue name="dc" value="0 0 0"/>
+      &lt;fieldValue name="sc" value="0 0 0"/>
+      &lt;fieldValue name="sh" value="0.2"/>
+      &lt;fieldValue name="sz" value="0.65"/>
+    &lt;/ProtoInstance>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="-22.00 -18.00 0.00 -15.87 -18.00 0.00 -15.87 -16.80 0.00 -22.00 -18.00 0.00 -15.87 -16.80 0.00 -22.00 -16.80 0.00"/>
+        &lt;Color color="1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="-14.33 -18.00 0.00 -8.20 -18.00 0.00 -8.20 -16.80 0.00 -14.33 -18.00 0.00 -8.20 -16.80 0.00 -14.33 -16.80 0.00"/>
+        &lt;Color color="0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;Shape>
+      &lt;Appearance>
+        &lt;Material diffuseColor="1 1 1" ambientIntensity="0.2" shininess="0.2"/>
+      &lt;/Appearance>
+      &lt;IndexedFaceSet solid="FALSE" coordIndex="0 1 2 -1 3 4 5 -1">
+        &lt;Coordinate point="-6.67 -18.00 0.00 -0.53 -18.00 0.00 -0.53 -16.80 0.00 -6.67 -18.00 0.00 -0.53 -16.80 0.00 -6.67 -16.80 0.00"/>
+        &lt;Color color="0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0"/>
+      &lt;/IndexedFaceSet>
+    &lt;/Shape>
+    &lt;ProtoInstance name="Label">
+      &lt;fieldValue name="p" value="-18.93 -19.50 0.00"/>
+      &lt;fieldValue name="c" value="&amp;quot;A&amp;quot;"/>
+      &lt;fieldValue name="family" value="&amp;quot;SERIF&amp;quot;"/>
+      &lt;fieldValue name="dc" value="0 0 0"/>
+      &lt;fieldValue name="sc" value="0 0 0"/>
+      &lt;fieldValue name="sh" value="0.2"/>
+      &lt;fieldValue name="sz" value="0.65"/>
+    &lt;/ProtoInstance>
+    &lt;ProtoInstance name="Label">
+      &lt;fieldValue name="p" value="-11.27 -19.50 0.00"/>
+      &lt;fieldValue name="c" value="&amp;quot;B&amp;quot;"/>
+      &lt;fieldValue name="family" value="&amp;quot;SERIF&amp;quot;"/>
+      &lt;fieldValue name="dc" value="0 0 0"/>
+      &lt;fieldValue name="sc" value="0 0 0"/>
+      &lt;fieldValue name="sh" value="0.2"/>
+      &lt;fieldValue name="sz" value="0.65"/>
+    &lt;/ProtoInstance>
+    &lt;ProtoInstance name="Label">
+      &lt;fieldValue name="p" value="-3.60 -19.50 0.00"/>
+      &lt;fieldValue name="c" value="&amp;quot;C&amp;quot;"/>
+      &lt;fieldValue name="family" value="&amp;quot;SERIF&amp;quot;"/>
+      &lt;fieldValue name="dc" value="0 0 0"/>
+      &lt;fieldValue name="sc" value="0 0 0"/>
+      &lt;fieldValue name="sh" value="0.2"/>
+      &lt;fieldValue name="sz" value="0.65"/>
+    &lt;/ProtoInstance>
+    &lt;ProtoInstance name="Label">
+      &lt;fieldValue name="p" value="-22.00 -15.00 0.00"/>
+      &lt;fieldValue name="c" value="&amp;quot;Chains&amp;quot;"/>
+      &lt;fieldValue name="family" value="&amp;quot;SERIF&amp;quot;"/>
+      &lt;fieldValue name="dc" value="0 0 0"/>
+      &lt;fieldValue name="sc" value="0 0 0"/>
+      &lt;fieldValue name="sh" value="0.2"/>
+      &lt;fieldValue name="sz" value="0.65"/>
+    &lt;/ProtoInstance>
+  &lt;/Collision>
+  &lt;NavigationInfo speed="4" type="&amp;quot;EXAMINE&amp;quot; &amp;quot;FLY&amp;quot;"/>
+  &lt;Background skyColor="1 1 1"/>
+  &lt;Viewpoint position="-4.56 -1.75 45.00" description="overall default"/>
+  &lt;/Scene>
+&lt;/X3D>
+</textarea>
+  <x3d-canvas id="molscript-scene" contentScale="auto" update="auto"></x3d-canvas>
+</body>
+</html>

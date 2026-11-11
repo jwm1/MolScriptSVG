@@ -1,6 +1,6 @@
 /* svg.c
 
-   MolScriptSVG v2.2
+   MolScriptSVG v2.3
 
    SVG
 
@@ -19,6 +19,7 @@
 #include "clib/str_utils.h"
 #include "clib/angle.h"
 #include "clib/matrix3.h"
+#include "clib/dynstring.h"
 
 #include "svg.h"
 #include "col.h"
@@ -26,6 +27,7 @@
 #include "graphics.h"
 #include "segment.h"
 #include "state.h"
+#include "select.h"
 
 
 typedef struct {
@@ -33,11 +35,14 @@ typedef struct {
   int slot;
   double depth;
   state *st;
+  int command;
 } depth_db_entry;
 
 typedef struct {
   vector3 v1;
   vector3 v2;
+  vector3 c1, c2;
+  boolean curved;
   colour *c;
 } line_db_entry;
 
@@ -118,6 +123,74 @@ static double current_linewidth;
 static double current_linedash;
 static FILE *svg_body = NULL;
 static int svg_plot_count = 0;
+
+typedef struct {
+  char *kind;
+  dynstring *selection;
+} svg_command;
+static svg_command *commands;
+static int command_count;
+static int fragment_count;
+
+static void
+svg_clear_commands (void)
+{
+  int i;
+  for (i = 0; i < command_count; i++) {
+    free (commands[i].kind);
+    ds_delete (commands[i].selection);
+  }
+  free (commands);
+  commands = NULL;
+  command_count = fragment_count = 0;
+}
+
+void
+svg_begin_command (const char *kind)
+{
+  mol3d *mol;
+  res3d *res;
+  at3d *at;
+  selection *sel;
+  dynstring *description = ds_create ("");
+  int ai, ri, set = 0, selected;
+  char buffer[128];
+  /* Snapshot before drawing consumes selections or a later command deletes
+     the molecule. Paired selections retain their separate set membership. */
+  sel = current_atom_sel ? current_atom_sel : current_residue_sel;
+  for (; sel; sel = sel->prev) {
+    snprintf (buffer, sizeof(buffer), "set %d: ", ++set);
+    ds_cat (description, buffer);
+    ai = ri = 0;
+    for (mol = first_molecule; mol; mol = mol->next) {
+      for (res = mol->first; res; res = res->next, ri++) {
+        selected = 0;
+        for (at = res->first; at; at = at->next, ai++) {
+          if (!(current_atom_sel ? sel->flags[ai] : sel->flags[ri])) continue;
+          if (!selected) {
+            ds_cat (description, mol->name ? mol->name : "");
+            snprintf (buffer, sizeof(buffer), "/model=%d/chain=%c/%s(%s)[",
+                      mol->model, res->chain ? res->chain : ' ', res->name, res->type);
+            ds_cat (description, buffer);
+          }
+          if (current_atom_sel) {
+            if (selected) ds_cat (description, ",");
+            ds_cat (description, at->name);
+            if (at->altloc && at->altloc != ' ') {
+              ds_cat (description, ":alt="); ds_add (description, at->altloc);
+            }
+          }
+          selected++;
+        }
+        if (selected) ds_cat (description, current_atom_sel ? "]; " : "all]; ");
+      }
+    }
+  }
+  commands = realloc (commands, (command_count+1)*sizeof(*commands));
+  if (!commands) yyerror ("out of memory storing SVG commands");
+  commands[command_count].kind = str_clone (kind);
+  commands[command_count++].selection = description;
+}
 
 #define SVG_SEAM_STROKE_WIDTH 0.35
 
@@ -233,6 +306,39 @@ svg_write_escaped (FILE *file, char *str, int len, int strip_percent)
       fputc (ch, file);
       break;
     }
+  }
+}
+
+static void
+svg_command_metadata (void)
+{
+  int i;
+  if (!command_count) return;
+  fputs ("<metadata xmlns:ms=\"urn:molscript:svg\">\n", svg_body);
+  for (i = 0; i < command_count; i++) {
+    fprintf (svg_body, "<ms:command id=\"plot-%d-command-%d\" kind=\"%s\">",
+             svg_plot_count, i+1, commands[i].kind);
+    if (commands[i].selection->length)
+      svg_write_escaped (svg_body, commands[i].selection->string,
+                         commands[i].selection->length, FALSE);
+    fputs ("</ms:command>\n", svg_body);
+  }
+  fputs ("</metadata>\n", svg_body);
+}
+
+/* Only contiguous runs are grouped: regrouping by command would break the
+   painter's algorithm for interleaved helices, strands and ligand atoms. */
+static void
+svg_group_switch (int *active, int command)
+{
+  if (*active == command) return;
+  if (*active) fputs ("</g>\n", svg_body);
+  *active = command;
+  if (command) {
+    fprintf (svg_body, "<g id=\"plot-%d-fragment-%d\" data-command=\"plot-%d-command-%d\" data-kind=\"%s\">\n",
+             svg_plot_count, ++fragment_count, svg_plot_count, command,
+             commands[command-1].kind);
+    fprintf (svg_body, "<title>%s</title>\n", commands[command-1].kind);
   }
 }
 
@@ -533,6 +639,7 @@ enter_depth (int code, int slot, double depth)
   de->slot = slot;
   de->depth = depth;
   de->st = current_state;
+  de->command = command_count;
 
   depth_count++;
 }
@@ -569,6 +676,7 @@ db_line (vector3 *v1, vector3 *v2, colour *c)
     le = line_array + line_count;
     le->v1 = *v1;
     le->v2 = *v2;
+    le->curved = FALSE;
     if (c) {
       le->c = colour_clone (c);
     } else {
@@ -581,6 +689,28 @@ db_line (vector3 *v1, vector3 *v2, colour *c)
 
 
 /*------------------------------------------------------------*/
+/* De Casteljau splitting retains the existing depth-sort segment granularity. */
+static void
+db_curve (vector3 p[4], colour *c, int level)
+{
+  double length=v3_distance(p,p+1)+v3_distance(p+1,p+2)+v3_distance(p+2,p+3);
+  int old;
+  if (length > current_state->segmentsize && level<20) {
+    vector3 a[4],b[4],mid;
+    a[0]=p[0]; b[3]=p[3];
+    v3_middle(a+1,p,p+1); v3_middle(&mid,p+1,p+2); v3_middle(b+2,p+2,p+3);
+    v3_middle(a+2,a+1,&mid); v3_middle(b+1,&mid,b+2);
+    v3_middle(a+3,a+2,b+1); b[0]=a[3];
+    db_curve(a,c,level+1); db_curve(b,c,level+1);
+    return;
+  }
+  old=line_count; db_line(p,p+3,c);
+  if (line_count==old+1) {
+    line_array[old].curved=TRUE;
+    line_array[old].c1=p[1]; line_array[old].c2=p[2];
+  }
+}
+
 static void
 db_point (vector3 *v, colour *c)
 {
@@ -677,6 +807,16 @@ db_plane (vector3 *p1, vector3 *p2, vector3 *p3, vector3 *p4,
 
 
 /*------------------------------------------------------------*/
+void
+svg_legend_box (vector3 *low, vector3 *high, colour *c)
+{
+  vector3 p2 = *low, p4 = *high;
+  p2.x = high->x;
+  p4.x = low->x;
+  /* A flat swatch needs no triangulation or depth subdivision. */
+  db_plane (low, &p2, high, &p4, c, 1.0, P_CODE);
+}
+
 static void
 db_plane_add_edge (int slot, int first)
 {
@@ -817,6 +957,10 @@ db_transform (double matrix[4][4], double scale)
   for (slot = 0; slot < line_count; slot++, le++) {
     matrix3_transform (&(le->v1), matrix);
     matrix3_transform (&(le->v2), matrix);
+    if (le->curved) {
+      matrix3_transform (&le->c1, matrix);
+      matrix3_transform (&le->c2, matrix);
+    }
   }
 
   pte = point_array;
@@ -980,7 +1124,8 @@ db_label_output (depth_db_entry *de)
            lae->pos.x, lae->pos.y);
   if (de->st->labelrotation) fputs (" rotate(-90)", file);
   fputc ('"', file);
-  fprintf (file, " font-size=\"%.2f\" font-family=\"Times-Roman\"", size);
+  fprintf (file, " font-size=\"%.2f\" font-family=\"%s\"", size,
+           label_font_name (de->st, SVG_MODE));
   if (de->st->labelcentre) {
     fputs (" text-anchor=\"middle\" dominant-baseline=\"middle\"", file);
   }
@@ -1008,6 +1153,7 @@ static void
 db_output (void)
 {
   int slot;
+  int active = 0;
   depth_db_entry *de;
   line_db_entry *le;
   point_db_entry *pte;
@@ -1029,6 +1175,8 @@ db_output (void)
     de = depth_array + slot;
 
     if (de->st->transparency == 1.0) continue;
+    if (de->code == LABEL_CODE && !de->st->labelclip) continue;
+    svg_group_switch (&active, de->command);
     /* Composite each depth-sorted primitive once, including its fill,
        border and highlights. Labels also use this in the second pass. */
     if (de->code != LABEL_CODE && de->st->transparency > 0.0)
@@ -1037,6 +1185,13 @@ db_output (void)
 
     case LINE_CODE:
       le = line_array + de->slot;
+      if (le->curved) {
+        fprintf(file,"<path d=\"M %.4f %.4f C %.4f %.4f %.4f %.4f %.4f %.4f\"",
+          le->v1.x,le->v1.y,le->c1.x,le->c1.y,le->c2.x,le->c2.y,le->v2.x,le->v2.y);
+        svg_write_style(file,le->c ? le->c : &de->st->linecolour,NULL,
+          depthcue(de->depth,de->st)*de->st->linewidth,de->st->linedash);
+        fputs("/>\n",file); line_output_count++; break;
+      }
       svg_write_line (file, &(le->v1), &(le->v2),
                       le->c ? le->c : &(de->st->linecolour),
                       depthcue (de->depth, de->st) * de->st->linewidth,
@@ -1150,7 +1305,7 @@ db_output (void)
     if (de->code != LABEL_CODE && de->st->transparency > 0.0)
       fputs ("</g>\n", file);
   }
-
+  svg_group_switch (&active, 0);
 }
 
 
@@ -1159,13 +1314,17 @@ static void
 db_unclipped_labels_output (void)
 {
   int slot;
+  int active = 0;
   depth_db_entry *de;
 
   for (slot = 0; slot < depth_count; slot++) {
     de = depth_array + slot;
-    if ((de->code == LABEL_CODE) &&
-	(! de->st->labelclip)) db_label_output (de);
+    if ((de->code == LABEL_CODE) && !de->st->labelclip && de->st->transparency < 1) {
+      svg_group_switch (&active, de->command);
+      db_label_output (de);
+    }
   }
+  svg_group_switch (&active, 0);
 }
 
 
@@ -1219,6 +1378,7 @@ svg_set (void)
 void
 svg_first_plot (void)
 {
+  if (check_mode) return;
   if (first_plot) {
     bounding_box[0] = -1.0;
     bounding_box[1] = -1.0;
@@ -1237,6 +1397,9 @@ svg_finish_output (void)
 {
   double x0, y0, x1, y1, width, height;
   int ch;
+
+  svg_clear_commands();
+  if (check_mode) return;
 
   if (svg_plot_count == 0) {
     x0 = default_area[0];
@@ -1279,6 +1442,7 @@ svg_finish_output (void)
 void
 svg_start_plot (void)
 {
+  svg_clear_commands();
   set_area_values (default_area[0], default_area[1],
 		   default_area[2], default_area[3]);
 
@@ -1300,6 +1464,8 @@ svg_finish_plot (void)
   double temp_matrix[4][4];
   double scale;
   FILE *file;
+
+  if (check_mode) { check_plot(); return; }
 
   file = svg_body;
 
@@ -1342,6 +1508,7 @@ svg_finish_plot (void)
   db_transform (matrix, scale);
 
   svg_plot_count++;
+  svg_command_metadata();
   fprintf (file, "<clipPath id=\"plot-clip-%d\"><rect x=\"%.2f\" y=\"%.2f\" width=\"%.2f\" height=\"%.2f\"/></clipPath>\n",
            svg_plot_count, area[0], area[1], area[2] - area[0], area[3] - area[1]);
   fprintf (file, "<g clip-path=\"url(#plot-clip-%d)\">\n", svg_plot_count);
@@ -1670,6 +1837,15 @@ svg_line (boolean polylines)
   int slot;
 
   if (line_segment_count < 2) return;
+  if (polylines && line_segments_curved) {
+    vector3 p[4];
+    for (slot=1;slot<line_segment_count;slot++) {
+      if (line_segments[slot].new) continue;
+      line_segment_bezier(slot,p);
+      db_curve(p,current_state->colourparts ? &line_segments[slot-1].c : NULL,0);
+    }
+    return;
+  }
 
   if (current_state->colourparts) {
 

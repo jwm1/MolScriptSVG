@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <X3D profile="Immersive" version="3.3" xmlns:xsd="http://www.w3.org/2001/XMLSchema-instance" xsd:noNamespaceSchemaLocation="http://www.web3d.org/specifications/x3d-3.3.xsd">
   <Scene>
-  <WorldInfo title="c-H-Ras p21 protein (1-166), comples with GDP, Mg" info="&quot;Program: MolScriptSVG 2.2, Copyright (C) 1997-1998 Per J. Kraulis&quot; &quot;Author: jwm&quot;"/>
+  <WorldInfo title="c-H-Ras p21 protein (1-166), comples with GDP, Mg" info="&quot;Program: MolScriptSVG 2.3, Copyright (C) 1997-1998 Per J. Kraulis&quot; &quot;Author: jwm&quot;"/>
   <ProtoDeclare name="Ball">
     <ProtoInterface>
       <field accessType="inputOutput" type="SFVec3f" name="p" value="0 0 0"/>
@@ -40,6 +40,8 @@
   </ProtoDeclare>
   <ProtoDeclare name="Cyl">
     <ProtoInterface>
+      <field accessType="initializeOnly" type="SFBool" name="tc" value="TRUE"/>
+      <field accessType="initializeOnly" type="SFBool" name="bc" value="TRUE"/>
       <field accessType="inputOutput" type="SFVec3f" name="p" value="0 0 0"/>
       <field accessType="inputOutput" type="SFRotation" name="r" value="0 0 1 0"/>
       <field accessType="inputOutput" type="SFVec3f" name="s" value="1 1 1"/>
@@ -63,7 +65,12 @@
               </IS>
             </Material>
           </Appearance>
-          <Cylinder/>
+          <Cylinder>
+            <IS>
+              <connect nodeField="top" protoField="tc"/>
+              <connect nodeField="bottom" protoField="bc"/>
+            </IS>
+          </Cylinder>
         </Shape>
         <IS>
           <connect nodeField="translation" protoField="p"/>
@@ -113,6 +120,7 @@
       <field accessType="initializeOnly" type="SFVec3f" name="p" value="0 0 0"/>
       <field accessType="initializeOnly" type="SFFloat" name="sz" value="1"/>
       <field accessType="initializeOnly" type="MFString" name="c" value=""/>
+      <field accessType="initializeOnly" type="MFString" name="family" value="&quot;SERIF&quot;"/>
       <field accessType="initializeOnly" type="SFVec3f" name="o" value="0 0 0"/>
       <field accessType="initializeOnly" type="SFColor" name="dc" value="1 1 1"/>
       <field accessType="initializeOnly" type="SFColor" name="ec" value="0 0 0"/>
@@ -139,6 +147,7 @@
               <Text>
                 <FontStyle>
                   <IS>
+                    <connect nodeField="family" protoField="family"/>
                     <connect nodeField="size" protoField="sz"/>
                   </IS>
                 </FontStyle>
@@ -290,7 +299,7 @@
     <Anchor url="&quot;ras_loops_text.html&quot;" description="effector loops" parameter="&quot;target=text&quot;" bboxCenter="68.5135 74.3248 42.9971" bboxSize="9.26348 25.5317 27.5161">
       <Shape>
         <Appearance>
-          <Material emissiveColor="0.63 0.13 0.94" ambientIntensity="0.2" shininess="0.2"/>
+          <Material emissiveColor="0.627451 0.12549 0.941176" ambientIntensity="0.2" shininess="0.2"/>
         </Appearance>
         <IndexedLineSet coordIndex="0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28">
           <Coordinate point="66.17 62.06 48.52 66.51 62.18 49.77 66.27 62.48 51.34 65.95 62.87 52.61 65.50 63.48 53.73 65.00 64.40 54.67 64.57 65.56 55.40 64.38 66.95 55.87 64.39 68.46 56.15 64.62 70.00 56.26 65.01 71.50 56.21 65.53 72.84 56.05 66.17 73.95 55.71 66.94 74.69 55.12 67.77 75.20 54.34 68.63 75.53 53.38 69.40 75.84 52.32 69.97 76.38 51.28 70.42 77.01 50.24 70.76 77.73 49.23 71.08 78.30 48.23 71.52 78.48 47.25 71.95 78.32 46.26 72.30 77.70 45.23 72.55 76.77 44.21 72.60 75.61 43.20 72.56 74.27 42.25 72.65 72.80 41.43 72.47 71.28 40.68"/>
@@ -298,7 +307,7 @@
       </Shape>
       <Shape>
         <Appearance>
-          <Material emissiveColor="0.63 0.13 0.94" ambientIntensity="0.2" shininess="0.2"/>
+          <Material emissiveColor="0.627451 0.12549 0.941176" ambientIntensity="0.2" shininess="0.2"/>
         </Appearance>
         <IndexedLineSet coordIndex="0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18">
           <Coordinate point="65.41 72.02 41.38 65.88 73.56 41.52 66.50 75.19 41.32 67.03 76.75 41.53 67.57 78.27 41.76 68.16 79.73 41.87 68.76 81.13 41.79 69.36 82.46 41.34 69.93 83.71 40.63 70.42 84.87 39.65 70.84 85.80 38.51 71.17 86.40 37.25 71.40 86.59 35.97 71.48 86.22 34.81 71.43 85.45 33.73 71.22 84.36 32.77 70.95 83.10 31.83 70.64 81.89 30.56 70.44 80.55 29.74"/>

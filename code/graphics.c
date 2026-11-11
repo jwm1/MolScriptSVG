@@ -1,6 +1,6 @@
 /* graphics.c
 
-   MolScriptSVG v2.2
+   MolScriptSVG v2.3
 
    Graphics: construct the geometries and call the output procedures.
 
@@ -27,10 +27,190 @@
 #include "lex.h"
 #include "select.h"
 #include "xform.h"
+#include "svg.h"
+#include "col.h"
+#include "figure.h"
+
+/* Inspect completed selections, not intermediate Boolean expressions. */
+void
+drawing_begin (const char *kind)
+{
+  selection *sel;
+  mol3d *mol;
+  res3d *res;
+  at3d *at, *previous;
+  int n, index, missing = 0, breaks = 0, drawable = 0;
+  char message[256];
+  const char *atomname = !strcmp (kind, "double-helix") ?
+    NUCLEOTIDE_CHAIN_ATOMNAME : PEPTIDE_CHAIN_ATOMNAME;
+  double distance = !strcmp (kind, "double-helix") ?
+    NUCLEOTIDE_DISTANCE : PEPTIDE_DISTANCE;
+
+  view_note_draw();
+
+  if (output_mode == SVG_MODE && !check_mode && svg_groups)
+    svg_begin_command (kind);
+  if (!check_mode) return;
+
+  for (sel = current_atom_sel; sel; sel = sel->prev) {
+    n = index = 0;
+    for (mol = first_molecule; mol; mol = mol->next)
+      for (res = mol->first; res; res = res->next)
+        for (at = res->first; at; at = at->next, index++)
+          if (sel->flags[index]) {
+            n++;
+            if (!isfinite(at->xyz.x) || !isfinite(at->xyz.y) || !isfinite(at->xyz.z))
+              yyerror ("non-finite selected atom coordinates");
+          }
+    fprintf (stderr, "Check: %s: %d selected atoms\n", kind, n);
+    if (!n) yywarning ("empty atom selection in drawing command");
+  }
+  if (current_residue_sel) {
+    mol3d_chain *chains, *ch;
+    int minimum = (!strcmp(kind, "helix") || !strcmp(kind, "strand") ||
+                   !strcmp(kind, "cylinder")) ? 3 : 2;
+    n = index = 0;
+    for (mol = first_molecule; mol; mol = mol->next) {
+      previous = NULL;
+      for (res = mol->first; res; res = res->next, index++) {
+        if (!current_residue_sel->flags[index]) { previous = NULL; continue; }
+        n++;
+        at = at3d_lookup (res, atomname);
+        if (!at) { missing++; previous = NULL; continue; }
+        if (!isfinite(at->xyz.x) || !isfinite(at->xyz.y) || !isfinite(at->xyz.z))
+          yyerror ("non-finite backbone coordinates");
+        if (previous && res->chain == previous->res->chain &&
+            v3_distance (&previous->xyz, &at->xyz) >= distance) breaks++;
+        previous = at;
+      }
+    }
+    fprintf (stderr, "Check: %s: %d selected residues\n", kind, n);
+    if (!n) yywarning ("empty residue selection in drawing command");
+    if (missing) {
+      snprintf (message, sizeof(message), "%s: %d selected residues missing %s",
+                kind, missing, atomname);
+      yywarning (message);
+    }
+    if (breaks) {
+      snprintf (message, sizeof(message), "%s: %d backbone distance breaks (cutoff %.3g A)",
+                kind, breaks, distance);
+      yywarning (message);
+    }
+    chains = mol3d_chain_find (first_molecule, (char *)atomname, distance,
+                              current_residue_sel->flags);
+    for (ch = chains; ch; ch = ch->next)
+      if (ch->length >= minimum) drawable += ch->length;
+    if (chains) mol3d_chain_delete (chains);
+    if (n - missing > drawable) {
+      snprintf (message, sizeof(message), "%s: %d backbone atoms in fragments too short to draw (minimum %d residues)",
+                kind, n - missing - drawable, minimum);
+      yywarning (message);
+    }
+  }
+}
+
+void
+check_plot (void)
+{
+  vector3 low, high;
+  ext3d_get_low_high (&low, &high);
+  if (low.x > high.x) {
+    yywarning ("plot has no drawable geometry");
+    return;
+  }
+  if (!isfinite(low.x) || !isfinite(low.y) || !isfinite(low.z) ||
+      !isfinite(high.x) || !isfinite(high.y) || !isfinite(high.z))
+    yyerror ("non-finite plot extent");
+  fprintf (stderr, "Check: geometry bounds x %.6g..%.6g, y %.6g..%.6g, z %.6g..%.6g A\n",
+           low.x, high.x, low.y, high.y, low.z, high.z);
+  if (window > 0 && (low.x < -aspect_window_x || high.x > aspect_window_x ||
+                     low.y < -aspect_window_y || high.y > aspect_window_y))
+    yywarning ("geometry extends outside the explicit window");
+  if (slab > 0 && (low.z < -slab || high.z > slab))
+    yywarning ("geometry extends outside the explicit slab");
+}
+
+/* Legends are ordinary image-frame geometry, portable to every backend. */
+void
+legend (char *text)
+{
+  double x, y, z, width, height, low, high, a, b, f;
+  const double edges[] = {0, .5, .7, .9, 1};
+  vector3 vertices[12], p;
+  colour c;
+  int i, j, count, discrete = ramp_is_discrete();
+  int vertical = legend_config.vertical;
+  int ticks = legend_config.custom_ticks ? legend_config.count : 5;
+  char label[64];
+  assert (dstack_size == 7);
+  for (i = 0; i < 7; i++)
+    if (!isfinite(dstack[i])) { yyerror ("non-finite legend value"); return; }
+  x = dstack[0]; y = dstack[1]; z = dstack[2];
+  width = dstack[3]; height = dstack[4]; low = dstack[5]; high = dstack[6];
+  clear_dstack();
+  if (width <= 0 || height <= 0 || low >= high || !isfinite(high-low)) {
+    yyerror ("legend requires positive width/height and finite LOW < HIGH"); return;
+  }
+  if (discrete && (low != 0 || high != 100)) {
+    yyerror ("discrete alphafold legend requires range 0 100"); return;
+  }
+  for (i = 0; i < (legend_config.custom_ticks ? ticks : 0); i++) {
+    if (legend_config.ticks[i] < low || legend_config.ticks[i] > high ||
+        (i && legend_config.ticks[i] <= legend_config.ticks[i-1])) {
+      yyerror ("legend ticks must be increasing and within LOW HIGH"); return;
+    }
+  }
+  push_state();
+  new_state();
+  current_state->depthcue = 0;
+  current_state->linewidth = 0;
+  current_state->transparency = 0;
+  current_state->labelcentre = TRUE;
+  v3_initialize (&current_state->labeloffset, 0, 0, 0);
+  current_state->labelrotation = 0;
+  count = discrete ? 4 : 256;
+  output_start_object();
+  for (i = 0; i < count; i++) {
+    a = discrete ? edges[i] : (double)i/count;
+    b = discrete ? edges[i+1] : (double)(i+1)/count;
+    ramp_colour (&c, (a+b)/2);
+    if (vertical) figure_swatch (x, y+a*height, z, width, (b-a)*height, &c);
+    else figure_swatch (x+a*width, y, z, (b-a)*width, height, &c);
+  }
+  new_state();
+  current_state->linewidth = 0.5;
+  current_state->linedash = 0;
+  for (i = 0; i < ticks; i++) {
+    f = legend_config.custom_ticks ? (legend_config.ticks[i]-low)/(high-low) :
+        discrete ? edges[i] : i/4.0;
+    v3_initialize (vertices, vertical ? x+width : x+f*width, vertical ? y+f*height : y, z);
+    v3_initialize (vertices+1, vertical ? x+1.3*width : x+f*width,
+                   vertical ? y+f*height : y-0.3*height, z);
+    output_object (OBJ_LINES, vertices, 2);
+  }
+  output_finish_object();
+  /* Keep label metrics backend-specific, as for the ordinary label command. */
+  if (vertical) { new_state(); current_state->labelcentre = FALSE; }
+  for (i = 0; i < ticks; i++) {
+    f = legend_config.custom_ticks ? (legend_config.ticks[i]-low)/(high-low) :
+        discrete ? edges[i] : i/4.0;
+    snprintf (label, sizeof(label), "%.6g", low + f*(high-low));
+    v3_initialize (&p, vertical ? x+1.6*width : x+f*width,
+                   vertical ? y+f*height : y-height, z);
+    output_label (&p, legend_config.custom_ticks ? legend_config.labels[i] : label,
+                  &current_state->linecolour);
+    ext3d_update (&p, 0);
+  }
+  v3_initialize (&p, vertical ? x : x+width/2, vertical ? y+height+width : y+2*height, z);
+  output_label (&p, text, &current_state->linecolour);
+  ext3d_update (&p, 0);
+  pop_state();
+}
 
 				/* empirically determined factors */
 #define HELIX_HERMITE_FACTOR 4.7
 #define STRAND_HERMITE_FACTOR 0.5
+static void smooth_coil (void);
 #define HELIX_ALPHA (to_radians(32.0))
 #define HELIX_BETA (to_radians(-11.0))
 
@@ -119,6 +299,7 @@ void (*output_comment) (char *str);
 
 void (*output_coil) (void);
 void (*output_cylinder) (vector3 *v1, vector3 *v2);
+boolean cylinder_start_cap = TRUE, cylinder_end_cap = TRUE;
 void (*output_helix) (void);
 void (*output_label) (vector3 *p, char *label, colour *c);
 void (*output_line) (boolean polylines);
@@ -203,6 +384,7 @@ set_aspect_ratio (void)
 void
 graphics_plot_init (void)
 {
+  view_plot_init();
   frame = TRUE;
   window = -1.0;
   slab = -1.0;
@@ -774,6 +956,8 @@ coil (int is_peptide_chain, int smoothing)
   vector3 vec1, vec2;
   colour *col;
   int slot, segment;
+  int smooth_colour;
+  colour sample;
   double hermite_factor = 0.5 * current_state->splinefactor;
   int segments = current_state->segments;
 
@@ -842,6 +1026,7 @@ coil (int is_peptide_chain, int smoothing)
       line_segment *ls;
 
       line_segment_init();
+      line_segments_curved = TRUE;
       ls = line_segment_next();
       ls->new = TRUE;
       ls->p = *points;
@@ -868,11 +1053,14 @@ coil (int is_peptide_chain, int smoothing)
 	v3_scale (&vec2, hermite_factor);
 
 	hermite_set (points + slot, points + slot + 1, &vec1, &vec2);
+	segments = adaptive_segments (segments);
+	smooth_colour = interpolate_residue_colour (&sample, ch->residues[slot], ch->residues[slot+1], 0);
 	for (segment = 1; segment < segments; segment++) {
 	  t = ((double) segment) / ((double) segments);
 	  ls = line_segment_next();
 	  hermite_get (&(ls->p), t);
-	  if (current_state->colourparts &&
+	  line_segment_hermite (ls, (segment-1.0)/segments, t);
+	  if (!smooth_colour && current_state->colourparts &&
 	      (segment == segments / 2) &&
 	      colour_unequal (col, &(ch->residues[slot+1]->colour))) {
 	    ls->c = *col;
@@ -882,11 +1070,14 @@ coil (int is_peptide_chain, int smoothing)
 	    col = &(ch->residues[slot+1]->colour);
 	  }
 	  if (col) ls->c = *col;
+	  interpolate_residue_colour (&ls->c, ch->residues[slot], ch->residues[slot+1], t);
 	  ext3d_update (&(ls->p), 0.0);
 	}
 
 	ls = line_segment_next();
 	ls->p = *(points + slot + 1);
+	line_segment_hermite (ls, (segments-1.0)/segments, 1.0);
+	if (smooth_colour) col = &ch->residues[slot+1]->colour;
 	if (col) ls->c = *col;
 	ext3d_update (points + slot + 1, 0.0);
       }
@@ -925,6 +1116,7 @@ coil (int is_peptide_chain, int smoothing)
 	v3_scale (&vec2, hermite_factor);
 
 	hermite_set (points + slot, points + slot + 1, &vec1, &vec2);
+	segments = adaptive_segments (segments);
 	for (segment = 1; segment < segments; segment++) {
 	  t = ((double) segment) / ((double) segments);
 	  cs = coil_segment_next();
@@ -932,12 +1124,14 @@ coil (int is_peptide_chain, int smoothing)
 	  if (current_state->colourparts &&
 	      (segment == segments / 2)) col = &(ch->residues[slot+1]->colour);
 	  if (col) cs->c = *col;
+	  interpolate_residue_colour (&cs->c, ch->residues[slot], ch->residues[slot+1], t);
 	  ext3d_update (&(cs->p), radius);
 	}
 
 	cs = coil_segment_next();
 	cs->p = *(points +slot + 1);
 	if (col) cs->c = *col;
+	interpolate_residue_colour (&cs->c, ch->residues[slot], ch->residues[slot+1], 1);
 	ext3d_update (points + slot + 1, radius);
       }
 				/* coil plane coordinates */
@@ -1015,7 +1209,10 @@ coil (int is_peptide_chain, int smoothing)
 	normalize_direction (&(cs->n4));
       }
 
-      output_coil();
+      if (output_mode != POSTSCRIPT_MODE && output_mode != SVG_MODE &&
+          output_mode != METAPOST_MODE && output_mode != POVRAY_MODE)
+        smooth_coil();
+      else output_coil();
     }
 
     free (points);
@@ -1059,6 +1256,132 @@ cpk (void)
 
 
 /*------------------------------------------------------------*/
+static void
+band_triangle (vector3 *p, vector3 *n, colour *c)
+{
+  vector3 data[9];
+  int i;
+  for (i=0; i<3; i++) {
+    data[3*i] = p[i]; data[3*i+1] = n[i];
+    data[3*i+2].x = c->x; data[3*i+2].y = c->y; data[3*i+2].z = c->z;
+  }
+  output_object (OBJ_TRIANGLES_NORMALS_COLOURS, data, 9);
+}
+
+/* Circular rings and radial normals, with independent flat end-cap normals. */
+static void
+smooth_coil (void)
+{
+  int i,j,k,t,count,sides=16;
+  vector3 data[16*36], p[4], n[4], radial, normal;
+  int order[6]={0,1,3,0,3,2};
+  colour c;
+  output_start_object();
+  for (i=0;i<coil_segment_count-1;i++) {
+    c=current_state->colourparts ? coil_segments[i].c : current_state->planecolour;
+    colour_to_rgb(&c); count=0;
+    for (j=0;j<sides;j++) {
+      for (k=0;k<4;k++) {
+        coil_segment *cs=coil_segments+i+k/2;
+        double angle=2*ANGLE_PI*((j+k%2)%sides)/sides;
+        v3_scaled(&n[k],cos(angle),&cs->n1);
+        v3_add_scaled(&n[k],sin(angle),&cs->n2);
+        normalize_direction(&n[k]);
+        v3_sum_scaled(&p[k],&cs->p,current_state->coilradius,&n[k]);
+      }
+      for (t=0;t<6;t++) {
+        k=order[t]; data[count++]=p[k]; data[count++]=n[k];
+        data[count].x=c.x; data[count].y=c.y; data[count++].z=c.z;
+      }
+      if (i==0 || i==coil_segment_count-2) {
+        int end;
+        for(end=0;end<2;end++) {
+          if ((!end && i!=0) || (end && i!=coil_segment_count-2)) continue;
+          v3_difference(&normal,&coil_segments[i+1].p,&coil_segments[i].p);
+          normalize_direction(&normal); if(!end) v3_scale(&normal,-1);
+          for(t=0;t<3;t++) {
+            data[count++]= t==0 ? coil_segments[i+end].p : p[end ? (t==1?2:3) : (t==1?1:0)];
+            data[count++]=normal;
+            data[count].x=c.x; data[count].y=c.y; data[count++].z=c.z;
+          }
+        }
+      }
+    }
+    output_object(OBJ_TRIANGLES_NORMALS_COLOURS,data,count);
+  }
+  output_finish_object();
+}
+
+/* A single cylindrical surface, with caps only at the terminal rings. */
+static void
+coloured_cylinder (vector3 *start, vector3 *finish, mol3d_chain *ch)
+{
+  vector3 axis, u, v, r[2], a[2], b[2], p[3], n[3], centre;
+  double length, t0, t1, angle;
+  int i, j, k, last, sides = 3*current_state->segments+5;
+  colour c, next;
+  v3_difference (&axis, finish, start);
+  length = v3_length (&axis);
+  normalize_direction (&axis);
+  v3_cross_product (&u, &axis, &xaxis);
+  normalize_normal (&u, &axis);
+  v3_cross_product (&v, &axis, &u);
+  output_start_object();
+  for (i=0; i<ch->length; i=last+1) {
+    c = ch->residues[i]->colour; colour_to_rgb (&c);
+    last = i;
+    while (last+1 < ch->length) {
+      next = ch->residues[last+1]->colour; colour_to_rgb (&next);
+      if (c.x != next.x || c.y != next.y || c.z != next.z) break;
+      last++;
+    }
+    t0 = i == 0 ? 0 : (i-0.5)/(ch->length-1);
+    t1 = last == ch->length-1 ? 1 : (last+0.5)/(ch->length-1);
+    if (output_mode == VRML_MODE || output_mode == X3D_MODE ||
+        output_mode == WEBGL_MODE || output_mode == POVRAY_MODE) {
+      colour saved = current_state->planecolour;
+      v3_sum_scaled (&a[0], start, length*t0, &axis);
+      v3_sum_scaled (&b[0], start, length*t1, &axis);
+      current_state->planecolour = c;
+      cylinder_start_cap = i == 0;
+      cylinder_end_cap = last == ch->length-1;
+      output_cylinder (&a[0], &b[0]);
+      cylinder_start_cap = cylinder_end_cap = TRUE;
+      current_state->planecolour = saved;
+      continue;
+    }
+    for (j=0; j<sides; j++) {
+      for (k=0; k<2; k++) {
+        angle = 2*ANGLE_PI*((j+k)%sides)/sides;
+        v3_scaled (&r[k], cos(angle), &u);
+        v3_add_scaled (&r[k], sin(angle), &v);
+        v3_sum_scaled (&a[k], start, length*t0, &axis);
+        v3_add_scaled (&a[k], current_state->cylinderradius, &r[k]);
+        v3_sum_scaled (&b[k], start, length*t1, &axis);
+        v3_add_scaled (&b[k], current_state->cylinderradius, &r[k]);
+      }
+      p[0]=a[0]; p[1]=a[1]; p[2]=b[1];
+      /* Equal face normals avoid diagonal shading across a vector-output quad. */
+      v3_sum (&n[0], &r[0], &r[1]); normalize_direction (&n[0]);
+      n[1]=n[2]=n[0];
+      if (output_mode != POSTSCRIPT_MODE && output_mode != SVG_MODE && output_mode != METAPOST_MODE) {
+        n[0]=r[0]; n[1]=n[2]=r[1];
+      }
+      band_triangle(p,n,&c);
+      p[1]=b[1]; p[2]=b[0]; n[2]=n[0]; band_triangle(p,n,&c);
+      if (i == 0) {
+        p[0]=*start; p[1]=a[1]; p[2]=a[0];
+        v3_scaled (&n[0], -1, &axis); n[1]=n[2]=n[0]; band_triangle(p,n,&c);
+      }
+      if (last == ch->length-1) {
+        p[0]=*finish; p[1]=b[0]; p[2]=b[1];
+        n[0]=n[1]=n[2]=axis; band_triangle(p,n,&c);
+      }
+    }
+  }
+  output_finish_object();
+}
+
 void
 cylinder (void)
 {
@@ -1111,7 +1434,8 @@ cylinder (void)
 		          cos (v3_angle (&vec, &dir)), &dir);
     v3_add (&finish, &top);
 
-    output_cylinder (&start, &finish);
+    if (current_state->colourparts) coloured_cylinder (&start, &finish, ch);
+    else output_cylinder (&start, &finish);
     ext3d_update (&start, current_state->cylinderradius);
     ext3d_update (&finish, current_state->cylinderradius);
   }
@@ -1224,6 +1548,7 @@ helix (void)
 				/* helix start segments */
     pos = *points;
     hermite_set (points, points + 1, tangents, tangents + 1);
+    segments = adaptive_segments (segments);
 
     for (segment = 1; segment < segments; segment++) {
       t = ((double) segment) / ((double) segments);
@@ -1241,6 +1566,7 @@ helix (void)
       if (current_state->colourparts &&
 	  (segment == segments / 2)) col = &(ch->residues[1]->colour);
       if (col) hs->c = *col;
+      interpolate_residue_colour (&hs->c, ch->residues[0], ch->residues[1], t);
       ext3d_update (&pos, halfwidth);
     }
 
@@ -1252,6 +1578,7 @@ helix (void)
     v3_cross_product (&(hs->n), tangents + 1, axes + 1);
     normalize_direction (&(hs->n));
     if (col) hs->c = *col;
+    interpolate_residue_colour (&hs->c, ch->residues[0], ch->residues[1], 1);
     ext3d_update (points + 1, halfwidth);
 
 				/* helix main segments */
@@ -1259,6 +1586,7 @@ helix (void)
 
       hermite_set (points + slot, points + slot + 1,
 		   tangents + slot, tangents + slot + 1);
+      segments = adaptive_segments (segments);
 
       for (segment = 1; segment < segments; segment++) {
 	t = ((double) segment) / ((double) segments);
@@ -1275,6 +1603,7 @@ helix (void)
 	if (current_state->colourparts && (segment == segments / 2))
 	  col = &(ch->residues[slot+1]->colour);
 	if (col) hs->c = *col;
+	interpolate_residue_colour (&hs->c, ch->residues[slot], ch->residues[slot+1], t);
 	ext3d_update (&pos, halfwidth);
       }
 
@@ -1285,12 +1614,14 @@ helix (void)
       v3_cross_product (&(hs->n), tangents + slot + 1, axes + slot + 1);
       normalize_direction (&(hs->n));
       if (col) hs->c = *col;
+      interpolate_residue_colour (&hs->c, ch->residues[slot], ch->residues[slot+1], 1);
       ext3d_update (points + slot + 1, halfwidth);
     }
 				/* helix finish segments */
     pos = *(points + ch->length - 2);
     hermite_set (points + ch->length - 2, points + ch->length - 1,
 		 tangents + ch->length - 2, tangents + ch->length - 1);
+    segments = adaptive_segments (segments);
 
     for (segment = 1; segment < segments; segment++) {
       t = ((double) segment) / ((double) segments);
@@ -1308,6 +1639,7 @@ helix (void)
       if (current_state->colourparts && (segment == segments / 2))
 	  col = &(ch->residues[ch->length-2]->colour);
       if (col) hs->c = *col;
+      interpolate_residue_colour (&hs->c, ch->residues[ch->length-2], ch->residues[ch->length-1], t);
       ext3d_update (&pos, halfwidth);
     }
 
@@ -1321,6 +1653,7 @@ helix (void)
 		      tangents + ch->length - 1, axes + ch->length - 1);
     normalize_direction (&(hs->n));
     if (col) hs->c = *col;
+    interpolate_residue_colour (&hs->c, ch->residues[ch->length-2], ch->residues[ch->length-1], 1);
     ext3d_update (points + ch->length - 1, coilradius);
 
     output_helix();
@@ -1795,6 +2128,7 @@ strand (void)
       v3_difference (&vec2, points + slot + 2, points + slot);
       v3_scale (&vec2, STRAND_HERMITE_FACTOR);
       hermite_set (points + slot, points + slot + 1, &vec1, &vec2);
+      segments = adaptive_segments (segments);
 
       for (segment = 0; segment < segments; segment++) {
 	t = ((double) segment) / ((double) segments);
@@ -1821,6 +2155,7 @@ strand (void)
 	v3_scaled (&(ss->n3), -1.0, &normal);
 	v3_scaled (&(ss->n4), -1.0, &side);
 	if (col) ss->c = *col;
+	interpolate_residue_colour (&ss->c, ch->residues[slot], ch->residues[slot+1], t);
 	ext3d_update (&pos, radius);
       }
     }

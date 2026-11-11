@@ -1,9 +1,9 @@
 %!PS-Adobe-3.0
 %%BoundingBox: (atend)
 %%Title: c-H-ras p21 protein (1-166), complex with GDP and Mg
-%%Creator: MolScriptSVG 2.2, Copyright (C) 1997-1998 Per J. Kraulis
+%%Creator: MolScriptSVG 2.3, Copyright (C) 1997-1998 Per J. Kraulis
 %%For: jwm
-%%DocumentNeededResources: font Times-Roman Symbol
+%%DocumentNeededResources: (atend)
 %%Pages: 1
 %%EndComments
 %%BeginProlog
@@ -45,7 +45,10 @@
 /P123 { 8 copy P moveto lineto lineto lineto stroke } bind def
 /P134 { 8 copy P 4 2 roll moveto lineto 4 2 roll lineto lineto stroke } bind def
 /P1234 { 8 copy P moveto lineto lineto lineto closepath stroke } bind def
-/FR { /Times-Roman findfont } bind def
+/Times-Latin1 /Times-Roman findfont dup length dict begin
+  { 1 index /FID ne { def } { pop pop } ifelse } forall
+  /Encoding ISOLatin1Encoding def currentdict end definefont pop
+/FR { /Times-Latin1 findfont } bind def
 /FG { /Symbol findfont } bind def
 /PR { scalefont setfont show } bind def
 /C {
@@ -2621,21 +2624,33 @@ ND
 0.21 1 0.733 HS 312.82 109.79 294.69 106.29 298.81 99.70 T1
 0.21 1 0.849 HS 278.59 64.73 268.27 76.41 298.81 99.70 309.14 88.02 P1
 0.21 1 0.847 HS 268.27 76.41 260.02 89.58 290.57 112.87 298.81 99.70 P1
+%%IncludeResource: font Times-Roman
+/MSFont0 /Times-Roman findfont dup length dict begin
+  { 1 index /FID ne { def } { pop pop } ifelse } forall
+  /Encoding ISOLatin1Encoding def currentdict end definefont pop
+/FR { /MSFont0 findfont } bind def
 1 0.647 0 R
 103.53 411.87 M (17 SER) 11.25 FR C
 (17 SER) FR 11.25 PR
+/FR { /MSFont0 findfont } bind def
 394.14 345.69 M (146 ALA) 11.36 FR C
 (146 ALA) FR 11.36 PR
+/FR { /MSFont0 findfont } bind def
 59.31 398.77 M (MG) 11.88 FR C
 (MG) FR 11.88 PR
+/FR { /MSFont0 findfont } bind def
 452.65 328.33 M (119 ASP) 12.01 FR C
 (119 ASP) FR 12.01 PR
+/FR { /MSFont0 findfont } bind def
 383.95 481.20 M (28 PHE) 12.02 FR C
 (28 PHE) FR 12.02 PR
+/FR { /MSFont0 findfont } bind def
 259.75 309.50 M (15 GLY) 12.15 FR C
 (15 GLY) FR 12.15 PR
+/FR { /MSFont0 findfont } bind def
 148.61 247.43 M (13 GLY) 12.90 FR C
 (13 GLY) FR 12.90 PR
+/FR { /MSFont0 findfont } bind def
 368.23 267.28 M (117 LYS) 13.12 FR C
 (117 LYS) FR 13.12 PR
 grestore stroke
@@ -2643,5 +2658,6 @@ MolScriptPlotSave restore
 end
 showpage
 %%Trailer
+%%DocumentNeededResources: font Times-Roman Symbol
 %%BoundingBox: 50 100 550 700
 %%EOF

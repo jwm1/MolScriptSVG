@@ -1,10 +1,26 @@
 <html>
 <head>
-<title>MolScriptSVG 2.2: The MolAuto v1.1 program</title>
+<title>MolScriptSVG 2.3: The MolAuto v1.1 program</title>
 <link href="style.css" type="text/css" rel="stylesheet"></link>
 </head>
 
 <body>
+
+<h2>New in MolScriptSVG 2.3</h2>
+<p><code>-curvetolerance A</code>, <code>-colourinterpolate</code> and
+<code>-view file</code> add explicit sampling, scalar interpolation and saved
+view reuse. See <a href="../FIGURE_TOOLS.html">figure tools</a>.</p>
+<p><code>-legend X Y Z WIDTH HEIGHT</code> adds an explicitly placed numeric
+key for a scalar palette. B-factor titles use &Aring;&sup2;, while confidence
+keys are dimensionless. See <a href="../ANNOTATIONS_AND_CHECKS.html">legends</a>.</p>
+<p><code>-bfactor</code> generates blue-white-red B-factor colouring;
+<code>-bfactor_range LOW HIGH</code> overrides automatic scaling.
+<code>-alphafold</code> uses four confidence bins with strict thresholds
+at 50, 70 and 90. <code>-alphafold_gradient</code> uses a continuous
+orange/yellow/cyan/blue ramp on 0-100. Both assume confidence in the PDB
+B-factor column. Cartoons and ligand atoms are coloured, including cylinders.</p>
+<p>See <a href="../SCALAR_COLOURS.html">palette definitions, compatibility and
+examples</a> and the <a href="../examples/index.html">gallery</a>.</p>
 
 <h1 align=center>The MolAuto v1.1 program</h1>
 

@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MolScriptSVG: README</title>
+<link rel="stylesheet" href="docs/style.css">
+<link rel="stylesheet" href="docs/documentation.css">
+</head>
+<body>
+<!-- Generated from README.md by scripts/build-html-docs.py. -->
+<nav><a href="docs/index.html">Manual</a> | <a href="README.html">README</a> |
+<a href="examples/index.html">Examples</a> | <a href="CHANGES.html">Changelog</a></nav>
+<main>
+<h1 id="molscriptsvg-23-development">MolScriptSVG 2.3 (development)</h1>
+<p>New scalar colours: <code>molauto -bfactor</code>, <code>-alphafold</code>, or
+<code>-alphafold_gradient</code>. These colour cartoons and ligand atoms, including
+banded helix cylinders. See <a href="SCALAR_COLOURS.html">SCALAR_COLOURS.md</a>.
+Add an explicit key with <code>molauto -legend X Y Z WIDTH HEIGHT</code>, validate a
+script without rendering with <code>molscript -check</code>, and inspect drawing-command
+groups in SVG output. See <a href="ANNOTATIONS_AND_CHECKS.html">legends, checking and SVG groups</a>
+for syntax, examples and limitations.
+Further <a href="FIGURE_TOOLS.html">figure tools</a> add distance/angle annotations, labelled
+connectors, adaptive curve sampling, continuous scalar colours, vertical and
+categorical keys, and editable reusable view files.
+Distance labels now use Å, and B-factor legends use Å². Thin vector backbones
+preserve the original spline exactly: use <code>turn</code> to pass through C-alpha atoms,
+or <code>coil</code> for a smoothed path. See the updated
+<a href="examples/ras_curved_lines.svg">backbone example</a> with C-alpha markers and
+<a href="FIGURE_TOOLS.html">font/smoothing details</a>.
+Choose label fonts with <code>-font serif</code>, <code>-font sans</code>, <code>-font monospace</code>, or
+<code>set labelfont "Helvetica";</code> for a backend-native name. See
+<a href="FONTS.html">output fonts</a> for supported formats, FreeType image options and
+<a href="examples/index.html#fonts">comparison previews</a>.
+Version 2.3 is unreleased; the 2.2 release notes below are historical.</p>
+<p>Local HTML documentation starts at <a href="docs/index.html">docs/index.html</a> or
+<a href="README.html">README.html</a>. HTML pages link to HTML companions rather than raw
+Markdown. To refresh them after editing the Markdown sources, install
+Python-Markdown (<code>python3-markdown</code> on Debian/Ubuntu) and run:</p>
+<pre><code class="language-bash">python3 scripts/build-html-docs.py
+python3 scripts/build-html-docs.py --check
+</code></pre>
+<p>The check requires only Python's standard library and verifies documentation
+links, local HTML targets and heading anchors in the generated pages.</p>
+<p>Version 2.2 adds display-independent bitmap/FreeType labels, safer geometry,
+and fixes across SVG, image export, X3D and MolAuto. The executables remain
+<code>molscript</code> and <code>molauto</code>. Generated example files are included.</p>
+<p>See the <a href="RELEASE_NOTES_2.2.html">2.2 release notes</a>, <a href="CHANGES.html">changelog</a>,
+<a href="examples/index.html">example gallery</a> and <a href="RELEASING.html">release procedure</a>.
+The repository is <a href="https://github.com/jwm1/MolScriptSVG">jwm1/MolScriptSVG</a>.</p>
+<p>Build, run regression tests, and refresh all SVG/PNG examples with:</p>
+<pre><code class="language-bash">make -C code
+python3 scripts/test-svg.py
+python3 scripts/test-backends-molauto.py
+python3 scripts/test-scalar-colours.py
+python3 scripts/test-curves.py
+python3 scripts/test-annotations.py
+python3 scripts/test-figure-tools.py
+python3 scripts/test-fonts.py
+python3 scripts/test-rendering.py
+python3 scripts/test-webgl-browser.py
+python3 scripts/test-output-formats.py --images
+python3 scripts/regenerate-svg-examples.py
+</code></pre>
+<p>The preview script uses CairoSVG when installed, otherwise Inkscape. It checks
+SVG XML and PNG signatures and stages new files before replacing old previews.
+The format check uses available external readers; <code>--images</code> requires Pillow
+and working EGL. Headless labels use a bundled bitmap font, with optional
+FreeType support. See <a href="RENDERING_TESTS.html">RENDERING_TESTS.md</a> for font options,
+geometry checks, browser tests and remaining coverage gaps.
+The <a href="examples/svg_transparency.svg">transparency example</a> compares opaque and
+half-transparent geometry; its <a href="examples/svg_transparency_svg.png">PNG preview</a>
+is also included.</p>
+<pre><code>Copyright (C) 1997-1998 Per J. Kraulis
+Copyright (C) 2026 James W. Murray
+</code></pre>
+<table>
+  <tr>
+    <td>
+      <img src="docs/images/ras_std.jpg" title="ras_std">
+    </td>
+    <td>
+      <img src="docs/images/ras_cyl.jpg" title="ras_cyl">
+    </td>
+    <td>
+      <img src="docs/images/ras_gdp_balls.jpg" title="ras_gdp_balls">
+    </td>
+  </tr>
+</table>
+
+<p>MolScriptSVG is a fork of MolScript, a program for displaying
+molecular 3D structures, such as proteins, in both schematic and
+detailed representations. As far as I can tell, MolScript is still the
+only program that can produce high quality protein cartoon diagrams in
+vector format. This fork extends the output modes of the original
+MolScript and fixes OpenGL support.</p>
+<p>This fork also includes SVG, MetaPost, POV-Ray, X3D and WebGL-oriented output
+backends. SVG, MetaPost, and POV-Ray are written directly from the MolScript
+geometry pipeline and do not require any external library at export
+time. X3D output is available as both XML (<code>-x3d</code>) and Classic
+encoding (<code>-x3dv</code>). Both Classic and XML X3D are generated natively
+inside MolScriptSVG. The <code>-webgl</code> mode writes an HTML viewer that
+embeds the native XML X3D scene and displays it in the browser using
+the X_ITE WebGL runtime.</p>
+<p>Notes on syntax coverage and known grammar/doc mismatches are collected in
+<a href="UNDOCUMENTED_FEATURES.html">UNDOCUMENTED_FEATURES.md</a>.</p>
+<p>Fork-specific modifications in this repository are copyright
+James W. Murray. Those modifications were developed with assistance
+from OpenAI Codex.</p>
+<p>The original documentation is at <a href="https://pekrau.github.io/MolScript/">pekrau.github.io/MolScript</a>.</p>
+<h2 id="open-source">Open Source</h2>
+<p>MolScriptSVG is distributed as a fork under the MIT license in this GitHub
+repository. The original MolScript project is available at <a href="https://github.com/pekrau/MolScript">MolScript</a></p>
+<h2 id="version-molscriptsvg-23">Version MolScriptSVG 2.3</h2>
+<p>The first version of MolScript (written in Fortran 77) was released in
+1991, and its current version (2.1.2, written in C) in 1998.</p>
+<p>This fork keeps the upstream MolScript 2.1.2 language and executable name,
+but it is no longer a pristine 1998 code snapshot. The original OpenGL/image
+build expected a 1990s GLUT/GLX setup and no longer built cleanly on a modern
+Linux system. The <code>code/Makefile.complete</code> file has now been modernized to use
+<code>pkg-config</code> for OpenGL, PNG, JPEG and GIF dependencies.</p>
+<h2 id="build">Build</h2>
+<p>From the repository root, the default full build is:</p>
+<pre><code class="language-bash">make -C code -j4
+</code></pre>
+<p><code>code/Makefile</code> delegates to <code>Makefile.complete</code>, so plain <code>make</code> builds the
+full MolScriptSVG binary by default.</p>
+<h3 id="makefile-summary">Makefile summary</h3>
+<ul>
+<li><code>Makefile</code></li>
+<li>Default entry point.</li>
+<li>
+<p>Produces the full build by including <code>Makefile.complete</code>.</p>
+</li>
+<li>
+<p><code>Makefile.complete</code></p>
+</li>
+<li>Modern Linux-oriented build using <code>pkg-config</code>.</li>
+<li>
+<p>Enables OpenGL, EGL-backed image rendering, and PNG/JPEG/GIF support by default.</p>
+</li>
+<li>
+<p><code>Makefile.basic</code></p>
+</li>
+<li>Minimal build with no OpenGL or OpenGL-backed raster image outputs.</li>
+<li>Still includes PostScript, SVG, Raster3D, VRML, X3D and WebGL export code.</li>
+</ul>
+<p>To build the minimal version explicitly:</p>
+<pre><code class="language-bash">make -C code clean
+make -C code -f Makefile.basic -j4
+</code></pre>
+<p>To rebuild the full version explicitly:</p>
+<pre><code class="language-bash">make -C code clean
+make -C code -f Makefile.complete -j4
+</code></pre>
+<h3 id="full-build-dependencies">Full-build dependencies</h3>
+<p>On a modern Linux system, the default full build expects <code>pkg-config</code> plus
+development packages for:</p>
+<ul>
+<li>OpenGL / GLU / GLUT / X11</li>
+<li>EGL</li>
+<li>libpng</li>
+<li>libjpeg</li>
+<li><a href="https://libgd.github.io/">libgd</a> for GIF encoding</li>
+<li>zlib</li>
+</ul>
+<p>A C compiler, GNU Make and Bison are also required for development builds.
+On Debian/Ubuntu, install the full build and optional FreeType dependencies:</p>
+<pre><code class="language-bash">sudo apt install build-essential bison pkg-config freeglut3-dev \
+  libgl1-mesa-dev libglu1-mesa-dev libegl1-mesa-dev libx11-dev \
+  libpng-dev libjpeg-dev libgd-dev zlib1g-dev libfreetype-dev
+make -C code -j4 USE_FREETYPE=1
+</code></pre>
+<p>FreeType is opt-in; omit <code>USE_FREETYPE=1</code> for bundled bitmap fonts only.
+Clean before switching between basic and complete builds. The FreeType toggle
+alone is tracked automatically. Test dependencies and optional checks are in
+<a href="RENDERING_TESTS.html">RENDERING_TESTS.md</a>.</p>
+<p>If those are present, <code>make</code> should produce:</p>
+<ul>
+<li><code>molscript</code></li>
+<li><code>molauto</code></li>
+</ul>
+<p>with support for:</p>
+<ul>
+<li><code>-ps</code></li>
+<li><code>-svg</code></li>
+<li><code>-mp</code></li>
+<li><code>-pov</code></li>
+<li><code>-r3d</code></li>
+<li><code>-wrl</code></li>
+<li><code>-x3d</code></li>
+<li><code>-x3dv</code></li>
+<li><code>-webgl</code></li>
+<li><code>-gl</code></li>
+<li><code>-eps</code></li>
+<li><code>-epsbw</code></li>
+<li><code>-sgi</code></li>
+<li><code>-jpeg</code></li>
+<li><code>-png</code></li>
+<li><code>-gif</code></li>
+</ul>
+<h3 id="headless-image-rendering">Headless image rendering</h3>
+<p>The image-output path prefers a headless EGL OpenGL context. That avoids
+opening an X11 window and allows <code>-png</code>, <code>-jpeg</code> and <code>-gif</code> rendering without
+a working X11 display. If EGL initialization fails, MolScriptSVG falls back to
+the hidden GLUT window path for compatibility.</p>
+<p>Labels no longer depend on GLUT font initialization. The default
+<code>-labelfont bitmap</code> uses a bundled printable-ASCII font with Å and ² glyphs.
+UTF-8 input is decoded before rasterization. To enable optional
+TrueType/OpenType fonts, install the FreeType development package (for example,
+<code>libfreetype-dev</code> on Debian/Ubuntu), then build with <code>make -C code USE_FREETYPE=1</code>.
+Select one with <code>-labelfont freetype -fontfile /path/to/font.ttf</code>.
+Both paths currently use monochrome bitmap glyphs, not antialiased text.
+SVG and PostScript label rendering is unchanged.</p>
+<p><code>MOLSCRIPT_IMAGE_BACKEND=auto|egl|glut</code> selects the image context; the default
+is <code>auto</code>. Forced EGL never falls back to X11. Accumulation antialiasing
+(<code>-accum</code>) uses software accumulation when the context has no accumulation
+buffer.</p>
+<p>Compare the labelled <a href="examples/ras_gdp_bitmap.png">bitmap preview</a> and
+<a href="examples/ras_gdp_freetype.png">FreeType preview</a>. Commands and test coverage
+are in <a href="RENDERING_TESTS.html">RENDERING_TESTS.md</a>.</p>
+<h3 id="example-commands">Example commands</h3>
+<p>Build:</p>
+<pre><code class="language-bash">cd code
+make
+</code></pre>
+<p>Run:</p>
+<pre><code class="language-bash">./molscript -svg -in examples/ras_std.in -out ras_std.svg
+./molscript -mp -in examples/ras_std.in -out ras_std.mp
+./molscript -pov -in examples/ras_std.in -out ras_std.pov
+./molscript -x3d -in examples/ras_std.in -out ras_std.x3d
+./molscript -x3dv -in examples/ras_std.in -out ras_std.x3dv
+./molscript -webgl -in examples/ras_std.in -out ras_std.webgl.html
+</code></pre>
+<p>If <code>povray</code> is installed, the generated <code>.pov</code> scene files can be rendered to
+PNG images with:</p>
+<pre><code class="language-bash">./scripts/render-pov-examples.sh
+</code></pre>
+<p>The broader example refresh script:</p>
+<pre><code class="language-bash">./scripts/regenerate-examples.sh
+</code></pre>
+<p>will also render <code>*_pov.png</code> images automatically when <code>povray</code> is available.</p>
+<p>The SVG, MetaPost, POV-Ray, X3D and WebGL backends are available in both the basic and complete
+builds:</p>
+<pre><code class="language-bash">./molscript -svg -in examples/ras_std.in -out ras_std.svg
+./molscript -mp -in examples/ras_std.in -out ras_std.mp
+./molscript -pov -in examples/ras_std.in -out ras_std.pov
+./molscript -x3d -in examples/ras_std.in -out ras_std.x3d
+./molscript -x3dv -in examples/ras_std.in -out ras_std.x3dv
+./molscript -webgl -in examples/ras_std.in -out ras_std.webgl.html
+</code></pre>
+<p><code>molauto</code> has also been extended with a few modern convenience options:</p>
+<ul>
+<li><code>-window n</code></li>
+<li><code>-rotate a11 a12 a13 a21 a22 a23 a31 a32 a33</code></li>
+<li><code>-translate x y z</code></li>
+<li><code>-ss_palette</code></li>
+<li><code>-colourblind</code></li>
+<li><code>-publication</code></li>
+</ul>
+<p>The <code>-colourblind</code> preset uses a fixed high-contrast secondary-structure
+palette:</p>
+<ul>
+<li>helices: orange</li>
+<li>strands: blue</li>
+<li>coils: green</li>
+<li>turns: yellow-orange</li>
+</ul>
+<p><code>-x3dv</code>, <code>-x3d</code> and <code>-webgl</code> are all generated natively by MolScriptSVG.
+The <code>-webgl</code> output is a self-contained HTML wrapper around the native XML X3D
+scene, but it still loads the X_ITE JavaScript runtime from a CDN at view time.</p>
+<h2 id="fork-changes">Fork Changes</h2>
+<p>This fork differs from the historical 2.1.2 release in a few important ways:</p>
+<ul>
+<li>Added direct SVG output with <code>-svg</code>.</li>
+<li>Added MetaPost source output with <code>-mp</code>.</li>
+<li>Added POV-Ray scene output with <code>-pov</code> / <code>-povray</code>.</li>
+<li>Added a POV-Ray example render script and rendered <code>*_pov.png</code> example images.</li>
+<li>Added X3D output in both XML (<code>-x3d</code>) and Classic (<code>-x3dv</code>) encodings.</li>
+<li>Added HTML WebGL viewer output with <code>-webgl</code>, backed by the X3D scene exporter.</li>
+<li>Modernized the OpenGL build in <code>code/Makefile.complete</code> for current Linux
+  systems using <code>pkg-config</code>.</li>
+<li>Restored OpenGL-backed PNG, JPEG and GIF image export on modern systems.</li>
+<li>Updated the examples gallery to work from a local filesystem checkout and to
+  include the generated SVG assets.</li>
+<li>XML X3D and WebGL are generated natively, without an external converter.</li>
+<li>MetaPost output can optionally include projected axes and semantic comments.</li>
+<li>POV-Ray output now uses fitted orthographic cameras and softer multi-light
+  scene defaults for rendered examples.</li>
+</ul>
+<h2 id="release-status">Release Status</h2>
+<p>The current tree has been smoke-tested for:</p>
+<ul>
+<li><code>-svg</code></li>
+<li><code>-mp</code></li>
+<li><code>-x3d</code></li>
+<li><code>-x3dv</code></li>
+<li><code>-webgl</code></li>
+<li>OpenGL interactive mode via <code>-gl</code></li>
+<li>OpenGL-backed <code>-png</code>, <code>-jpeg</code> and <code>-gif</code></li>
+</ul>
+<p>The generated example outputs under <code>examples/</code> are intended to be part of the
+repository for comparison and regression checking.</p>
+<p>For a quick smoke test after building:</p>
+<pre><code class="language-bash">./scripts/smoke-test.sh
+</code></pre>
+<h2 id="reference">Reference</h2>
+<pre><code>Per J. Kraulis
+MOLSCRIPT: a program to produce both detailed and schematic plots of
+protein structures.
+J. Appl. Cryst. (1991) 24, 946-950
+</code></pre>
+<p>This paper is now available under Open Access: <a href="docs/kraulis_1991_molscript_j_appl_cryst.pdf">PDF</a></p>
+<p><a href="https://doi.org/10.1107/S0021889891004399">DOI:10.1107/S0021889891004399</a></p>
+<p><a href="https://journals.iucr.org/j/issues/1991/05/00/gl0206/gl0206.pdf">Publisher's PDF</a></p>
+</main>
+</body>
+</html>

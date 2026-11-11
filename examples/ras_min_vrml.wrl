@@ -2,8 +2,8 @@
 WorldInfo {
 title "c-H-Ras p21 protein (1-166), comples with GDP, Mg"
 info [
-"Program: MolScript v2.1.1, Copyright (C) 1997-1998 Per J. Kraulis"
-"Author: pjk"
+"Program: MolScriptSVG 2.3, Copyright (C) 1997-1998 Per J. Kraulis"
+"Author: jwm"
 ]
 }
 PROTO Ball [
@@ -37,6 +37,8 @@ radius IS rad
 }
 }
 PROTO Cyl [
+field SFBool tc TRUE
+field SFBool bc TRUE
 exposedField SFVec3f p 0 0 0
 exposedField SFRotation r 0 0 1 0
 exposedField SFVec3f s 1 1 1
@@ -62,7 +64,10 @@ shininess IS sh
 transparency IS tr
 }
 }
-geometry Cylinder { }
+geometry Cylinder {
+top IS tc
+bottom IS bc
+}
 }
 ]
 }
@@ -96,7 +101,7 @@ transparency IS tr
 geometry Extrusion {
 spine [0 -1 0, 0 1 0]
 crossSection [
-1 0 0.707107 -0.707107 0 -1 -0.707107 -0.707107 -1 0 -0.707107 0.707107 0 1 0.707107 0.707107 1 0
+1 0 0.707107 -0.707107 -1.83697e-16 -1 -0.707107 -0.707107 -1 1.22465e-16 -0.707107 0.707107 6.12323e-17 1 0.707107 0.707107 1 0
 ]
 beginCap FALSE
 endCap FALSE
@@ -110,6 +115,7 @@ PROTO Label [
 field SFVec3f p 0 0 0
 field SFFloat sz 1
 field MFString c []
+field MFString family ["SERIF"]
 field SFVec3f o 0 0 0
 field SFColor dc 1 1 1
 field SFColor ec 0 0 0
@@ -140,6 +146,7 @@ transparency IS tr
 geometry Text {
 string IS c
 fontStyle FontStyle {
+family IS family
 size IS sz
 }
 }
@@ -470,7 +477,7 @@ children [
 Shape {
 appearance Appearance {
 material Material {
-emissiveColor 0.63 0.13 0.94
+emissiveColor 0.627451 0.12549 0.941176
 ambientIntensity 0.2
 shininess 0.2
 }
@@ -489,7 +496,7 @@ coordIndex [
 Shape {
 appearance Appearance {
 material Material {
-emissiveColor 0.63 0.13 0.94
+emissiveColor 0.627451 0.12549 0.941176
 ambientIntensity 0.2
 shininess 0.2
 }

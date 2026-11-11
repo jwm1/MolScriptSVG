@@ -1,5 +1,8 @@
 # Releasing MolScriptSVG 2.2
 
+Historical 2.2 instructions. This tree is now unreleased 2.3 development;
+do not run the 2.2 publication commands from this directory.
+
 The prepared release lives in `MolScriptSVG_2.2`, on branch `main`, with the
 original Git history. Its remote is `git@github.com:jwm1/MolScriptSVG.git`.
 The executables remain `molscript` and `molauto`. `VERSION`, the application

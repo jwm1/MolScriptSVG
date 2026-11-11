@@ -45,7 +45,7 @@
   <textarea id="molscript-scene-data">&lt;?xml version="1.0" encoding="UTF-8"?>
 &lt;X3D profile="Immersive" version="3.3" xmlns:xsd="http://www.w3.org/2001/XMLSchema-instance" xsd:noNamespaceSchemaLocation="http://www.web3d.org/specifications/x3d-3.3.xsd">
   &lt;Scene>
-  &lt;WorldInfo title="SVG review: translucent points, borders and triangle surfaces" info="&amp;quot;Program: MolScriptSVG 2.2, Copyright (C) 1997-1998 Per J. Kraulis&amp;quot; &amp;quot;Author: jwm&amp;quot;"/>
+  &lt;WorldInfo title="SVG review: translucent points, borders and triangle surfaces" info="&amp;quot;Program: MolScriptSVG 2.3, Copyright (C) 1997-1998 Per J. Kraulis&amp;quot; &amp;quot;Author: jwm&amp;quot;"/>
   &lt;ProtoDeclare name="Ball">
     &lt;ProtoInterface>
       &lt;field accessType="inputOutput" type="SFVec3f" name="p" value="0 0 0"/>
@@ -84,6 +84,8 @@
   &lt;/ProtoDeclare>
   &lt;ProtoDeclare name="Cyl">
     &lt;ProtoInterface>
+      &lt;field accessType="initializeOnly" type="SFBool" name="tc" value="TRUE"/>
+      &lt;field accessType="initializeOnly" type="SFBool" name="bc" value="TRUE"/>
       &lt;field accessType="inputOutput" type="SFVec3f" name="p" value="0 0 0"/>
       &lt;field accessType="inputOutput" type="SFRotation" name="r" value="0 0 1 0"/>
       &lt;field accessType="inputOutput" type="SFVec3f" name="s" value="1 1 1"/>
@@ -107,7 +109,12 @@
               &lt;/IS>
             &lt;/Material>
           &lt;/Appearance>
-          &lt;Cylinder/>
+          &lt;Cylinder>
+            &lt;IS>
+              &lt;connect nodeField="top" protoField="tc"/>
+              &lt;connect nodeField="bottom" protoField="bc"/>
+            &lt;/IS>
+          &lt;/Cylinder>
         &lt;/Shape>
         &lt;IS>
           &lt;connect nodeField="translation" protoField="p"/>
@@ -157,6 +164,7 @@
       &lt;field accessType="initializeOnly" type="SFVec3f" name="p" value="0 0 0"/>
       &lt;field accessType="initializeOnly" type="SFFloat" name="sz" value="1"/>
       &lt;field accessType="initializeOnly" type="MFString" name="c" value=""/>
+      &lt;field accessType="initializeOnly" type="MFString" name="family" value="&amp;quot;SERIF&amp;quot;"/>
       &lt;field accessType="initializeOnly" type="SFVec3f" name="o" value="0 0 0"/>
       &lt;field accessType="initializeOnly" type="SFColor" name="dc" value="1 1 1"/>
       &lt;field accessType="initializeOnly" type="SFColor" name="ec" value="0 0 0"/>
@@ -183,6 +191,7 @@
               &lt;Text>
                 &lt;FontStyle>
                   &lt;IS>
+                    &lt;connect nodeField="family" protoField="family"/>
                     &lt;connect nodeField="size" protoField="sz"/>
                   &lt;/IS>
                 &lt;/FontStyle>
@@ -230,6 +239,7 @@
     &lt;ProtoInstance name="Label">
       &lt;fieldValue name="p" value="-8.00 -3.00 0.00"/>
       &lt;fieldValue name="c" value="&amp;quot;Opaque&amp;quot;"/>
+      &lt;fieldValue name="family" value="&amp;quot;SERIF&amp;quot;"/>
       &lt;fieldValue name="dc" value="0 0 0"/>
       &lt;fieldValue name="sc" value="0 0 0"/>
       &lt;fieldValue name="sh" value="0.2"/>
@@ -238,6 +248,7 @@
     &lt;ProtoInstance name="Label">
       &lt;fieldValue name="p" value="-3.00 -3.00 0.00"/>
       &lt;fieldValue name="c" value="&amp;quot;Half transparent&amp;quot;"/>
+      &lt;fieldValue name="family" value="&amp;quot;SERIF&amp;quot;"/>
       &lt;fieldValue name="dc" value="0 0 0"/>
       &lt;fieldValue name="sc" value="0 0 0"/>
       &lt;fieldValue name="sh" value="0.2"/>
@@ -246,6 +257,7 @@
     &lt;ProtoInstance name="Label">
       &lt;fieldValue name="p" value="4.00 -3.00 0.00"/>
       &lt;fieldValue name="c" value="&amp;quot;Translucent mesh&amp;quot;"/>
+      &lt;fieldValue name="family" value="&amp;quot;SERIF&amp;quot;"/>
       &lt;fieldValue name="dc" value="0 0 0"/>
       &lt;fieldValue name="sc" value="0 0 0"/>
       &lt;fieldValue name="sh" value="0.2"/>

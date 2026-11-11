@@ -392,15 +392,15 @@ vrml_rgb_colour (colour *c)
   indent_check_buflen (5);
   if (indent_flag) {
     if (indent_needs_blank) {
-      INDENT_FPRINTF (indent_file, ", %.2g %.2g %.2g", c->x, c->y, c->z);
+      INDENT_FPRINTF (indent_file, ", %.6g %.6g %.6g", c->x, c->y, c->z);
     } else {
-      INDENT_FPRINTF (indent_file, "%.2g %.2g %.2g", c->x, c->y, c->z);
+      INDENT_FPRINTF (indent_file, "%.6g %.6g %.6g", c->x, c->y, c->z);
     }
   } else {
     if (indent_needs_blank) {
-      INDENT_FPRINTF (indent_file, " %.2g %.2g %.2g", c->x, c->y, c->z);
+      INDENT_FPRINTF (indent_file, " %.6g %.6g %.6g", c->x, c->y, c->z);
     } else {
-      INDENT_FPRINTF (indent_file, "%.2g %.2g %.2g", c->x, c->y, c->z);
+      INDENT_FPRINTF (indent_file, "%.6g %.6g %.6g", c->x, c->y, c->z);
     }
   }
   indent_needs_blank = TRUE;
@@ -629,7 +629,7 @@ vrml_material (colour *dc, colour *ec, colour *sc,
     if (colour_unequal (&rgb, &default_diffusecolour)) {
       indent_check_buflen (18);
       INDENT_FPRINTF (indent_file,
-		      "diffuseColor %.2g %.2g %.2g", rgb.x, rgb.y, rgb.z);
+		      "diffuseColor %.6g %.6g %.6g", rgb.x, rgb.y, rgb.z);
       prev = TRUE;
     }
   }
@@ -640,7 +640,7 @@ vrml_material (colour *dc, colour *ec, colour *sc,
       if (prev) indent_newline();
       indent_check_buflen (19);
       INDENT_FPRINTF (indent_file,
-		      "emissiveColor %.2g %.2g %.2g", rgb.x, rgb.y, rgb.z);
+		      "emissiveColor %.6g %.6g %.6g", rgb.x, rgb.y, rgb.z);
       prev = TRUE;
     }
   }
@@ -651,7 +651,7 @@ vrml_material (colour *dc, colour *ec, colour *sc,
       if (prev) indent_newline();
       indent_check_buflen (19);
       INDENT_FPRINTF (indent_file,
-		      "specularColor %.2g %.2g %.2g", rgb.x, rgb.y, rgb.z);
+		      "specularColor %.6g %.6g %.6g", rgb.x, rgb.y, rgb.z);
       prev = TRUE;
     }
   }
@@ -659,21 +659,21 @@ vrml_material (colour *dc, colour *ec, colour *sc,
   if (fabs (ai - 0.2) <= 0.0005) {
     if (prev) indent_newline();
     indent_check_buflen (18);
-    INDENT_FPRINTF (indent_file, "ambientIntensity %.2g", ai);
+    INDENT_FPRINTF (indent_file, "ambientIntensity %.6g", ai);
     prev = TRUE;
   }
 
   if (fabs (sh - 0.2) <= 0.0005) {
     if (prev) indent_newline();
     indent_check_buflen (11);
-    INDENT_FPRINTF (indent_file, "shininess %.2g", sh);
+    INDENT_FPRINTF (indent_file, "shininess %.6g", sh);
     prev = TRUE;
   }
 
   if (tr != 0.0) {
     if (prev) indent_newline();
     indent_check_buflen (14);
-    INDENT_FPRINTF (indent_file, "transparency %.2g", tr);
+    INDENT_FPRINTF (indent_file, "transparency %.6g", tr);
   }
 
   vrml_finish_node();
@@ -697,14 +697,14 @@ vrml_directionallight (double in, double ai, colour *c, vector3 *dir)
 
   if (in != 1.0) {
     indent_check_buflen (11);
-    INDENT_FPRINTF (indent_file, "intensity %.2g", in);
+    INDENT_FPRINTF (indent_file, "intensity %.6g", in);
     prev = TRUE;
   }
 
   if (ai != 0.0) {
     if (prev) indent_newline();
     indent_check_buflen (18);
-    INDENT_FPRINTF (indent_file, "ambientIntensity %.2g", ai);
+    INDENT_FPRINTF (indent_file, "ambientIntensity %.6g", ai);
     prev = TRUE;
   }
 
@@ -714,7 +714,7 @@ vrml_directionallight (double in, double ai, colour *c, vector3 *dir)
       if (prev) indent_newline();
       indent_check_buflen (10);
       INDENT_FPRINTF (indent_file,
-		      "color %.2g %.2g %.2g", rgb.x, rgb.y, rgb.z);
+		      "color %.6g %.6g %.6g", rgb.x, rgb.y, rgb.z);
       prev = TRUE;
     }
   }
@@ -752,14 +752,14 @@ vrml_pointlight (double in, double ai, colour *c,
 
   if (in != 1.0) {
     indent_check_buflen (11);
-    INDENT_FPRINTF (indent_file, "intensity %.2g", in);
+    INDENT_FPRINTF (indent_file, "intensity %.6g", in);
     prev = TRUE;
   }
 
   if (ai != 0.0) {
     if (prev) indent_newline();
     indent_check_buflen (18);
-    INDENT_FPRINTF (indent_file, "ambientIntensity %.2g", ai);
+    INDENT_FPRINTF (indent_file, "ambientIntensity %.6g", ai);
     prev = TRUE;
   }
 
@@ -769,7 +769,7 @@ vrml_pointlight (double in, double ai, colour *c,
       if (prev) indent_newline();
       indent_check_buflen (10);
       INDENT_FPRINTF (indent_file,
-		      "color %.2g %.2g %.2g", rgb.x, rgb.y, rgb.z);
+		      "color %.6g %.6g %.6g", rgb.x, rgb.y, rgb.z);
       prev = TRUE;
     }
   }
@@ -829,14 +829,14 @@ vrml_spotlight (double in, double ai, colour *c,
 
   if (in != 1.0) {
     indent_check_buflen (11);
-    INDENT_FPRINTF (indent_file, "intensity %.2g", in);
+    INDENT_FPRINTF (indent_file, "intensity %.6g", in);
     prev = TRUE;
   }
 
   if (ai != 0.0) {
     if (prev) indent_newline();
     indent_check_buflen (18);
-    INDENT_FPRINTF (indent_file, "ambientIntensity %.2g", ai);
+    INDENT_FPRINTF (indent_file, "ambientIntensity %.6g", ai);
     prev = TRUE;
   }
 
@@ -846,7 +846,7 @@ vrml_spotlight (double in, double ai, colour *c,
       if (prev) indent_newline();
       indent_check_buflen (10);
       INDENT_FPRINTF (indent_file,
-		      "color %.2g %.2g %.2g", rgb.x, rgb.y, rgb.z);
+		      "color %.6g %.6g %.6g", rgb.x, rgb.y, rgb.z);
       prev = TRUE;
     }
   }

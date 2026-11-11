@@ -1,5 +1,39 @@
-MolScriptSVG 2.2
+MolScriptSVG 2.3 (development)
 ==================
+
+New scalar colours: `molauto -bfactor`, `-alphafold`, or
+`-alphafold_gradient`. These colour cartoons and ligand atoms, including
+banded helix cylinders. See [SCALAR_COLOURS.md](SCALAR_COLOURS.md).
+Add an explicit key with `molauto -legend X Y Z WIDTH HEIGHT`, validate a
+script without rendering with `molscript -check`, and inspect drawing-command
+groups in SVG output. See [legends, checking and SVG groups](ANNOTATIONS_AND_CHECKS.md)
+for syntax, examples and limitations.
+Further [figure tools](FIGURE_TOOLS.md) add distance/angle annotations, labelled
+connectors, adaptive curve sampling, continuous scalar colours, vertical and
+categorical keys, and editable reusable view files.
+Distance labels now use Å, and B-factor legends use Å². Thin vector backbones
+preserve the original spline exactly: use `turn` to pass through C-alpha atoms,
+or `coil` for a smoothed path. See the updated
+[backbone example](examples/ras_curved_lines.svg) with C-alpha markers and
+[font/smoothing details](FIGURE_TOOLS.md).
+Choose label fonts with `-font serif`, `-font sans`, `-font monospace`, or
+`set labelfont "Helvetica";` for a backend-native name. See
+[output fonts](FONTS.md) for supported formats, FreeType image options and
+[comparison previews](examples/index.html#fonts).
+Version 2.3 is unreleased; the 2.2 release notes below are historical.
+
+Local HTML documentation starts at [docs/index.html](docs/index.html) or
+[README.html](README.html). HTML pages link to HTML companions rather than raw
+Markdown. To refresh them after editing the Markdown sources, install
+Python-Markdown (`python3-markdown` on Debian/Ubuntu) and run:
+
+```bash
+python3 scripts/build-html-docs.py
+python3 scripts/build-html-docs.py --check
+```
+
+The check requires only Python's standard library and verifies documentation
+links, local HTML targets and heading anchors in the generated pages.
 
 Version 2.2 adds display-independent bitmap/FreeType labels, safer geometry,
 and fixes across SVG, image export, X3D and MolAuto. The executables remain
@@ -15,6 +49,11 @@ Build, run regression tests, and refresh all SVG/PNG examples with:
 make -C code
 python3 scripts/test-svg.py
 python3 scripts/test-backends-molauto.py
+python3 scripts/test-scalar-colours.py
+python3 scripts/test-curves.py
+python3 scripts/test-annotations.py
+python3 scripts/test-figure-tools.py
+python3 scripts/test-fonts.py
 python3 scripts/test-rendering.py
 python3 scripts/test-webgl-browser.py
 python3 scripts/test-output-formats.py --images
@@ -71,7 +110,7 @@ Fork-specific modifications in this repository are copyright
 James W. Murray. Those modifications were developed with assistance
 from OpenAI Codex.
 
-The original documentation is at [http://pekrau.github.io/MolScript/](http://pekrau.github.io/MolScript/).
+The original documentation is at [pekrau.github.io/MolScript](https://pekrau.github.io/MolScript/).
 
 
 Open Source
@@ -80,7 +119,7 @@ Open Source
 MolScriptSVG is distributed as a fork under the MIT license in this GitHub
 repository. The original MolScript project is available at [MolScript](https://github.com/pekrau/MolScript)
 
-Version MolScriptSVG 2.2
+Version MolScriptSVG 2.3
 -------------
 
 The first version of MolScript (written in Fortran 77) was released in
@@ -141,7 +180,7 @@ development packages for:
 - EGL
 - libpng
 - libjpeg
-- libgd
+- [libgd](https://libgd.github.io/) for GIF encoding
 - zlib
 
 A C compiler, GNU Make and Bison are also required for development builds.
@@ -191,7 +230,8 @@ a working X11 display. If EGL initialization fails, MolScriptSVG falls back to
 the hidden GLUT window path for compatibility.
 
 Labels no longer depend on GLUT font initialization. The default
-`-labelfont bitmap` uses a bundled printable-ASCII font. To enable optional
+`-labelfont bitmap` uses a bundled printable-ASCII font with Å and ² glyphs.
+UTF-8 input is decoded before rasterization. To enable optional
 TrueType/OpenType fonts, install the FreeType development package (for example,
 `libfreetype-dev` on Debian/Ubuntu), then build with `make -C code USE_FREETYPE=1`.
 Select one with `-labelfont freetype -fontfile /path/to/font.ttf`.
@@ -330,6 +370,6 @@ Reference
 
 This paper is now available under Open Access: [PDF](docs/kraulis_1991_molscript_j_appl_cryst.pdf)
 
-[DOI:10.1107/S0021889891004399](http://dx.doi.org/10.1107/S0021889891004399)
+[DOI:10.1107/S0021889891004399](https://doi.org/10.1107/S0021889891004399)
 
-[Entry at J. Appl. Cryst. web site](http://scripts.iucr.org/cgi-bin/paper?S0021889891004399)
+[Publisher's PDF](https://journals.iucr.org/j/issues/1991/05/00/gl0206/gl0206.pdf)

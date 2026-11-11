@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="50.00 100.00 500.00 600.00" width="500.00" height="600.00">
 <title>GDP ball-and-stick</title>
-<desc>MolScriptSVG 2.2, Copyright (C) 1997-1998 Per J. Kraulis</desc>
+<desc>MolScriptSVG 2.3, Copyright (C) 1997-1998 Per J. Kraulis</desc>
 <g transform="translate(0 800.00) scale(1 -1)">
+<metadata xmlns:ms="urn:molscript:svg">
+<ms:command id="plot-1-command-1" kind="ball-and-stick">set 1: mol/model=0/chain= /200(GDP)[PB,O1B,O2B,O3B,PA,O1A,O2A,O3A,O5',C5',C4',O4',C3',O3',C2',O2',C1',N9,C8,N7,C5,C6,O6,N1,C2,N2,N3,C4]; </ms:command>
+</metadata>
 <clipPath id="plot-clip-1"><rect x="50.00" y="100.00" width="500.00" height="600.00"/></clipPath>
 <g clip-path="url(#plot-clip-1)">
 <rect x="50.00" y="100.00" width="500.00" height="600.00" fill="rgb(255,255,255)"/>
+<g id="plot-1-fragment-1" data-command="plot-1-command-1" data-kind="ball-and-stick">
+<title>ball-and-stick</title>
 <circle cx="175.9262" cy="398.1753" r="10.5469" style="stroke:rgb(0,0,0);stroke-width:0.324;stroke-linejoin:round;stroke-linecap:round;fill:rgb(255,0,0)"/>
 <path d="M 174.2046 388.4118 A 9.9141 9.9141 0 0 1 185.6896 396.4537" style="stroke:rgb(0,0,0);stroke-width:0.5;stroke-linejoin:round;stroke-linecap:round;fill:none"/>
 <path d="M 176.7259 389.0344 A 9.1758 9.1758 0 0 1 184.2423 394.2974" style="stroke:rgb(0,0,0);stroke-width:0.5;stroke-linejoin:round;stroke-linecap:round;fill:none"/>
@@ -296,6 +301,7 @@
 <path d="M 121.1688 344.3234 A 7.3828 7.3828 0 0 1 119.0684 342.8528" style="stroke:rgb(0,0,0);stroke-width:0.5;stroke-linejoin:round;stroke-linecap:round;fill:none"/>
 <path d="M 120.6683 342.8224 A 6.3281 6.3281 0 0 1 120.6592 342.8160" style="stroke:rgb(0,0,0);stroke-width:0.5;stroke-linejoin:round;stroke-linecap:round;fill:none"/>
 <path d="M 119.4493 344.5439 A 8.4375 8.4375 0 0 1 119.4373 344.5355" style="stroke:rgb(0,0,0);stroke-width:0.5;stroke-linejoin:round;stroke-linecap:round;fill:none"/>
+</g>
 </g>
 </g>
 </svg>

@@ -1,6 +1,6 @@
 /* state.c
 
-   MolScriptSVG v2.2
+   MolScriptSVG v2.3
 
    Graphics state.
 
@@ -11,6 +11,7 @@
 */
 
 #include <assert.h>
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -22,6 +23,59 @@
 /*============================================================*/
 state *current_state = NULL;
 static state *current_stack = NULL;
+char default_labelfont[128] = "default";
+
+const char *
+label_font_error (const char *name)
+{
+  const unsigned char *p = (const unsigned char *) name;
+  if (!name || !*name || strlen(name) >= sizeof(default_labelfont))
+    return "font name must contain 1 to 127 characters";
+  if (*p == ' ' || name[strlen(name)-1] == ' ')
+    return "font name must not start or end with spaces";
+  /* Font names are data, never executable PS, MetaPost or CSS fragments. */
+  for (; *p; p++)
+    if (!((*p >= 'a' && *p <= 'z') || (*p >= 'A' && *p <= 'Z') ||
+          (*p >= '0' && *p <= '9') || *p == ' ' || *p == '-' || *p == '_' || *p == '.'))
+      return "font names allow ASCII letters, digits, spaces, hyphens, underscores and dots";
+  if (!strcmp(name, "default") || check_mode) return NULL;
+  if (output_mode == POSTSCRIPT_MODE || output_mode == METAPOST_MODE) {
+    if (strchr(name, ' ')) return "PostScript and MetaPost require a font name without spaces";
+  } else if (output_mode == RASTER3D_MODE) {
+    if (strcmp(name, "roman") && strcmp(name, "monospace"))
+      return "Raster3D supports only default, roman and monospace stroke fonts";
+  } else if (output_mode != SVG_MODE && output_mode != VRML_MODE &&
+             output_mode != X3D_MODE && output_mode != WEBGL_MODE) {
+    return "font family selection is unavailable for this output; OpenGL/images use -labelfont freetype -fontfile PATH";
+  }
+  return NULL;
+}
+
+const char *
+label_font_name (const state *st, int mode)
+{
+  const char *name = st->labelfont;
+  int preset = !strcmp(name, "default") ? 0 : !strcmp(name, "serif") ? 1 :
+    (!strcmp(name, "sans") || !strcmp(name, "sans-serif")) ? 2 :
+    !strcmp(name, "monospace") ? 3 : -1;
+  static const char *ps[] = {"Times-Roman", "Times-Roman", "Helvetica", "Courier"};
+  static const char *svg[] = {"Times-Roman", "serif", "sans-serif", "monospace"};
+  static const char *mp[] = {"cmr10", "cmr10", "cmss10", "cmtt10"};
+  static const char *x3d[] = {"SERIF", "SERIF", "SANS", "TYPEWRITER"};
+  if (preset < 0) return name;
+  if (mode == POSTSCRIPT_MODE) return ps[preset];
+  if (mode == SVG_MODE) return svg[preset];
+  if (mode == METAPOST_MODE) return mp[preset];
+  return x3d[preset];
+}
+
+void
+set_labelfont (const char *name)
+{
+  const char *error = label_font_error(name);
+  if (error) { yyerror((char *) error); return; }
+  strcpy(current_state->labelfont, name);
+}
 
 
 /*------------------------------------------------------------*/
@@ -54,6 +108,8 @@ state_init (void)
   current_state->bondcross = 0.4;
   current_state->coilradius = 0.2;
   current_state->colourparts = FALSE;
+  current_state->colourinterpolate = FALSE;
+  current_state->curvetolerance = 0.0;
   current_state->cylinderradius = 2.3;
   current_state->depthcue = 0.75;
   current_state->emissivecolour = black_colour;
@@ -64,6 +120,7 @@ state_init (void)
   current_state->labelbackground = 0.0;
   current_state->labelcentre = TRUE;
   current_state->labelclip = FALSE;
+  strcpy (current_state->labelfont, default_labelfont);
   current_state->labelmask = NULL;
   current_state->labelmasklength = 0;
   v3_initialize (&(current_state->labeloffset), 0.0, 0.0, 0.0);
@@ -196,6 +253,7 @@ set_atomcolour (void)
 
   if (message_mode)
     fprintf (stderr, "%i atoms selected for atomcolour\n", total);
+  if (check_mode && !total) yywarning ("empty atom selection for atomcolour");
 
   assert (count_atom_selections() == 0);
 }
@@ -210,7 +268,7 @@ set_atomcolour_bfactor (void)
   at3d *at;
   int *flags;
   int total = 0;
-  double lower, upper, invdiff;
+  double lower, upper;
 
   assert (count_atom_selections() == 1);
   assert (dstack_size == 2);
@@ -219,24 +277,24 @@ set_atomcolour_bfactor (void)
   upper = dstack[1];
   clear_dstack();
 
-  if (upper <= lower) {
+  if (!isfinite(lower) || !isfinite(upper) || upper <= lower || !isfinite(upper-lower)) {
     yyerror ("invalid b-factor range values");
     return;
   }
 
-  invdiff = 1.0 / (upper - lower);
 
   flags = current_atom_sel->flags;
   for (mol = first_molecule; mol; mol = mol->next) {
     for (res = mol->first; res; res = res->next) {
       for (at = res->first; at; at = at->next) {
 	if (*flags++) {
+	  if (!isfinite(at->bfactor)) yyerror ("non-finite B-factor");
 	  if (at->bfactor <= lower) {
 	    at->colour = ramp_from_colour;
 	  } else if (at->bfactor >= upper) {
 	    at->colour = ramp_to_colour;
 	  } else {
-	    ramp_colour (&(at->colour), (at->bfactor - lower) * invdiff);
+	    ramp_colour (&(at->colour), (at->bfactor - lower) / (upper-lower));
 	  }
 	  total++;
 	}
@@ -247,6 +305,7 @@ set_atomcolour_bfactor (void)
 
   if (message_mode)
     fprintf (stderr, "%i atoms selected for atomcolour b-factor\n", total);
+  if (check_mode && !total) yywarning ("empty atom selection for atomcolour b-factor");
 
   assert (count_atom_selections() == 0);
 }
@@ -289,6 +348,7 @@ set_atomradius (void)
 
   if (message_mode)
     fprintf (stderr, "%i atoms selected for atomradius\n", total);
+  if (check_mode && !total) yywarning ("empty atom selection for atomradius");
 
   assert (count_atom_selections() == 0);
 }
@@ -696,6 +756,7 @@ set_residuecolour (void)
     for (res = mol->first; res; res = res->next) {
       if (*flags++) {
 	res->colour = given_colour;
+	clear_residue_ramp (res);
 	total++;
       }
     }
@@ -704,6 +765,7 @@ set_residuecolour (void)
 
   if (message_mode)
     fprintf (stderr, "%i residues selected for residuecolour\n", total);
+  if (check_mode && !total) yywarning ("empty residue selection for residuecolour");
 
   assert (count_residue_selections() == 0);
 }
@@ -718,7 +780,7 @@ set_residuecolour_bfactor (void)
   int *flags;
   int total = 0;
   at3d *at;
-  double lower, upper, invdiff, bfactor, sum;
+  double lower, upper, bfactor, sum;
 
   assert (count_residue_selections() == 1);
   assert (dstack_size == 2);
@@ -727,12 +789,11 @@ set_residuecolour_bfactor (void)
   upper = dstack[1];
   clear_dstack();
 
-  if (upper <= lower) {
+  if (!isfinite(lower) || !isfinite(upper) || upper <= lower || !isfinite(upper-lower)) {
     yyerror ("invalid b-factor range values");
     return;
   }
 
-  invdiff = 1.0 / (upper - lower);
 
   flags = current_residue_sel->flags;
   for (mol = first_molecule; mol; mol = mol->next) {
@@ -756,12 +817,14 @@ set_residuecolour_bfactor (void)
 	  if (sum != 0.0) bfactor /= sum;
 	}
 
+	if (!isfinite(bfactor)) yyerror ("non-finite residue B-factor");
+	record_residue_ramp (res, (bfactor-lower)/(upper-lower), lower, upper);
 	if (bfactor <= lower) {
 	  res->colour = ramp_from_colour;
 	} else if (bfactor >= upper) {
 	  res->colour = ramp_to_colour;
 	} else {
-	  ramp_colour (&(res->colour), (bfactor - lower) * invdiff);
+	  ramp_colour (&(res->colour), (bfactor - lower) / (upper-lower));
 	}
 	total++;
       }
@@ -771,6 +834,7 @@ set_residuecolour_bfactor (void)
 
   if (message_mode)
     fprintf (stderr, "%i residues selected for residuecolour b-factor\n", total);
+  if (check_mode && !total) yywarning ("empty residue selection for residuecolour b-factor");
 
   assert (count_residue_selections() == 0);
 }
@@ -794,6 +858,7 @@ set_residuecolour_seq (void)
     for (res = mol->first; res; res = res->next) {
       if (*flags++) {
 	f = ((double) total++) / sum;
+	clear_residue_ramp (res);
 	ramp_colour (&(res->colour), (f <= 1.0 ? f : 1.0));
       }
     }
@@ -802,6 +867,7 @@ set_residuecolour_seq (void)
 
   if (message_mode)
     fprintf (stderr, "%i residues selected for residuecolour sequence\n", total);
+  if (check_mode && !total) yywarning ("empty residue selection for residuecolour sequence");
 
   assert (count_residue_selections() == 0);
 }
@@ -826,6 +892,17 @@ set_segments (void)
   } else {
     current_state->segments = ival;
   }
+  clear_dstack();
+}
+
+void
+set_curvetolerance (void)
+{
+  assert (dstack_size == 1);
+  if (!isfinite(dstack[0]) || dstack[0] < 0) {
+    yyerror ("curvetolerance must be finite and nonnegative"); return;
+  }
+  current_state->curvetolerance = dstack[0];
   clear_dstack();
 }
 
@@ -896,7 +973,7 @@ set_smoothsteps (void)
 {
   assert (dstack_size == 1);
 
-  if (ival < 1) {
+  if (ival < 0) {
     yyerror ("invalid smoothsteps value");
   } else {
     current_state->smoothsteps = ival;

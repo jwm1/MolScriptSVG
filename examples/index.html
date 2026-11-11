@@ -1,6 +1,6 @@
 <html>
 <head>
-  <title>MolScriptSVG 2.2: Gallery</title>
+  <title>MolScriptSVG 2.3: Gallery</title>
   <link href="style.css" type="text/css" rel="stylesheet"></link>
 </head>
 
@@ -8,7 +8,51 @@
 
 <a href="../docs/index.html">Documentation index</a>
 
-<h1 align="center">MolScriptSVG 2.2 Gallery</h1>
+<h1 align="center">MolScriptSVG 2.3 Gallery</h1>
+
+<h2>2.3 scalar colours</h2>
+<p><a href="../FIGURE_TOOLS.html">New figure tools</a>: measurements, adaptive
+curves, continuous scalar colours, custom keys and saved views.</p>
+<table><tr>
+<td><a href="ras_measurements.svg"><img src="ras_measurements_svg.png" width="240" alt="GDP distances and angle"></a><br>Measurements: <a href="ras_measurements.in">script</a></td>
+<td><a href="ras_smooth_scalar.svg"><img src="ras_smooth_scalar_svg.png" width="240" alt="Adaptive cartoon with interpolated B-factor colours"></a><br>Adaptive scalar cartoon: <a href="ras_smooth_scalar.in">script</a></td>
+</tr><tr>
+<td><a href="legend_layouts.svg"><img src="legend_layouts_svg.png" width="240" alt="Vertical legend and categorical keys"></a><br>Custom keys: <a href="legend_layouts.in">script</a></td>
+<td><a href="ras_reused_view.svg"><img src="ras_reused_view_svg.png" width="240" alt="Ras using an exported view"></a><br>Reused view: <a href="ras_reused_view.in">script</a>, <a href="ras_saved_view.inc">macros</a></td>
+</tr></table>
+<p>Legends use explicit positions and the same ranges as the molecular colours.
+<a href="../ANNOTATIONS_AND_CHECKS.html">Legends, checking mode and SVG groups</a>.</p>
+<table><tr>
+<td><a href="ras_bfactor_legend.svg"><img src="ras_bfactor_legend_svg.png" width="240" alt="B-factor gradient with numeric key"></a><br>B-factor key: <a href="ras_bfactor_legend.in">script</a></td>
+<td><a href="ras_confidence_legend.svg"><img src="ras_confidence_legend_svg.png" width="240" alt="Discrete confidence key"></a><br>Four-bin key: <a href="ras_confidence_legend.in">script</a></td>
+<td><a href="ras_confidence_gradient_legend.svg"><img src="ras_confidence_gradient_legend_svg.png" width="240" alt="Continuous confidence key"></a><br>Continuous key: <a href="ras_confidence_gradient_legend.in">script</a></td>
+</tr></table>
+<p>Curve rendering: <a href="ras_curved_lines.svg">exact thin backbone Bezier paths through C-alpha atoms</a>
+(<a href="ras_curved_lines_svg.png">PNG</a>,
+<a href="ras_curved_lines.in">script</a>). Black spheres mark the C-alpha atoms;
+the script uses an unsmoothed <code>turn</code>, not a smoothed <code>coil</code>.
+Distance labels use &Aring;, and B-factor legends use &Aring;&sup2;.
+The WebGL cylinder example below uses native cylinders and round coil tubes.</p>
+<p>Confidence examples below use synthetic scores, not an AlphaFold prediction.
+<a href="../SCALAR_COLOURS.html">Options and palette definitions</a>.</p>
+<table><tr>
+<td><a href="ras_bfactor.svg"><img src="ras_bfactor_svg.png" width="240" alt="B-factor gradient"></a><br>Experimental B-factors: <a href="ras_bfactor.in">script</a></td>
+<td><a href="ras_confidence.svg"><img src="ras_confidence_svg.png" width="240" alt="Four confidence colours"></a><br>Four confidence colours: <a href="ras_confidence.in">script</a></td>
+</tr><tr>
+<td><a href="ras_confidence_gradient.svg"><img src="ras_confidence_gradient_svg.png" width="240" alt="Continuous confidence colours"></a><br>Continuous confidence: <a href="ras_confidence_gradient.in">script</a></td>
+<td><a href="ras_confidence_cylinders.svg"><img src="ras_confidence_cylinders_svg.png" width="240" alt="Coloured helix cylinders"></a><br>Coloured cylinders: <a href="ras_confidence_cylinders.in">script</a>, <a href="ras_confidence_cylinders.webgl.html">WebGL</a>, <a href="ras_confidence_cylinders.x3d">X3D</a>, <a href="ras_confidence_cylinders_pov.png">POV-Ray</a></td>
+</tr></table>
+
+<h2 id="fonts">Output font choices</h2>
+<p>The same <a href="font_labels.in">label script</a> rendered with
+<code>-font serif</code>, <code>-font sans</code> and <code>-font monospace</code>.
+Click a preview for SVG; <a href="../FONTS.html">font documentation</a> covers
+native names and image-output font files.</p>
+<table><tr>
+<td><a href="font_labels_serif.svg"><img src="font_labels_serif_svg.png" width="240" alt="Serif labels and angstrom distance"></a><br>Serif: <a href="font_labels_serif.ps">PS</a>, <a href="font_labels_serif.mp">MetaPost</a>, <a href="font_labels_serif.webgl.html">WebGL</a></td>
+<td><a href="font_labels_sans.svg"><img src="font_labels_sans_svg.png" width="240" alt="Sans-serif labels and angstrom distance"></a><br>Sans: <a href="font_labels_sans.ps">PS</a>, <a href="font_labels_sans.mp">MetaPost</a>, <a href="font_labels_sans.webgl.html">WebGL</a></td>
+<td><a href="font_labels_monospace.svg"><img src="font_labels_monospace_svg.png" width="240" alt="Monospace labels and angstrom distance"></a><br>Monospace: <a href="font_labels_monospace.ps">PS</a>, <a href="font_labels_monospace.mp">MetaPost</a>, <a href="font_labels_monospace.webgl.html">WebGL</a></td>
+</tr></table>
 
 <h2>New in 2.2</h2>
 <p>Headless OpenGL label renderers, using <a href="ras_gdp.in">ras_gdp.in</a>:
@@ -16,7 +60,7 @@
 <a href="ras_gdp_freetype.png">FreeType / DejaVu Sans</a>.
 The <a href="svg_transparency.svg">SVG transparency comparison</a>
 also has a <a href="svg_transparency_svg.png">PNG preview</a>.
-See <a href="../RELEASE_NOTES_2.2.md">release notes</a> for details.</p>
+See <a href="../RELEASE_NOTES_2.2.html">release notes</a> for details.</p>
 <p><a href="ras_gdp_bitmap.png"><img src="ras_gdp_bitmap.png" width="240"
 alt="Headless labels using the bundled bitmap font"></a>
 <a href="ras_gdp_freetype.png"><img src="ras_gdp_freetype.png" width="240"
@@ -544,21 +588,21 @@ heteronuclear three- and four-dimensional NMR spectroscopy.
 <strong>
 Biochemistry (1994) vol 33, pp 3515-3531.
 </strong>
-<a href="http://www.ncbi.nlm.nih.gov/sites/entrez?db=PubMed&cmd=search&term=8142349">PubMed PMID:8142349</a>
+<a href="https://pubmed.ncbi.nlm.nih.gov/8142349/">PubMed PMID:8142349</a>
 </blockquote>
 
 <p>
-The <a href="http://www.rcsb.org/">RSCB Protein Data Bank
+The <a href="https://www.rcsb.org/">RCSB Protein Data Bank
 (PDB)</a> code for the coordinate set used in these example images is
-<a href="http://www.rcsb.org/pdb/explore/explore.do?structureId=1CRQ">1CRQ</a>,
+<a href="https://www.rcsb.org/structure/1CRQ">1CRQ</a>,
 which contains the minimized average structure. All hydrogen atoms
 were stripped from the coordinate file before use, for simplicity.
 </p>
 <p>
 The 40 individual structures are available in two separate
 PDB data sets with 20 structures each:
-<a href="http://www.rcsb.org/pdb/explore/explore.do?structureId=1CRR">1CRR</a> and
-<a href="http://www.rcsb.org/pdb/explore/explore.do?structureId=1CRP">1CRP</a>.
+<a href="https://www.rcsb.org/structure/1CRR">1CRR</a> and
+<a href="https://www.rcsb.org/structure/1CRP">1CRP</a>.
 </p>
 
 <a href="../docs/index.html">Documentation index</a>

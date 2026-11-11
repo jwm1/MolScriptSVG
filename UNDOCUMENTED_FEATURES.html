@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MolScriptSVG: UNDOCUMENTED FEATURES</title>
+<link rel="stylesheet" href="docs/style.css">
+<link rel="stylesheet" href="docs/documentation.css">
+</head>
+<body>
+<!-- Generated from UNDOCUMENTED_FEATURES.md by scripts/build-html-docs.py. -->
+<nav><a href="docs/index.html">Manual</a> | <a href="README.html">README</a> |
+<a href="examples/index.html">Examples</a> | <a href="CHANGES.html">Changelog</a></nav>
+<main>
+<h1 id="undocumented-features">Undocumented Features</h1>
+<p>This note compares the actual yacc grammar in
+<a href="./code/molscript.y">code/molscript.y</a> against the published syntax summary:</p>
+<ul>
+<li><a href="https://pekrau.github.io/MolScript/syntax.html">https://pekrau.github.io/MolScript/syntax.html</a></li>
+</ul>
+<p>That syntax page explicitly says it omits undocumented features. The items
+below are supported by the grammar but are absent from that summary, or are
+only represented there by an undefined placeholder production.</p>
+<h2 id="clearly-missing-commands">Clearly Missing Commands</h2>
+<ul>
+<li><code>trace residue_selection ;</code></li>
+<li>Draws a peptide C-alpha trace as a polyline.</li>
+<li>
+<p>Grammar: <code>geom_command</code> in <a href="./code/molscript.y">code/molscript.y</a></p>
+</li>
+<li>
+<p><code>element id</code></p>
+</li>
+<li>Atom-selection primitive for selecting atoms by element symbol.</li>
+<li>Grammar: <code>atom_specification</code> in <a href="./code/molscript.y">code/molscript.y</a></li>
+</ul>
+<h2 id="grammar-placeholders-not-expanded-in-the-published-summary">Grammar Placeholders Not Expanded in the Published Summary</h2>
+<p>The syntax page uses these names, but does not define them:</p>
+<ul>
+<li><code>xform</code></li>
+<li><code>parameter_spec</code></li>
+<li><code>vector</code></li>
+<li><code>colour</code></li>
+<li><code>ramp</code></li>
+<li><code>view_definition</code></li>
+</ul>
+<p>These omissions hide a number of real language features.</p>
+<h2 id="undocumented-transform-by-forms">Undocumented <code>transform ... by ...</code> Forms</h2>
+<p>The published summary includes:</p>
+<ul>
+<li><code>transform atom_selection {by xform} ;</code></li>
+</ul>
+<p>but it does not document the supported <code>xform</code> forms:</p>
+<ul>
+<li><code>centre vector</code></li>
+<li><code>translation vector</code></li>
+<li><code>rotation xaxis number</code></li>
+<li><code>rotation yaxis number</code></li>
+<li><code>rotation zaxis number</code></li>
+<li><code>rotation axis number number number number</code></li>
+<li><code>rotation</code> followed by a 3x3 matrix as 9 numbers</li>
+<li><code>recall-matrix</code></li>
+</ul>
+<p>See <code>xform</code> in <a href="./code/molscript.y">code/molscript.y</a>.</p>
+<h2 id="undocumented-set-parameters">Undocumented <code>set</code> Parameters</h2>
+<p>The published summary includes:</p>
+<ul>
+<li><code>set parameter_spec {',' parameter_spec} ';'</code></li>
+</ul>
+<p>but it does not document the concrete <code>parameter_spec</code> alternatives. These
+include at least:</p>
+<ul>
+<li><code>atomcolour atom_selection colour</code></li>
+<li><code>atomcolour atom_selection b-factor number number ramp</code></li>
+<li><code>atomradius atom_selection number</code></li>
+<li><code>bonddistance number</code></li>
+<li><code>bondcross number</code></li>
+<li><code>coilradius number</code></li>
+<li><code>colourparts on|off</code></li>
+<li><code>colourramp hsb|rgb</code></li>
+<li><code>cylinderradius number</code></li>
+<li><code>depthcue number</code></li>
+<li><code>emissivecolour colour</code></li>
+<li><code>helixthickness number</code></li>
+<li><code>helixwidth number</code></li>
+<li><code>hsbrampreverse on|off</code></li>
+<li><code>labelbackground number</code></li>
+<li><code>labelcentre on|off</code></li>
+<li><code>labelclip on|off</code></li>
+<li><code>labelmask id</code></li>
+<li><code>labeloffset vector</code></li>
+<li><code>labelrotation on|off</code></li>
+<li><code>labelsize number</code></li>
+<li><code>lightambientintensity number</code></li>
+<li><code>lightattenuation vector</code></li>
+<li><code>lightcolour colour</code></li>
+<li><code>lightintensity number</code></li>
+<li><code>lightradius number</code></li>
+<li><code>linecolour colour</code></li>
+<li><code>linedash number</code></li>
+<li><code>linewidth number</code></li>
+<li><code>objecttransform on|off</code></li>
+<li><code>planecolour colour</code></li>
+<li><code>plane2colour colour</code></li>
+<li><code>regularexpression on|off</code></li>
+<li><code>residuecolour residue_selection colour</code></li>
+<li><code>residuecolour residue_selection b-factor number number ramp</code></li>
+<li><code>residuecolour residue_selection ramp</code></li>
+<li><code>segments integer</code></li>
+<li><code>segmentsize number</code></li>
+<li><code>shading number</code></li>
+<li><code>shadingexponent number</code></li>
+<li><code>shininess number</code></li>
+<li><code>smoothsteps integer</code></li>
+<li><code>specularcolour colour</code></li>
+<li><code>splinefactor number</code></li>
+<li><code>stickradius number</code></li>
+<li><code>sticktaper number</code></li>
+<li><code>strandthickness number</code></li>
+<li><code>strandwidth number</code></li>
+<li><code>transparency number</code></li>
+</ul>
+<p>See <code>state_change</code> in <a href="./code/molscript.y">code/molscript.y</a>.</p>
+<h2 id="omitted-helper-syntax">Omitted Helper Syntax</h2>
+<p>The grammar also defines helper syntax that matters in practice but is not
+shown on the summary page:</p>
+<ul>
+<li><code>vector</code></li>
+<li><code>position atom_selection</code></li>
+<li>
+<p><code>number number number</code></p>
+</li>
+<li>
+<p><code>colour</code></p>
+</li>
+<li><code>rgb number number number</code></li>
+<li><code>hsb number number number</code></li>
+<li><code>grey number</code></li>
+<li>
+<p>named colour / identifier</p>
+</li>
+<li>
+<p><code>ramp</code></p>
+</li>
+<li><code>from colour to colour</code></li>
+<li>
+<p><code>rainbow</code></p>
+</li>
+<li>
+<p><code>view_definition</code></p>
+</li>
+<li><code>from vector to vector</code></li>
+<li><code>from vector to vector number</code></li>
+<li>
+<p><code>origin vector number</code></p>
+</li>
+<li>
+<p><code>number_as_id</code></p>
+</li>
+<li>residue ranges accept either a numeric token or an identifier token at
+    each end of <code>from ... to ...</code></li>
+</ul>
+<h2 id="notes">Notes</h2>
+<ul>
+<li>Most of the control-structure features such as <code>anchor</code>, <code>level-of-detail</code>,
+  <code>viewpoint</code>, and the light commands are already present on the published
+  syntax summary.</li>
+<li>The summary is therefore fairly complete at the top level; the largest gaps
+  are the missing <code>trace</code> and <code>element</code> productions, and the omission of the
+  full subgrammars behind <code>xform</code> and <code>parameter_spec</code>.</li>
+</ul>
+</main>
+</body>
+</html>

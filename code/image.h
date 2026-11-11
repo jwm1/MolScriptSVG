@@ -1,6 +1,6 @@
 /* image.h
 
-   MolScriptSVG v2.2
+   MolScriptSVG v2.3
 
    Image file output definitions and routines.
 

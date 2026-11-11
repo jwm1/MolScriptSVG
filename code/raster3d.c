@@ -1,6 +1,6 @@
 /* raster3d.c
 
-   MolScriptSVG v2.2
+   MolScriptSVG v2.3
 
    Raster3D; input for the 'render' program.
 
@@ -13,6 +13,8 @@
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
+#include "clib/str_utils.h"
 
 #include "raster3d.h"
 #include "global.h"
@@ -20,20 +22,15 @@
 #include "segment.h"
 #include "state.h"
 
-#ifdef OPENGL_SUPPORT
-#include "other/glutstroke.h"
-#endif
+#include "other/stroke_fonts.h"
 
 
 /*============================================================*/
 #define HELIX_RECESS 0.8
 
-#ifdef OPENGL_SUPPORT
-extern StrokeFontRec glutStrokeRoman;
 #define FONTSCALE_FACTOR 2.75e-5
 #define RADIUS_FACTOR 2.4e-4
 #define DEFAULT_WINDOW 20.0
-#endif
 
 static FILE *proper_outfile;
 static FILE *header_file;
@@ -650,23 +647,22 @@ r3d_helix (void)
 void
 r3d_label (vector3 *p, char *label, colour *c)
 {
-#ifdef OPENGL_SUPPORT
-  const StrokeCharRec *ch;
-  const StrokeRec *stroke;
-  const CoordRec *coord;
-  StrokeFontPtr fontinfo = &glutStrokeRoman;
+  const ms_stroke_char *ch;
+  const ms_stroke_strip *stroke;
+  const ms_stroke_vertex *coord;
+  const ms_stroke_font *fontinfo = &ms_stroke_roman;
   int i, j;
+  unsigned int cp;
+  const char *text = label;
+  double glyph_scale, glyph_raise;
   double offset = 0.0;
   vector3 pos1, pos2;
   double font_scale, radius;
   double spacing = 10.0;
-#endif
 
   assert (p);
   assert (label);
   assert (*label);
-
-#ifdef OPENGL_SUPPORT
 
   if (window > 0.0) {
     font_scale = FONTSCALE_FACTOR * window * current_state->labelsize;
@@ -677,27 +673,45 @@ r3d_label (vector3 *p, char *label, colour *c)
   }
 
   write_material();
+  if (!strcmp(current_state->labelfont, "monospace")) fontinfo = &ms_stroke_mono_roman;
   if (c) {
     convert_colour (c);
   } else {
     convert_colour (&(current_state->linecolour));
   }
 
-  for (; *label; label++) {
-    if (*label >= fontinfo->num_chars) continue;
-
-    ch = &(fontinfo->ch[*label]);
+  while (*text) {
+    cp = str_utf8_next (&text);
+    glyph_scale = cp == 0xb2 ? 0.65 : 1.0;
+    glyph_raise = cp == 0xb2 ? 40.0 : 0.0;
+    if (cp == 0xc5 || cp == 0x212b) {
+      /* The stroke font has no accented glyphs: add a closed ring above A. */
+      for (i = 0; i <= 16; i++) {
+        double theta = i * 2.0 * acos(-1.0) / 16;
+        v3_initialize (&pos2, fontinfo->characters['A']->advance/2 + 10*cos(theta), 115 + 10*sin(theta), 0);
+        v3_scale (&pos2, font_scale);
+        v3_add (&pos2, p);
+        v3_add (&pos2, &current_state->labeloffset);
+        pos2.x += offset;
+        if (i) write_cylinder_round (&pos1, &pos2, radius);
+        pos1 = pos2;
+      }
+      cp = 'A';
+    } else if (cp == 0xb2) cp = '2';
+    if (cp >= (unsigned int) fontinfo->count || !fontinfo->characters[cp]) cp = '?';
+    ch = fontinfo->characters[cp];
     if (ch) {
-      for (i = ch->num_strokes, stroke = ch->stroke; i > 0; i--, stroke++) {
-	coord = stroke->coord;
-	v3_initialize (&pos1, coord->x, coord->y, 0.0);
+      for (i = ch->count, stroke = ch->strips; i > 0; i--, stroke++) {
+        if (!stroke->count) continue;
+	coord = stroke->vertices;
+	v3_initialize (&pos1, coord->x * glyph_scale, coord->y * glyph_scale + glyph_raise, 0.0);
 	v3_scale (&pos1, font_scale);
 	v3_add (&pos1, p);
 	v3_add (&pos1, &(current_state->labeloffset));
 	pos1.x += offset;
 	coord++;
-	for (j = stroke->num_coords - 1; j > 0; j--, coord++) {
-	  v3_initialize (&pos2, coord->x, coord->y, 0.0);
+	for (j = stroke->count - 1; j > 0; j--, coord++) {
+	  v3_initialize (&pos2, coord->x * glyph_scale, coord->y * glyph_scale + glyph_raise, 0.0);
 	  v3_scale (&pos2, font_scale);
 	  v3_add (&pos2, p);
 	  v3_add (&pos2, &(current_state->labeloffset));
@@ -706,13 +720,10 @@ r3d_label (vector3 *p, char *label, colour *c)
 	  pos1 = pos2;
 	}
       }
-      offset += font_scale * (ch->right + spacing);
+      offset += font_scale * (ch->advance * glyph_scale + spacing);
     }
   }
 
-#else
-  not_implemented ("r3d_label");
-#endif
 }
 
 

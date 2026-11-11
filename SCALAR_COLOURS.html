@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MolScriptSVG: SCALAR COLOURS</title>
+<link rel="stylesheet" href="docs/style.css">
+<link rel="stylesheet" href="docs/documentation.css">
+</head>
+<body>
+<!-- Generated from SCALAR_COLOURS.md by scripts/build-html-docs.py. -->
+<nav><a href="docs/index.html">Manual</a> | <a href="README.html">README</a> |
+<a href="examples/index.html">Examples</a> | <a href="CHANGES.html">Changelog</a></nav>
+<main>
+<h1 id="b-factor-and-confidence-colours-23">B-factor and confidence colours (2.3)</h1>
+<p>Run MolAuto with one of <code>-bfactor</code>, <code>-alphafold</code>, <code>-alphafold_gradient</code>.
+All colour protein/nucleotide cartoons and individual ligand atoms. Protein
+values come from CA, falling back to an atom average; nucleotides use averages.
+Waters and omitted ligands are excluded from automatic range calculation.</p>
+<p><code>-bfactor</code> maps the displayed minimum to blue, midpoint to white and maximum
+to red. Override with <code>-bfactor_range LOW HIGH</code>. Constant data map to white.
+<code>-alphafold</code> assumes the B column contains confidence on a fixed 0-100 scale:</p>
+<table>
+<thead>
+<tr>
+<th>Range</th>
+<th>RGB (0-255)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>&lt;=50</td>
+<td>238,132,83 (orange)</td>
+</tr>
+<tr>
+<td>&gt;50 to 70</td>
+<td>249,220,77 (yellow)</td>
+</tr>
+<tr>
+<td>&gt;70 to 90</td>
+<td>117,199,244 (cyan)</td>
+</tr>
+<tr>
+<td>&gt;90</td>
+<td>33,82,206 (blue)</td>
+</tr>
+</tbody>
+</table>
+<p>Colours and strict boundaries match James Murray's <code>afcolors.py</code>, whose
+colour matching is credited to Daniella Pretorius.
+The custom continuous variant interpolates RGB at 0/orange, 50/yellow,
+70/cyan, 100/blue. It is not the standard four-bin AlphaFold scheme.
+Out-of-range confidence is clamped with a warning. Non-finite scores are errors.
+Blank PDB B-factor fields retain the reader's existing zero interpretation.</p>
+<p>The modes are mutually exclusive and conflict with <code>-nocolour</code>, <code>-ss_palette</code>
+and <code>-colourblind</code>. <code>-nice</code> and <code>-publication</code> retain their geometry settings;
+the scalar palette takes precedence. <code>-noligand</code> omits ligand colouring.
+By default, continuous refers to the value-to-colour mapping, not interpolation
+between residues. Optional <code>colourinterpolate on</code> adds sampled interpolation between adjacent
+scalar-coloured residues; categorical palettes remain discrete. See
+<a href="FIGURE_TOOLS.html">figure tools</a> for controls and limitations.</p>
+<p>Native MolScript also accepts the named ramps <code>blue-white-red</code>, <code>alphafold</code>
+and <code>alphafold-gradient</code>, for example:</p>
+<pre><code class="language-text">set colourparts on,
+    residuecolour amino-acids b-factor 0 100 alphafold,
+    atomcolour not in waters b-factor 0 100 alphafold;
+</code></pre>
+<p>Named ramps use normalized endpoints; use 0 and 100 for confidence. Existing
+two-colour and rainbow ramps are unchanged. With <code>colourparts on</code>, cylinders
+now use residue-coloured axial bands, merging equal neighbours. The shared
+X3D/WebGL and VRML use native Cylinder nodes with only terminal caps; POV-Ray
+uses native open cylinders with terminal discs. Other backends use meshes,
+with radial normals for 3D shading and flat facet normals for vector output;
+with <code>colourparts off</code>, the old cylinder path is unchanged.</p>
+<p>Round coils/turns now use 16-sided circular rings with radial normals in
+OpenGL, Raster3D, VRML and X3D. Cap normals remain separate, so the flat ends
+are not rounded by shading. POV-Ray uses local cubic <code>sphere_sweep</code> spans,
+joined at matching tangent-plane cuts to retain colour boundaries without
+clipping distant parts of a folded loop. Thin coils (<code>coilradius 0</code>) use
+piecewise cubic Bezier paths in SVG, PS and MetaPost. Explicit lines, bonds
+and unsmoothed traces remain straight. Beziers are subdivided using
+<code>segmentsize</code> before the existing depth sort; this retains painter-style
+occlusion approximations, not exact intersection clipping. Colour and chain
+breaks remain separate paths. Vector controls now preserve the exact original
+Hermite spline. Use a thin <code>turn</code> to pass through C-alpha coordinates;
+<code>coil</code> smooths those coordinates first unless <code>smoothsteps 0</code> is set.
+See <a href="FIGURE_TOOLS.html#backbones-through-c-alpha-atoms">backbones and sampling</a>.</p>
+<h2 id="examples-and-tests">Examples and tests</h2>
+<p>Use <code>-legend X Y Z WIDTH HEIGHT</code> with a scalar mode to generate a matching
+key with its exact numeric range. See <a href="ANNOTATIONS_AND_CHECKS.html">legends and checks</a>.
+The B-factor key is titled <code>B-factor (Å²)</code>; confidence keys remain dimensionless.
+The generator also creates three <code>*_legend</code> examples and PNG previews.</p>
+<p>From the repository root:</p>
+<pre><code class="language-bash">make -C code -j4 USE_FREETYPE=1
+python3 scripts/test-scalar-colours.py
+python3 scripts/generate-scalar-examples.py
+</code></pre>
+<p>The generator requires CairoSVG and writes scripts, scenes and PNG previews
+to <code>examples/</code>. <code>ras_bfactor</code> uses the original B-factors. The three
+<code>ras_confidence*</code> examples use explicitly synthetic scores, not a prediction.
+Open <code>examples/index.html</code> to compare them.</p>
+<p>Modern Bison is required to regenerate the parser. Checked-in generated
+sources are supplied. This development tree has no new release tag.</p>
+</main>
+</body>
+</html>

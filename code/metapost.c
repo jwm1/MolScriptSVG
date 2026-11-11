@@ -38,6 +38,8 @@ typedef struct {
 typedef struct {
   vector3 v1;
   vector3 v2;
+  vector3 c1, c2;
+  boolean curved;
   colour *c;
 } line_db_entry;
 
@@ -384,6 +386,35 @@ mp_write_label_text (FILE *file, char *str, int len, state *st)
   mp_write_escaped (file, str, len, TRUE);
 }
 
+/* Compose scientific units without requiring TeX or a particular font encoding. */
+static void
+mp_write_unicode_label (FILE *file, const char *text)
+{
+  unsigned int cp;
+  fputs ("image(save p,x; picture p; numeric x; x:=0;\n", file);
+  while (*text) {
+    cp = str_utf8_next (&text);
+    if (cp == '%') continue;
+    if (cp == ' ' || cp == '\t') {
+      fputs ("p:=\" \" infont defaultfont; x:=x+xpart(urcorner p-llcorner p);\n", file);
+      continue;
+    }
+    if (cp == 0xc5 || cp == 0x212b) {
+      fputs ("p:=\"A\" infont defaultfont;\n"
+             "draw p shifted (x,0);\n"
+             "draw fullcircle scaled 2.2 shifted "
+             "(x+0.5*xpart(urcorner p+llcorner p),ypart urcorner p+1.7) "
+             "withpen pencircle scaled 0.4;\n", file);
+    } else {
+      fprintf (file, "p:=char %u infont defaultfont", cp == 0xb2 ? '2' : cp < 128 ? cp : '?');
+      if (cp == 0xb2) fputs (" scaled 0.65 shifted (0,4)", file);
+      fputs ("; draw p shifted (x,0);\n", file);
+    }
+    fputs ("x:=x+xpart(urcorner p-llcorner p);\n", file);
+  }
+  fputs (")", file);
+}
+
 
 /*------------------------------------------------------------*/
 static void
@@ -418,6 +449,8 @@ mp_draw_axes (FILE *file, double matrix[4][4], double scale)
 
   matrix3_transform (&origin, matrix);
   mp_comment ("axes with distance ticks (Angstrom)");
+  fprintf (file, "begingroup; save defaultfont; string defaultfont; defaultfont:=\"%s\";\n",
+           label_font_name (current_state, METAPOST_MODE));
 
   for (axis = 0; axis < 3; axis++) {
     v3_initialize (&axis_end, 0.0, 0.0, 0.0);
@@ -459,6 +492,7 @@ mp_draw_axes (FILE *file, double matrix[4][4], double scale)
                tick_point.y + 4.0 * perp2d.y + 3.0);
     }
   }
+  fputs ("endgroup;\n", file);
 }
 
 
@@ -597,6 +631,7 @@ db_line (vector3 *v1, vector3 *v2, colour *c)
     le = line_array + line_count;
     le->v1 = *v1;
     le->v2 = *v2;
+    le->curved = FALSE;
     if (c) {
       le->c = colour_clone (c);
     } else {
@@ -609,6 +644,28 @@ db_line (vector3 *v1, vector3 *v2, colour *c)
 
 
 /*------------------------------------------------------------*/
+/* De Casteljau splitting retains the existing depth-sort segment granularity. */
+static void
+db_curve (vector3 p[4], colour *c, int level)
+{
+  double length=v3_distance(p,p+1)+v3_distance(p+1,p+2)+v3_distance(p+2,p+3);
+  int old;
+  if (length > current_state->segmentsize && level<20) {
+    vector3 a[4],b[4],mid;
+    a[0]=p[0]; b[3]=p[3];
+    v3_middle(a+1,p,p+1); v3_middle(&mid,p+1,p+2); v3_middle(b+2,p+2,p+3);
+    v3_middle(a+2,a+1,&mid); v3_middle(b+1,&mid,b+2);
+    v3_middle(a+3,a+2,b+1); b[0]=a[3];
+    db_curve(a,c,level+1); db_curve(b,c,level+1);
+    return;
+  }
+  old=line_count; db_line(p,p+3,c);
+  if (line_count==old+1) {
+    line_array[old].curved=TRUE;
+    line_array[old].c1=p[1]; line_array[old].c2=p[2];
+  }
+}
+
 static void
 db_point (vector3 *v, colour *c)
 {
@@ -845,6 +902,10 @@ db_transform (double matrix[4][4], double scale)
   for (slot = 0; slot < line_count; slot++, le++) {
     matrix3_transform (&(le->v1), matrix);
     matrix3_transform (&(le->v2), matrix);
+    if (le->curved) {
+      matrix3_transform (&le->c1, matrix);
+      matrix3_transform (&le->c2, matrix);
+    }
   }
 
   pte = point_array;
@@ -996,9 +1057,18 @@ db_label_output (depth_db_entry *de)
   lae = label_array + de->slot;
   len = strlen (lae->str);
 
-  fprintf (file, "label(\"");
-  mp_write_label_text (file, lae->str, len, de->st);
-  fprintf (file, "\", (%.2f,%.2f));\n", lae->pos.x, lae->pos.y);
+  fprintf (file, "begingroup; save defaultfont; string defaultfont; defaultfont:=\"%s\";\n",
+           label_font_name (de->st, METAPOST_MODE));
+  fprintf (file, "label(");
+  if (strpbrk (lae->str, "\302\303\342")) {
+    mp_write_unicode_label (file, lae->str);
+  } else {
+    fputc ('\"', file);
+    mp_write_label_text (file, lae->str, len, de->st);
+    fputc ('\"', file);
+  }
+  fprintf (file, ", (%.2f,%.2f));\n", lae->pos.x, lae->pos.y);
+  fputs ("endgroup;\n", file);
 
   label_output_count++;
 }
@@ -1033,6 +1103,13 @@ db_output (void)
 
     case LINE_CODE:
       le = line_array + de->slot;
+      if (le->curved) {
+        fprintf(file,"draw (%.4f,%.4f)..controls (%.4f,%.4f) and (%.4f,%.4f)..(%.4f,%.4f)",
+          le->v1.x,le->v1.y,le->c1.x,le->c1.y,le->c2.x,le->c2.y,le->v2.x,le->v2.y);
+        mp_write_pen(file,le->c ? le->c : &de->st->linecolour,
+          depthcue(de->depth,de->st)*de->st->linewidth,de->st->linedash);
+        fputs(";\n",file); line_output_count++; break;
+      }
       mp_write_line (file, &(le->v1), &(le->v2),
                       le->c ? le->c : &(de->st->linecolour),
                       depthcue (de->depth, de->st) * de->st->linewidth,
@@ -1636,6 +1713,15 @@ mp_line (boolean polylines)
   int slot;
 
   if (line_segment_count < 2) return;
+  if (polylines && line_segments_curved) {
+    vector3 p[4];
+    for (slot=1;slot<line_segment_count;slot++) {
+      if (line_segments[slot].new) continue;
+      line_segment_bezier(slot,p);
+      db_curve(p,current_state->colourparts ? &line_segments[slot-1].c : NULL,0);
+    }
+    return;
+  }
 
   if (current_state->colourparts) {
 

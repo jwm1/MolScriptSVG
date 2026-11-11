@@ -62,6 +62,15 @@ static double rotation_matrix[9];
 static double translation_vector[3];
 
 static double hue, decrement;
+static int scalar_mode, scalar_range;
+static double scalar_bounds[2];
+static double curve_tolerance;
+static int adaptive_mode, interpolate_mode;
+static char *view_file;
+static int legend_mode;
+static double legend_box[5];
+static const char *scalar_palettes[] = {"", "blue-white-red", "alphafold",
+                                        "alphafold-gradient"};
 
 void fatal_error (const char *msg);
 void fatal_error_str (const char *msg, const char *str);
@@ -157,6 +166,14 @@ process_arguments (void)
 
   if ((args_number <= 1) || (args_exists ("-h"))) {
     fprintf (stderr, "Usage: molauto [options] pdbfile\n");
+    fprintf (stderr, "  -bfactor   blue-white-red B-factor colours (automatic range)\n");
+    fprintf (stderr, "  -bfactor_range LOW HIGH  explicit range for -bfactor\n");
+    fprintf (stderr, "  -alphafold  four confidence colours, B column assumed 0-100\n");
+    fprintf (stderr, "  -alphafold_gradient  continuous confidence colours\n");
+    fprintf (stderr, "  -legend X Y Z WIDTH HEIGHT  scalar legend in transformed coordinates\n");
+    fprintf (stderr, "  -curvetolerance A  adaptive centreline chord tolerance (0 disables)\n");
+    fprintf (stderr, "  -colourinterpolate  interpolate continuous scalar colours along cartoons\n");
+    fprintf (stderr, "  -view file  reuse exported view_header/view_transform macros\n");
     fprintf (stderr, "  -notitle   do not output a title\n");
     fprintf (stderr, "  -nocentre  do not centre the molecule\n");
     fprintf (stderr, "  -window n  emit a MolScript window command\n");
@@ -203,6 +220,19 @@ process_arguments (void)
 
   if (parse_number_option ("-translate", 3, translation_vector)) {
     translation_mode = TRUE;
+  }
+
+  adaptive_mode = parse_number_option ("-curvetolerance", 1, &curve_tolerance);
+  if (adaptive_mode && curve_tolerance < 0) fatal_error ("-curvetolerance must be nonnegative");
+  slot = args_exists ("-colourinterpolate");
+  if (slot) { args_flag(slot); interpolate_mode = TRUE; }
+  slot = args_exists ("-view");
+  if (slot) {
+    view_file = args_item(slot+1);
+    if (!view_file || view_file[0] == '-') fatal_error("-view requires a filename");
+    if (window_mode || rotation_mode || translation_mode)
+      fatal_error("-view conflicts with -window/-rotate/-translate");
+    args_flag(slot); args_flag(slot+1);
   }
 
   slot = args_exists ("-notitle");
@@ -303,6 +333,29 @@ process_arguments (void)
   }
 
   slot = args_unflagged();
+  {
+    const char *options[] = {"-bfactor", "-alphafold", "-alphafold_gradient"};
+    int i;
+    for (i=0; i<3; i++) {
+      slot = args_exists ((char *)options[i]);
+      if (slot) {
+        if (scalar_mode) fatal_error ("scalar colour modes are mutually exclusive");
+        scalar_mode = i+1;
+        args_flag (slot);
+      }
+    }
+    scalar_range = parse_number_option ("-bfactor_range", 2, scalar_bounds);
+    legend_mode = parse_number_option ("-legend", 5, legend_box);
+    if (interpolate_mode && !scalar_mode) fatal_error("-colourinterpolate requires a scalar palette");
+    if (legend_mode && (!scalar_mode || legend_box[3] <= 0 || legend_box[4] <= 0))
+      fatal_error ("-legend requires a scalar colour mode and positive WIDTH HEIGHT");
+    if (scalar_range && (scalar_mode != 1 || scalar_bounds[1] <= scalar_bounds[0]))
+      fatal_error ("-bfactor_range requires -bfactor and LOW < HIGH");
+    if (scalar_mode && (!colour_mode || palette_mode == PALETTE_SS ||
+                        palette_mode == PALETTE_COLOURBLIND))
+      fatal_error ("scalar colours conflict with -nocolour/-ss_palette/-colourblind");
+  }
+  slot = args_unflagged();
   if (slot <= 0) fatal_error ("no PDB file name given");
   if (args_item (slot) [0] == '-')
     fatal_error_str ("invalid argument: ", args_item (slot));
@@ -369,6 +422,7 @@ output_palette_colour (char ss)
 static void
 output_scheme_colour (char ss)
 {
+  if (scalar_mode) return;
   if (!colour_mode) return;
 
   if (palette_mode == PALETTE_AUTO) {
@@ -509,7 +563,7 @@ output_secondary_structure (mol3d *mol)
   strcpy (res->type, res->name);
   mol3d_append_residue (mol, res);
 
-  if (colour_mode) {
+  if (colour_mode && !scalar_mode) {
     hue = 0.666666;
 
     if ((palette_mode == PALETTE_AUTO) && nice_mode) {
@@ -645,7 +699,7 @@ output_nucleotides (mol3d *mol)
 
   for (res = mol->first; res; res = res->next) {
     if (is_nucleic_acid_type (res->type)) {
-      if (colour_mode) {
+      if (colour_mode && !scalar_mode) {
 	if ((palette_mode == PALETTE_AUTO) && nice_mode) {
 	  printf ("\n  set residuecolour nucleotides rainbow;");
 	} else if (palette_mode != PALETTE_AUTO) {
@@ -767,6 +821,41 @@ main (int argc, char *argv[])
 	      MOL3D_INIT_CENTRALS | MOL3D_INIT_RESIDUE_ORDINALS);
   set_secondary_structure (mol);
 
+  if (scalar_mode) {
+    res3d *res;
+    at3d *at, *ca;
+    double lo = HUGE_VAL, hi = -HUGE_VAL, value;
+    int n, outside = 0;
+    for (res=mol->first; res; res=res->next) {
+      int schematic = res->secstruc != '-' || is_nucleic_acid_type(res->type);
+      if (is_water_type(res->type) || (!schematic && ligand_mode == LIGAND_NO)) continue;
+      ca = res->code != 'X' ? at3d_lookup(res, "CA") : NULL;
+      value = 0; n = 0;
+      for (at=res->first; at; at=at->next) {
+        if (!isfinite(at->bfactor)) fatal_error("non-finite B-factor");
+        if (scalar_mode > 1 && (at->bfactor < 0 || at->bfactor > 100)) outside++;
+        if (!schematic) {
+          if (at->bfactor < lo) lo = at->bfactor;
+          if (at->bfactor > hi) hi = at->bfactor;
+        }
+        value += at->bfactor; n++;
+      }
+      if (schematic && n) {
+        value = ca ? ca->bfactor : value/n;
+        if (value < lo) lo = value;
+        if (value > hi) hi = value;
+      }
+    }
+    if (!isfinite(lo) || !isfinite(hi)) fatal_error("no displayed B-factor values");
+    if (scalar_mode > 1) {
+      scalar_bounds[0] = 0; scalar_bounds[1] = 100;
+      if (outside) fprintf(stderr, "MolAuto warning: %d confidence values outside 0-100; clamping colours\n", outside);
+    } else if (!scalar_range) {
+      if (lo == hi) { double pad = fmax(0.5, fabs(lo)*1e-6); lo -= pad; hi += pad; }
+      scalar_bounds[0] = lo; scalar_bounds[1] = hi;
+    }
+  }
+
   printf ("! MolScript v2.1 input file\n");
   printf ("! generated by %s\n\n", program_str);
 
@@ -799,7 +888,9 @@ main (int argc, char *argv[])
     }
   }
 
+  if (view_file) { printf("@"); output_quoted_string(view_file); printf("\n\n"); }
   printf ("plot\n\n");
+  if (view_file) printf("  $view_header\n\n");
 
   if (window_mode) {
     printf ("  window %.4g;\n\n", window_size);
@@ -809,7 +900,8 @@ main (int argc, char *argv[])
   output_quoted_string (pdbfilename);
   printf (";\n\n");
 
-  if (centre_mode || rotation_mode || translation_mode) {
+  if (view_file) printf("  transform atom * $view_transform;\n\n");
+  else if (centre_mode || rotation_mode || translation_mode) {
     printf ("  transform atom *\n");
     if (centre_mode) {
       printf ("    by centre position atom *\n");
@@ -831,6 +923,8 @@ main (int argc, char *argv[])
   }
 
   if (!nice_mode) printf ("  set segments 2;\n\n");
+  if (adaptive_mode) printf("  set curvetolerance %.17g;\n", curve_tolerance);
+  if (interpolate_mode) printf("  set colourinterpolate on;\n");
 
   if (thin_mode)
     printf ("  set strandthickness 0, helixthickness 0, coilradius 0;\n\n");
@@ -839,9 +933,27 @@ main (int argc, char *argv[])
     printf ("  set specularcolour white, smoothsteps 2;\n\n");
   }
 
+  if (scalar_mode) {
+    printf ("  ! Scalar colours: %s, range %.17g to %.17g\n",
+            scalar_palettes[scalar_mode], scalar_bounds[0], scalar_bounds[1]);
+    printf ("  set colourparts on, residuecolour either amino-acids or nucleotides b-factor %.17g %.17g %s;\n",
+            scalar_bounds[0], scalar_bounds[1], scalar_palettes[scalar_mode]);
+    if (ligand_mode != LIGAND_NO)
+      printf ("  set atomcolour not in waters b-factor %.17g %.17g %s;\n",
+              scalar_bounds[0], scalar_bounds[1], scalar_palettes[scalar_mode]);
+  }
   output_secondary_structure (mol);
   output_nucleotides (mol);
   output_ligand (mol);
+
+  if (legend_mode) {
+    printf ("\n  push;\n  set labelsize 12;\n");
+    printf ("\n  legend \"%s\" %.17g %.17g %.17g %.17g %.17g %.17g %.17g %s;\n",
+            scalar_mode == 1 ? "B-factor (\303\205\302\262)" : "pLDDT (B column)",
+            legend_box[0], legend_box[1], legend_box[2], legend_box[3], legend_box[4],
+            scalar_bounds[0], scalar_bounds[1], scalar_palettes[scalar_mode]);
+    printf ("  pop;\n");
+  }
 
   printf ("\nend_plot\n");
 

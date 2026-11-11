@@ -1,6 +1,6 @@
 /* jpeg_img.c
 
-   MolScriptSVG v2.2
+   MolScriptSVG v2.3
 
    JPEG image file.
 

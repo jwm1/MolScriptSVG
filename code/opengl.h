@@ -1,6 +1,6 @@
 /* opengl.h
 
-   MolScriptSVG v2.2
+   MolScriptSVG v2.3
 
    OpenGL.
 

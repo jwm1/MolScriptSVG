@@ -1,18 +1,18 @@
 <html>
 <head>
-<title>MolScriptSVG 2.2: Output formats</title>
+<title>MolScriptSVG 2.3: Output formats</title>
 <link href="style.css" type="text/css" rel="stylesheet"></link>
 </head>
 
 <body>
 
-<h2>MolScriptSVG 2.2 output additions</h2>
+<h2>MolScriptSVG 2.3 output additions</h2>
 <p>The fork adds <code>-svg</code>, <code>-mp</code> (MetaPost),
 <code>-pov</code> (POV-Ray), <code>-x3d</code> (XML),
 <code>-x3dv</code> (Classic X3D) and <code>-webgl</code> (HTML/X_ITE).
 These scene exporters are available in basic and complete builds.
-See <a href="../README.md">README</a> for examples and
-<a href="../RENDERING_TESTS.md">headless font options and limitations</a>.
+See <a href="../README.html">README</a> for examples and
+<a href="../RENDERING_TESTS.html">headless font options and limitations</a>.
 The remaining format reference includes historical upstream descriptions.</p>
 
 <h1 align=center>Output formats</h1>
@@ -417,14 +417,9 @@ the JPEG library is <a href="copyright.html#JPEG">given here</a>.
 
 <h3><a name="PNG">PNG</a></h3>
 
-The PNG format is a format that may be either compressed or not, and
-the compression may be loss-less. It is very well suited for MolScript
-images. 
-<p>
-The PNG image format is intended as a replacement for both the
-patent-afflicted GIF format and the JPEG format. New Web browsers are
-supposed to support PNG. The VRML 2.0 specification requires support
-for PNG images. 
+PNG uses lossless compression and supports full-colour images. It is a good
+choice for MolScriptSVG raster figures because it avoids both JPEG compression
+artifacts and GIF palette reduction. Modern browsers support PNG.
 <p>
 The implementation relies on the publicly available
 <a href="links.html#PNG">PNG and zlib libraries</a>. The copyright
@@ -441,18 +436,23 @@ current implementation in MolScript uses a so-called error diffusion
 algorithm (<a href="references.html#Foley-1990">Foley <i>et al</i>,
 1990</a>) to minimize the visual artifacts. 
 <p>
-The implementation relies on the publicly available
-<a href="links.html#GIF">gd 1.3 library</a> for creation of the GIF
-files. The copyright notice for the gd 1.3 library is 
-<a href="copyright.html#gd 1.3">given here</a>.
+The implementation uses <a href="https://libgd.github.io/">libgd</a> to write
+GIF files through <code>gdImageGif</code>. Install a current libgd development
+package (for example, <code>libgd-dev</code> on Debian/Ubuntu), not the obsolete
+gd 1.3 release. MolScriptSVG currently quantizes colours to a 216-colour palette
+with error diffusion. The limitation is colour fidelity, not a patent workaround.
+See the <a href="https://libgd.github.io/pages/docs.html">libgd documentation</a>
+and <a href="https://github.com/libgd/libgd/blob/master/COPYING">current licence</a>.
 <p>
-The GIF format usually uses LZW compression, which is patented
-by Unisys. This creates a legal problem for commercial software.
-The current implementation uses version 1.3 of the gd library, which
-does <strong>not</strong> use LZW compression, thus avoiding the
-patent issue. Unfortunately, the run-length encoding it uses instead
-is less efficient, so the GIF files produced by MolScript are much
-bigger (by about a factor of 2.5) than they ought to be. 
+<strong>Historical patent note:</strong> the patents underlying the old
+GIF/LZW restrictions have expired. The Library of Congress records expiration
+of the Unisys US patent in June 2003 and its European and Japanese patents in
+June 2004; GNU also records expiry of the relevant IBM and Unisys patents.
+The former warning to avoid LZW-based GIF encoders no longer applies to those
+expired patents. The non-LZW gd 1.3 workaround and its file-size comparison
+describe the original 1998 implementation, not a current build using libgd.
+Sources: <a href="https://www.loc.gov/preservation/digital/formats/fdd/fdd000135.shtml">Library of Congress: LZW</a>
+and <a href="https://www.gnu.org/server/standards/gnu-website-guidelines.html">GNU website guidelines</a>.
 <p>
 
 <hr>

@@ -1,6 +1,6 @@
 /* x3d.h
 
-   MolScriptSVG v2.2
+   MolScriptSVG v2.3
 
    X3D Classic.
 

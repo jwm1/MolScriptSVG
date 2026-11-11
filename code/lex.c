@@ -1,6 +1,6 @@
 /* lex.c
 
-   MolScriptSVG v2.2
+   MolScriptSVG v2.3
 
    Input lexer.
 
@@ -68,6 +68,9 @@ static dhash_table *macro_table = NULL;
 static int defining_macro = FALSE;
 static int test_numerical = TRUE;
 
+void lex_numbers (void) { test_numerical = TRUE; }
+static int get_string (void);
+
 
 /*------------------------------------------------------------*/
 static input_source *in_source = NULL;
@@ -84,9 +87,12 @@ typedef struct {
 static size_t total_keywords;
 static keyword keywords[] =
 {
+  {"alphafold", AFRAMP, TRUE},
+  {"alphafold-gradient", AFGRADIENT, TRUE},
   {"amino-acids", AMINO_ACIDS, TRUE},
   {"anchor", ANCHOR, TRUE},
   {"and", AND, TRUE},
+  {"angle", ANGLE, TRUE},
   {"area", AREA, TRUE},
   {"atom", ATOM, FALSE},
   {"atomcolour", ATOMCOLOUR, TRUE},
@@ -96,6 +102,7 @@ static keyword keywords[] =
   {"backbone", BACKBONE, TRUE},
   {"background", BACKGROUND, TRUE},
   {"ball-and-stick", BALL_AND_STICK, TRUE},
+  {"blue-white-red", BWRAMP, TRUE},
   {"bondcross", BONDCROSS, TRUE},
   {"bonddistance", BONDDISTANCE, TRUE},
   {"bonds", BONDS, TRUE},
@@ -105,12 +112,15 @@ static keyword keywords[] =
   {"close", CLOSE, TRUE},
   {"coil", COIL, TRUE},
   {"coilradius", COILRADIUS, TRUE},
+  {"colourinterpolate", COLOURINTERPOLATE, TRUE},
   {"colourparts", COLOURPARTS, TRUE},
   {"colourramp", COLOURRAMP, TRUE},
   {"comment", COMMENT, TRUE},
+  {"connector", CONNECTOR, TRUE},
   {"contains", CONTAINS, TRUE},
   {"copy", COPY, FALSE},
   {"cpk", CPK, TRUE},
+  {"curvetolerance", CURVETOLERANCE, TRUE},
   {"cylinder", CYLINDER, TRUE},
   {"cylinderradius", CYLINDERRADIUS, TRUE},
   {"debug", DEBUG, TRUE},
@@ -118,6 +128,7 @@ static keyword keywords[] =
   {"depthcue", DEPTHCUE, TRUE},
   {"description", DESCRIPTION, TRUE},
   {"directionallight", DIRECTIONALLIGHT, TRUE},
+  {"distance", DISTANCE, TRUE},
   {"double-helix", DOUBLE_HELIX, TRUE},
   {"either", EITHER, TRUE},
   {"element", ELEMENT, TRUE},
@@ -138,14 +149,17 @@ static keyword keywords[] =
   {"in", IN, TRUE},
   {"inline", INLINE, FALSE},
   {"inline-PDB", INLINE_PDB, FALSE},
+  {"key", KEY, TRUE},
   {"label", LABEL, TRUE},
   {"labelbackground", LABELBACKGROUND, TRUE},
   {"labelcentre", LABELCENTRE, TRUE},
   {"labelclip", LABELCLIP,TRUE},
+  {"labelfont", LABELFONT, TRUE},
   {"labelmask", LABELMASK, TRUE},
   {"labeloffset", LABELOFFSET, TRUE},
   {"labelrotation", LABELROTATION, TRUE},
   {"labelsize", LABELSIZE, TRUE},
+  {"legend", LEGEND, TRUE},
   {"level-of-detail", LEVEL_OF_DETAIL, TRUE},
   {"ligands", LIGANDS, TRUE},
   {"lightambientintensity", LIGHTAMBIENTINTENSITY, TRUE},
@@ -191,6 +205,7 @@ static keyword keywords[] =
   {"residuecolour", RESIDUECOLOUR, TRUE},
   {"rgb", RGB, TRUE},
   {"rotation", ROTATION, TRUE},
+  {"scale", SCALE, TRUE},
   {"segid", SEGID, TRUE},
   {"segments", SEGMENTS, TRUE},
   {"segmentsize", SEGMENTSIZE, TRUE},
@@ -212,6 +227,7 @@ static keyword keywords[] =
   {"strandthickness", STRANDTHICKNESS, TRUE},
   {"strandwidth", STRANDWIDTH, TRUE},
   {"string", STRING, TRUE},
+  {"ticks", TICKS, TRUE},
   {"title", TITLE, TRUE},
   {"to", TO, TRUE},
   {"trace", TRACE, TRUE},
@@ -220,6 +236,7 @@ static keyword keywords[] =
   {"transparency", TRANSPARENCY, TRUE},
   {"turn", TURN, TRUE},
   {"type", TYPE, FALSE},
+  {"vertical", VERTICAL, TRUE},
   {"viewpoint", VIEWPOINT, TRUE},
   {"vrml", VRML, FALSE},
   {"waters", WATERS, TRUE},
@@ -448,8 +465,10 @@ push_in_source (int is_macro)
 {
   input_source *is;
   macro *mac;
+  int first = igetc();
 
-  get_yytext (igetc());
+  if (!is_macro && first == '"') get_string();
+  else get_yytext (first);
 
   is = malloc (sizeof (input_source));
 

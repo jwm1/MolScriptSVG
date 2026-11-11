@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="50.00 100.00 500.00 600.00" width="500.00" height="600.00">
 <title>GDP cpk</title>
-<desc>MolScriptSVG 2.2, Copyright (C) 1997-1998 Per J. Kraulis</desc>
+<desc>MolScriptSVG 2.3, Copyright (C) 1997-1998 Per J. Kraulis</desc>
 <g transform="translate(0 800.00) scale(1 -1)">
+<metadata xmlns:ms="urn:molscript:svg">
+<ms:command id="plot-1-command-1" kind="cpk">set 1: mol/model=0/chain= /200(GDP)[PB,O1B,O2B,O3B,PA,O1A,O2A,O3A,O5',C5',C4',O4',C3',O3',C2',O2',C1',N9,C8,N7,C5,C6,O6,N1,C2,N2,N3,C4]; </ms:command>
+</metadata>
 <clipPath id="plot-clip-1"><rect x="50.00" y="100.00" width="500.00" height="600.00"/></clipPath>
 <g clip-path="url(#plot-clip-1)">
 <rect x="50.00" y="100.00" width="500.00" height="600.00" fill="rgb(255,255,255)"/>
+<g id="plot-1-fragment-1" data-command="plot-1-command-1" data-kind="cpk">
+<title>cpk</title>
 <circle cx="175.9262" cy="398.1753" r="42.1875" style="stroke:rgb(0,0,0);stroke-width:0.462;stroke-linejoin:round;stroke-linecap:round;fill:rgb(255,0,0)"/>
 <path d="M 169.0400 359.1215 A 39.6562 39.6562 0 0 1 214.9800 391.2891" style="stroke:rgb(0,0,0);stroke-width:0.5;stroke-linejoin:round;stroke-linecap:round;fill:none"/>
 <path d="M 179.1251 361.6118 A 36.7031 36.7031 0 0 1 209.1905 382.6639" style="stroke:rgb(0,0,0);stroke-width:0.5;stroke-linejoin:round;stroke-linecap:round;fill:none"/>
@@ -230,6 +235,7 @@
 <path d="M 111.8084 364.3967 A 29.5312 29.5312 0 0 1 103.4071 358.5141" style="stroke:rgb(0,0,0);stroke-width:0.5;stroke-linejoin:round;stroke-linecap:round;fill:none"/>
 <path d="M 109.8064 358.3924 A 25.3125 25.3125 0 0 1 109.7702 358.3671" style="stroke:rgb(0,0,0);stroke-width:0.5;stroke-linejoin:round;stroke-linecap:round;fill:none"/>
 <path d="M 104.9307 365.2787 A 33.7500 33.7500 0 0 1 104.8825 365.2449" style="stroke:rgb(0,0,0);stroke-width:0.5;stroke-linejoin:round;stroke-linecap:round;fill:none"/>
+</g>
 </g>
 </g>
 </svg>

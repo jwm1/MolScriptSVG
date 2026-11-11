@@ -1,9 +1,9 @@
 %!PS-Adobe-3.0
 %%BoundingBox: (atend)
 %%Title: SVG review: translucent points, borders and triangle surfaces
-%%Creator: MolScriptSVG 2.2, Copyright (C) 1997-1998 Per J. Kraulis
+%%Creator: MolScriptSVG 2.3, Copyright (C) 1997-1998 Per J. Kraulis
 %%For: jwm
-%%DocumentNeededResources: font Times-Roman Symbol
+%%DocumentNeededResources: (atend)
 %%Pages: 1
 %%EndComments
 %%BeginProlog
@@ -45,7 +45,10 @@
 /P123 { 8 copy P moveto lineto lineto lineto stroke } bind def
 /P134 { 8 copy P 4 2 roll moveto lineto 4 2 roll lineto lineto stroke } bind def
 /P1234 { 8 copy P moveto lineto lineto lineto closepath stroke } bind def
-/FR { /Times-Roman findfont } bind def
+/Times-Latin1 /Times-Roman findfont dup length dict begin
+  { 1 index /FID ne { def } { pop pop } ifelse } forall
+  /Encoding ISOLatin1Encoding def currentdict end definefont pop
+/FR { /Times-Latin1 findfont } bind def
 /FG { /Symbol findfont } bind def
 /PR { scalefont setfont show } bind def
 /C {
@@ -83,11 +86,18 @@ clip newpath
 225.00 150.00 PT
 0 0 1 RS 450.00 200.00 450.00 100.00 350.00 100.00 T
 0 0 1 RS 350.00 200.00 450.00 200.00 350.00 100.00 T
+%%IncludeResource: font Times-Roman
+/MSFont0 /Times-Roman findfont dup length dict begin
+  { 1 index /FID ne { def } { pop pop } ifelse } forall
+  /Encoding ISOLatin1Encoding def currentdict end definefont pop
+/FR { /MSFont0 findfont } bind def
 0 G
 100.00 75.00 M (Opaque) 12.00 FR C
 (Opaque) FR 12.00 PR
+/FR { /MSFont0 findfont } bind def
 225.00 75.00 M (Half transparent) 12.00 FR C
 (Half transparent) FR 12.00 PR
+/FR { /MSFont0 findfont } bind def
 400.00 75.00 M (Translucent mesh) 12.00 FR C
 (Translucent mesh) FR 12.00 PR
 grestore stroke
@@ -95,5 +105,6 @@ MolScriptPlotSave restore
 end
 showpage
 %%Trailer
+%%DocumentNeededResources: font Times-Roman Symbol
 %%BoundingBox: 0 0 600 300
 %%EOF

@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MolScriptSVG: CHANGES</title>
+<link rel="stylesheet" href="docs/style.css">
+<link rel="stylesheet" href="docs/documentation.css">
+</head>
+<body>
+<!-- Generated from CHANGES.md by scripts/build-html-docs.py. -->
+<nav><a href="docs/index.html">Manual</a> | <a href="README.html">README</a> |
+<a href="examples/index.html">Examples</a> | <a href="CHANGES.html">Changelog</a></nav>
+<main>
+<h1 id="molscriptsvg-changes">MolscriptSVG Changes</h1>
+<h2 id="molscriptsvg-23-unreleased">MolScriptSVG 2.3 (unreleased)</h2>
+<ul>
+<li>Add -font and set labelfont for SVG, PostScript, MetaPost, VRML and X3D/WebGL,
+  with portable families and native font names. Preserve per-label state,
+  push/pop, unit symbols and existing defaults; document FreeType image fonts.</li>
+<li>Offer proportional and monospace Raster3D stroke fonts in every build.
+  Bundle permissively licensed freeglut font tables instead of interpreting
+  incompatible private GLUT structures, fixing missing Raster3D letters.</li>
+<li>Add font-family gallery previews, external-reader and font-state tests.</li>
+<li>Use proper Å and Å² symbols in distance labels and B-factor legend titles.
+  Add UTF-8 decoding for bitmap/FreeType and stroke labels, Latin-1 PostScript
+  fonts, and TeX-independent MetaPost ring/superscript composition. Avoid signed
+  byte indexing in Raster3D labels.</li>
+<li>Preserve exact Hermite controls in SVG/PS/MetaPost thin backbone Beziers,
+  including colour boundaries and adaptively sampled intervals. Use an
+  unsmoothed turn with C-alpha markers in the thin-backbone example.</li>
+<li>Accept smoothsteps 0 to disable coordinate smoothing explicitly; retain the
+  default of two. Document interpolation versus smoothing and unit-font limits.</li>
+<li>Provide HTML companions for the Markdown documentation, with local HTML-only
+  documentation navigation, a regeneration script and link checks.</li>
+<li>
+<p>Refresh external manual links, use local example files instead of remote
+  GitHub raw URLs, and update GIF/libgd documentation to reflect expiry of the
+  historical GIF/LZW patents. Preserve original library notices as history.</p>
+</li>
+<li>
+<p>Add distance/angle annotations, explicit unit scaling and labelled connectors.</p>
+</li>
+<li>Add optional per-interval adaptive centreline sampling with curvetolerance.</li>
+<li>Add scalar-ramp interpolation along cartoons without blending categorical
+  palettes; expose sampling/interpolation controls through MolAuto.</li>
+<li>Add vertical legends, explicit ticks/captions and categorical keys.</li>
+<li>Add -viewout export as editable header/transform macros and MolAuto -view reuse;
+  reject ambiguous mixed coordinate frames and preserve existing view files.</li>
+<li>
+<p>Support quoted include paths and fix res-atom lexer-stack cleanup and numeric
+  vectors following position selections. Add figure-tool tests and examples.</p>
+</li>
+<li>
+<p>Add portable scalar legends with explicit position, dimensions, range and
+  ramp, plus MolAuto -legend generation using the selected scalar bounds.</p>
+</li>
+<li>Add -check diagnostics without image output or a display; report empty
+  selections, missing backbone atoms, short fragments and clipping.</li>
+<li>
+<p>Add semantic SVG command metadata and depth-preserving fragment groups;
+  -svgplain omits them. Add regression tests and three legend examples.</p>
+</li>
+<li>
+<p>Use native coloured cylinders in X3D/WebGL, VRML and POV-Ray, with only
+  terminal caps; use radial cylinder normals in other 3D outputs.</p>
+</li>
+<li>Add circular, smoothly shaded coil tubes and POV-Ray cubic sphere sweeps.</li>
+<li>
+<p>Emit depth-subdivided Bezier paths for thin coils/turns in SVG, PS and MetaPost.</p>
+</li>
+<li>
+<p>Add MolAuto B-factor, exact AlphaFold-style and continuous confidence colours.</p>
+</li>
+<li>Add reusable native named ramps and colour ligand atoms by their own values.</li>
+<li>Support residue-coloured cylinder meshes with terminal caps only.</li>
+<li>Increase VRML/X3D colour precision to preserve palette values.</li>
+<li>Fix yacc action terminators for regeneration with modern Bison.</li>
+<li>Recognize modern PDB DNA residue names such as DA and DT.</li>
+<li>Add scalar-colour tests, synthetic-confidence examples and documentation.</li>
+</ul>
+<h2 id="molscriptsvg-22">MolScriptSVG 2.2</h2>
+<p>Release prepared 23 October 2026. See RELEASE_NOTES_2.2.md for migration notes.</p>
+<ul>
+<li>Fix coloured object point indexing and short label-mask bounds checks.</li>
+<li>Composite translucent primitive fills, outlines and highlights together.</li>
+<li>Disable opaque-only seam sealing for translucent facets; preserve small
+  transparency values and omit fully invisible primitives.</li>
+<li>Preserve negative and multiple plot area bounds and reject zero-size areas.</li>
+<li>Honour labelclip off by placing those labels outside the plot clip group.</li>
+<li>Add SVG regression tests, a transparency example, and staged SVG/PNG
+  regeneration with CairoSVG support.</li>
+<li>Fix PostScript and MetaPost coloured-point indexing, PostScript label-mask
+  memory errors, negative PostScript bounds, and degenerate plot areas.</li>
+<li>Correct the documented MetaPost image-frame matrix convention.</li>
+<li>Fix extra node closures in VRML/X3D coloured-point objects and preserve
+  escaped quotes in X3D label conversion.</li>
+<li>Restore a live PNG error-handler stack frame for writes, initialize GLUT
+  on image fallback, and explicitly set pixel readback alignment.</li>
+<li>Prefix the bundled regex symbols to avoid collisions with POSIX regex
+  functions called by shared libraries.</li>
+<li>Write portable SGI headers and RLE tables on little-endian/64-bit hosts.</li>
+<li>Fix a lexer crash when input has no final newline.</li>
+<li>Reject invalid MolAuto numbers, nonpositive windows and surplus arguments;
+  omit empty titles and clean up terminal short secondary-structure segments.</li>
+<li>Render headless OpenGL labels with a bundled bitmap font or optional
+  FreeType font; add -labelfont and -fontfile options and USE_FREETYPE builds.</li>
+<li>Add deterministic normals for straight backbones, reject undefined geometry
+  with diagnostics, and guard non-finite coordinates and planar scene slabs.</li>
+<li>Fix view-axis coils in SVG/PS/MetaPost and antiparallel cylinder/stick
+  rotation axes in VRML/X3D.</li>
+<li>Support accumulation antialiasing on EGL contexts without accumulation
+  buffers, and add an explicit EGL/GLUT image-backend selector.</li>
+<li>Declare the X3D Immersive profile needed by labels and detect nested browser
+  XML parser errors in the WebGL loader.</li>
+<li>Add MolAuto, cross-backend, headless-font, geometry, accumulation, X11 and
+  browser regression tests. See SVG_REVIEW.md and RENDERING_TESTS.md for
+  verification results and remaining limitations.</li>
+</ul>
+<h2 id="molscriptsvg-215">MolScriptSVG 2.1.5</h2>
+<ul>
+<li>Renamed this fork to MolScriptSVG while keeping the executable name
+  <code>molscript</code>.</li>
+<li>Added native SVG output with <code>-svg</code>.</li>
+<li>Added MetaPost source output with <code>-mp</code>.</li>
+<li>Added POV-Ray scene output with <code>-pov</code> / <code>-povray</code>.</li>
+<li>Added <code>scripts/render-pov-examples.sh</code> and rendered POV example PNGs.</li>
+<li>Added optional MetaPost axes/tick overlay with <code>-mpaxes</code>.</li>
+<li>Added semantic comments to MetaPost output for secondary-structure and
+  selected atom-style drawing commands.</li>
+<li>Added Classic X3D output with <code>-x3dv</code>.</li>
+<li>Added XML X3D output with <code>-x3d</code>, generated natively inside MolScriptSVG.</li>
+<li>Added WebGL HTML output with <code>-webgl</code>, embedding native XML X3D for use
+  with the X_ITE browser runtime.</li>
+<li>Added new <code>molauto</code> options for framing/orientation (<code>-window</code>, <code>-rotate</code>,
+  <code>-translate</code>) and palette presets (<code>-ss_palette</code>, <code>-colourblind</code>,
+  <code>-publication</code>).</li>
+<li>Modernized OpenGL build support in <code>code/Makefile.complete</code> for current Linux
+  systems.</li>
+<li>Restored OpenGL-backed PNG, JPEG and GIF output on modern systems.</li>
+<li>Added EGL-first headless OpenGL image rendering, with fallback to hidden GLUT
+  window rendering.</li>
+<li>Updated example outputs and local example gallery support, including
+  MetaPost source files and POV-Ray rendered example images.</li>
+</ul>
+<h2 id="215-release-notes">2.1.5 Release Notes</h2>
+<p>This release turns the fork into a modernized, usable MolScript distribution
+while keeping compatibility with the historical <code>molscript</code> executable and
+script language. The main additions are SVG, native X3D/XML and WebGL output,
+plus restored OpenGL image export on modern Linux systems.</p>
+</main>
+</body>
+</html>
